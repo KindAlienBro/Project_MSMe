@@ -1,0 +1,3879 @@
+[
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r10 does not surpass 120 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r10",
+      "parameters": {
+        "capacity": 120
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Aditi as unavailable for Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "aditi",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Blockchain' taught by Prof. Kiran: It must not be on Friday, and a room in the Tech Tower is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "kiran_blockchain_7a",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "kiran_blockchain_7a",
+        "parameters": {
+          "building": "Tech Tower"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Lab sessions like 'AI Lab' are preferred in the afternoon.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "ailab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Prof. Harish has requested a day off on Wednesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "harish",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Mr. Amit's 'Graph Theory' class, please avoid Tuesday and also try to keep it in the Science block.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "amit_gt_4c",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "amit_gt_4c",
+        "parameters": {
+          "building": "Science"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Schedule the 'Physics Lab' post-lunch if possible.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "phylab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Economics' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "eco",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Please block off all of Saturday for Ms. Sneha.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "sneha",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Room l8 can only hold 50 students, don't exceed this.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l8",
+      "parameters": {
+        "capacity": 50
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Gauri as unavailable for Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "gauri",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Big Data' taught by Dr. Mani: It must not be on Tuesday, and a room in the Main building is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "mani_bigdata_8b",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "mani_bigdata_8b",
+        "parameters": {
+          "building": "Main"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l6 does not surpass 45 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l6",
+      "parameters": {
+        "capacity": 45
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Cloud Computing' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "cloud",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark OE Teacher 3 as unavailable for Wednesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "oe_fac_3",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Rohan's 'HCI' class, please avoid Monday and also try to keep it in the Lab block.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "rohan_hci_6a",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "rohan_hci_6a",
+        "parameters": {
+          "building": "Lab block"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Schedule the 'Networking Lab' post-lunch if possible.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "netlab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Dr. Suresh as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "suresh",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Room r12 can only hold 70 students, don't exceed this.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r12",
+      "parameters": {
+        "capacity": 70
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Deep Learning' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "dl",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Please block off all of Monday for Prof. Kavya.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "kavya",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark OE Teacher 4 as unavailable for Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "oe_fac_4",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Divya's 'Embedded Systems' class, please avoid Friday and try the West building.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "divya_embedded_7c",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "divya_embedded_7c",
+        "parameters": {
+          "building": "West"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Lab sessions like 'Java Lab' are preferred in the afternoon.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "javalab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Prof. Nitin has requested a day off on Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "nitin",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r8 does not surpass 90 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r8",
+      "parameters": {
+        "capacity": 90
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Data Mining' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "dm",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Operating Systems' taught by Prof. Ajay: Avoid Monday, Main building preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "ajay_os_5a",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "ajay_os_5a",
+        "parameters": {
+          "building": "Main"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Schedule the 'Chemistry Lab' post-lunch if possible.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "chemlab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Priya as unavailable for Wednesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "priya",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l10 does not surpass 40 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l10",
+      "parameters": {
+        "capacity": 40
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark OE Teacher 5 as unavailable for Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "oe_fac_5",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Microcontrollers' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "mc",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Neha's 'Web Design' class, avoid Wednesday and use the Tech Hall.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "neha_web_4b",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "neha_web_4b",
+        "parameters": {
+          "building": "Tech Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Lab sessions like 'DBMS Lab' are preferred in the afternoon.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "dbmslab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Please block off all of Friday for Prof. Sameer.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "sameer",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Room r15 can only hold 100 students, don't exceed this.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r15",
+      "parameters": {
+        "capacity": 100
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Schedule the 'System Design' lab post-lunch if possible.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "sysdesign",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Dr. Anjali as unavailable for Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "anjali",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Signal Processing' taught by Prof. Vikram: Avoid Friday, North block preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "vikram_sp_6c",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "vikam_sp_6c",
+        "parameters": {
+          "building": "North"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l12 does not surpass 35 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l12",
+      "parameters": {
+        "capacity": 35
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark OE Teacher 1 as unavailable for Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "oe_fac_1",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Machine Learning' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "ml",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Arjun's 'Compiler Design' class, avoid Tuesday and try the South wing.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "arjun_cd_7a",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "arjun_cd_7a",
+        "parameters": {
+          "building": "South wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Lab sessions like 'Python Lab' are preferred in the afternoon.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "pylab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Please block off all of Wednesday for Dr. Rajiv.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "rajiv",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Room r20 can only hold 60 students, don't exceed this.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r20",
+      "parameters": {
+        "capacity": 60
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Schedule the 'Logic Design' lab post-lunch if possible.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "logiclab",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Shalini as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "shalini",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Algorithm Analysis' taught by Prof. Rahul: Avoid Thursday, Main building preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "rahul_daa_4a",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "rahul_daa_4a",
+        "parameters": {
+          "building": "Main"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Algorithms' taught by Prof. King: It must not be on Thursday, and a room in the Arts Center is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "king_algorithms_8b",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "king_algorithms_8b",
+        "parameters": {
+          "building": "Arts Center"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'CS' taught by Prof. Jones: It must not be on Wednesday, and a room in the Science Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "jones_cs_1c",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "jones_cs_1c",
+        "parameters": {
+          "building": "Science Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Economics' taught by Prof. Martin: It must not be on Wednesday, and a room in the Engineering Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "martin_economics_2c",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "martin_economics_2c",
+        "parameters": {
+          "building": "Engineering Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Baker's 'Astronomy' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "baker_astronomy_8c",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Data Structures taught by Nelson should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "nelson_data structures_9b",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Chemistry' taught by Prof. Smith: It must not be on Friday, and a room in the Engineering Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "smith_chemistry_6b",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "smith_chemistry_6b",
+        "parameters": {
+          "building": "Engineering Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l27 does not surpass 80 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l27",
+      "parameters": {
+        "capacity": 80
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Baker's 'Music' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "baker_music_3c",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Stats' taught by Prof. Robinson: It must not be on Wednesday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "robinson_stats_1c",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "robinson_stats_1c",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r180 does not surpass 60 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r180",
+      "parameters": {
+        "capacity": 60
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. White's 'Programming' class, please avoid Wednesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "white_programming_2b",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Politics' taught by Prof. Jackson: It must not be on Wednesday, and a room in the Tech Tower is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "jackson_politics_5c",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "jackson_politics_5c",
+        "parameters": {
+          "building": "Tech Tower"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Lee's 'Data Structures' class, please avoid Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "lee_data structures_2b",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Martin's 'Music' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "martin_music_4b",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Engineering' taught by Prof. Wright: It must not be on Monday, and a room in the Library Complex is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "wright_engineering_7c",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "wright_engineering_7c",
+        "parameters": {
+          "building": "Library Complex"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'CS' taught by Prof. Rivera: It must not be on Thursday, and a room in the North Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "rivera_cs_4b",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "rivera_cs_4b",
+        "parameters": {
+          "building": "North Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r178 does not surpass 120 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r178",
+      "parameters": {
+        "capacity": 120
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Sanchez as unavailable for Wednesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "sanchez",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Perez as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "perez",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r171 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r171",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Literature' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "literature",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Robotics' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "robotics",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Stats' taught by Prof. King: It must not be on Friday, and a room in the Library Complex is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "king_stats_1a",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "king_stats_1a",
+        "parameters": {
+          "building": "Library Complex"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r169 does not surpass 30 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r169",
+      "parameters": {
+        "capacity": 30
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Calculus taught by Campbell should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "campbell_calculus_1a",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Medicine taught by Jackson should ideally be in Library Complex.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "jackson_medicine_7b",
+      "parameters": {
+        "building": "Library Complex"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Algorithms' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "algorithms",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Garcia's 'Logic' class, please avoid Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "garcia_logic_1b",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Astronomy' taught by Prof. Carter: It must not be on Thursday, and a room in the South Block is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "carter_astronomy_7c",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "carter_astronomy_7c",
+        "parameters": {
+          "building": "South Block"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r179 does not surpass 200 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r179",
+      "parameters": {
+        "capacity": 200
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l22 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l22",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Politics taught by White should ideally be in Tech Tower.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "white_politics_3b",
+      "parameters": {
+        "building": "Tech Tower"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Politics' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "politics",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Gonzalez as unavailable for Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "gonzalez",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Ramirez as unavailable for Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "ramirez",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Robotics' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "robotics",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Logic' taught by Prof. Walker: It must not be on Saturday, and a room in the Arts Center is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "walker_logic_4a",
+        "parameters": {
+          "on_day": "Saturday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "walker_logic_4a",
+        "parameters": {
+          "building": "Arts Center"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Databases taught by Moore should ideally be in Engineering Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "moore_databases_2c",
+      "parameters": {
+        "building": "Engineering Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Politics' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "politics",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r158 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r158",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r112 does not surpass 50 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r112",
+      "parameters": {
+        "capacity": 50
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Robinson as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "robinson",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l26 does not surpass 200 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l26",
+      "parameters": {
+        "capacity": 200
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Networks taught by Smith should ideally be in West Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "smith_networks_6a",
+      "parameters": {
+        "building": "West Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Art' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "art",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'CS' taught by Prof. Rivera: It must not be on Friday, and a room in the Tech Tower is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "rivera_cs_3b",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "rivera_cs_3b",
+        "parameters": {
+          "building": "Tech Tower"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Calculus taught by Campbell should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "campbell_calculus_5a",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Psychology' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "psychology",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Chemistry' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "chemistry",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Nelson as unavailable for Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "nelson",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Calculus' taught by Prof. Martinez: It must not be on Thursday, and a room in the East Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "martinez_calculus_7a",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "martinez_calculus_7a",
+        "parameters": {
+          "building": "East Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Robotics taught by Thomas should ideally be in Main Block.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "thomas_robotics_2b",
+      "parameters": {
+        "building": "Main Block"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Medicine' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "medicine",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Baker as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "baker",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Hall's 'Sociology' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "hall_sociology_2b",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Architecture' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "architecture",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Flores as unavailable for Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "flores",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Mitchell's 'Biology' class, please avoid Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "mitchell_biology_2a",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Algebra taught by Thomas should ideally be in West Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "thomas_algebra_1a",
+      "parameters": {
+        "building": "West Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Campbell's 'Economics' class, please avoid Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "campbell_economics_3c",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Databases' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "databases",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r120 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r120",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l27 does not surpass 90 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l27",
+      "parameters": {
+        "capacity": 90
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Hall's 'Astronomy' class, please avoid Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "hall_astronomy_1b",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Campbell's 'Robotics' class, please avoid Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "campbell_robotics_5c",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Chemistry taught by Lee should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "lee_chemistry_4a",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r191 does not surpass 90 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r191",
+      "parameters": {
+        "capacity": 90
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Algorithms' taught by Prof. Scott: It must not be on Saturday, and a room in the Tech Tower is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "scott_algorithms_8a",
+        "parameters": {
+          "on_day": "Saturday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "scott_algorithms_8a",
+        "parameters": {
+          "building": "Tech Tower"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Geometry' taught by Prof. Robinson: It must not be on Wednesday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "robinson_geometry_3b",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "robinson_geometry_3b",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'AI' taught by Prof. White: It must not be on Monday, and a room in the North Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "white_ai_7a",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "white_ai_7a",
+        "parameters": {
+          "building": "North Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Brown as unavailable for Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "brown",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r156 does not surpass 120 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r156",
+      "parameters": {
+        "capacity": 120
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Algorithms' taught by Prof. Wilson: It must not be on Saturday, and a room in the Library Complex is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "wilson_algorithms_4c",
+        "parameters": {
+          "on_day": "Saturday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "wilson_algorithms_4c",
+        "parameters": {
+          "building": "Library Complex"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Walker as unavailable for Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "walker",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Mechanics' taught by Prof. Williams: It must not be on Friday, and a room in the East Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "williams_mechanics_9c",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "williams_mechanics_9c",
+        "parameters": {
+          "building": "East Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Logic' taught by Prof. Thompson: It must not be on Monday, and a room in the Arts Center is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "thompson_logic_2b",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "thompson_logic_2b",
+        "parameters": {
+          "building": "Arts Center"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Astronomy' taught by Prof. Davis: It must not be on Monday, and a room in the Engineering Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "davis_astronomy_4a",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "davis_astronomy_4a",
+        "parameters": {
+          "building": "Engineering Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "OS taught by Allen should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "allen_os_4c",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Ethics' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "ethics",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Nguyen as unavailable for Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "nguyen",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Geography' taught by Prof. Hernandez: It must not be on Monday, and a room in the East Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "hernandez_geography_5c",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "hernandez_geography_5c",
+        "parameters": {
+          "building": "East Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Music' taught by Prof. Taylor: It must not be on Monday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "taylor_music_4b",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "taylor_music_4b",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Electronics taught by Carter should ideally be in Main Block.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "carter_electronics_9b",
+      "parameters": {
+        "building": "Main Block"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Math' taught by Prof. Harris: It must not be on Thursday, and a room in the Tech Tower is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "harris_math_1c",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "harris_math_1c",
+        "parameters": {
+          "building": "Tech Tower"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l44 does not surpass 80 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l44",
+      "parameters": {
+        "capacity": 80
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Miller as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "miller",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Networks' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "networks",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Biology taught by Nguyen should ideally be in Tech Tower.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "nguyen_biology_7a",
+      "parameters": {
+        "building": "Tech Tower"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "ML taught by Hernandez should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "hernandez_ml_8a",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Hall's 'CS' class, please avoid Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "hall_cs_7c",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l40 does not surpass 200 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l40",
+      "parameters": {
+        "capacity": 200
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Anderson's 'Engineering' class, please avoid Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "anderson_engineering_6a",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Calculus taught by Ramirez should ideally be in Main Block.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "ramirez_calculus_7a",
+      "parameters": {
+        "building": "Main Block"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. White's 'Electronics' class, please avoid Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "white_electronics_8c",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r115 does not surpass 70 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r115",
+      "parameters": {
+        "capacity": 70
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mechanics taught by Hernandez should ideally be in Science Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "hernandez_mechanics_1a",
+      "parameters": {
+        "building": "Science Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r108 does not surpass 70 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r108",
+      "parameters": {
+        "capacity": 70
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Chemistry' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "chemistry",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Chemistry' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "chemistry",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Music' taught by Prof. Baker: It must not be on Friday, and a room in the North Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "baker_music_5c",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "baker_music_5c",
+        "parameters": {
+          "building": "North Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Programming' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "programming",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l40 does not surpass 120 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l40",
+      "parameters": {
+        "capacity": 120
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Geometry' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "geometry",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Economics' taught by Prof. Harris: It must not be on Friday, and a room in the Arts Center is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "harris_economics_9c",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "harris_economics_9c",
+        "parameters": {
+          "building": "Arts Center"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Flores's 'ML' class, please avoid Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "flores_ml_5c",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Physics' taught by Prof. Campbell: It must not be on Friday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "campbell_physics_7a",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "campbell_physics_7a",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "AI taught by Adams should ideally be in Tech Tower.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "adams_ai_6c",
+      "parameters": {
+        "building": "Tech Tower"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Literature' taught by Prof. Roberts: It must not be on Saturday, and a room in the Arts Center is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "roberts_literature_9a",
+        "parameters": {
+          "on_day": "Saturday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "roberts_literature_9a",
+        "parameters": {
+          "building": "Arts Center"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Networks' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "networks",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Art taught by Robinson should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "robinson_art_7c",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Biology' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "biology",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Robotics taught by Davis should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "davis_robotics_9c",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Algebra' taught by Prof. Allen: It must not be on Tuesday, and a room in the Main Block is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "allen_algebra_1c",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "allen_algebra_1c",
+        "parameters": {
+          "building": "Main Block"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l48 does not surpass 100 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l48",
+      "parameters": {
+        "capacity": 100
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l37 does not surpass 40 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l37",
+      "parameters": {
+        "capacity": 40
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Medicine' taught by Prof. Anderson: It must not be on Wednesday, and a room in the North Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "anderson_medicine_5a",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "anderson_medicine_5a",
+        "parameters": {
+          "building": "North Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Sociology' taught by Prof. Nelson: It must not be on Monday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "nelson_sociology_6b",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "nelson_sociology_6b",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Adams as unavailable for Tuesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "adams",
+      "parameters": {
+        "on_day": "Tuesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l46 does not surpass 90 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l46",
+      "parameters": {
+        "capacity": 90
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Sociology' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "sociology",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r189 does not surpass 30 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r189",
+      "parameters": {
+        "capacity": 30
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Roberts's 'Economics' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "roberts_economics_7a",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Calculus taught by Martinez should ideally be in West Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "martinez_calculus_5b",
+      "parameters": {
+        "building": "West Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "CS taught by Clark should ideally be in Library Complex.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "clark_cs_5b",
+      "parameters": {
+        "building": "Library Complex"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'OS' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "os",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Medicine' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "medicine",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Logic taught by Lewis should ideally be in Engineering Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "lewis_logic_6c",
+      "parameters": {
+        "building": "Engineering Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Logic' taught by Prof. Carter: It must not be on Friday, and a room in the Main Block is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "carter_logic_9a",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "carter_logic_9a",
+        "parameters": {
+          "building": "Main Block"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Williams as unavailable for Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "williams",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Calculus' taught by Prof. Perez: It must not be on Monday, and a room in the Main Block is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "perez_calculus_3a",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "perez_calculus_3a",
+        "parameters": {
+          "building": "Main Block"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'CS' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "cs",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Logic' taught by Prof. Baker: It must not be on Monday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "baker_logic_4c",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "baker_logic_4c",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Art' taught by Prof. Carter: It must not be on Tuesday, and a room in the Engineering Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "carter_art_2a",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "carter_art_2a",
+        "parameters": {
+          "building": "Engineering Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r184 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r184",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Martinez's 'ML' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "martinez_ml_1c",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Algebra taught by Moore should ideally be in South Block.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "moore_algebra_3a",
+      "parameters": {
+        "building": "South Block"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Lopez as unavailable for Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "lopez",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Brown as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "brown",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Politics taught by Lewis should ideally be in Library Complex.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "lewis_politics_6a",
+      "parameters": {
+        "building": "Library Complex"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Sociology' taught by Prof. Clark: It must not be on Monday, and a room in the Library Complex is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "clark_sociology_9c",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "clark_sociology_9c",
+        "parameters": {
+          "building": "Library Complex"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'English' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "english",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Anderson's 'Trigonometry' class, please avoid Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "anderson_trigonometry_9a",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r116 does not surpass 120 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r116",
+      "parameters": {
+        "capacity": 120
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'English' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "english",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Logic' taught by Prof. Davis: It must not be on Friday, and a room in the Tech Tower is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "davis_logic_4a",
+        "parameters": {
+          "on_day": "Friday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "davis_logic_4a",
+        "parameters": {
+          "building": "Tech Tower"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Engineering' taught by Prof. Williams: It must not be on Monday, and a room in the North Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "williams_engineering_6c",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "williams_engineering_6c",
+        "parameters": {
+          "building": "North Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Literature taught by Rivera should ideally be in North Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "rivera_literature_2c",
+      "parameters": {
+        "building": "North Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Literature taught by Anderson should ideally be in Engineering Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "anderson_literature_5a",
+      "parameters": {
+        "building": "Engineering Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Roberts as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "roberts",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r168 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r168",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Programming' taught by Prof. Rodriguez: It must not be on Tuesday, and a room in the Main Block is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "rodriguez_programming_7c",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "rodriguez_programming_7c",
+        "parameters": {
+          "building": "Main Block"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Anderson's 'Economics' class, please avoid Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "anderson_economics_7a",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Economics' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "economics",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r153 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r153",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Databases taught by Green should ideally be in Engineering Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "green_databases_8a",
+      "parameters": {
+        "building": "Engineering Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r126 does not surpass 30 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r126",
+      "parameters": {
+        "capacity": 30
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'AI' taught by Prof. Adams: It must not be on Tuesday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "adams_ai_4c",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "adams_ai_4c",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r100 does not surpass 50 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r100",
+      "parameters": {
+        "capacity": 50
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "CS taught by Nguyen should ideally be in South Block.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "nguyen_cs_7c",
+      "parameters": {
+        "building": "South Block"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "CS taught by Torres should ideally be in East Wing.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "torres_cs_9a",
+      "parameters": {
+        "building": "East Wing"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'CS' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "cs",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r139 does not surpass 100 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r139",
+      "parameters": {
+        "capacity": 100
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Jones as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "jones",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Geometry' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "geometry",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Algorithms' taught by Prof. Nguyen: It must not be on Monday, and a room in the South Block is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "nguyen_algorithms_8a",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "nguyen_algorithms_8a",
+        "parameters": {
+          "building": "South Block"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Green's 'Mechanics' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "green_mechanics_3c",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Ethics' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "ethics",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Chemistry' taught by Prof. King: It must not be on Thursday, and a room in the Library Complex is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "king_chemistry_7b",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "king_chemistry_7b",
+        "parameters": {
+          "building": "Library Complex"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Physics' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "physics",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'ML' in the morning slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "ml",
+      "parameters": {
+        "preferred_slot": "morning"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Programming' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "programming",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Rodriguez as unavailable for Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "rodriguez",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r128 does not surpass 50 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r128",
+      "parameters": {
+        "capacity": 50
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Networks' taught by Prof. Rodriguez: It must not be on Wednesday, and a room in the East Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "rodriguez_networks_6b",
+        "parameters": {
+          "on_day": "Wednesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "rodriguez_networks_6b",
+        "parameters": {
+          "building": "East Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Geometry' taught by Prof. Allen: It must not be on Tuesday, and a room in the Science Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "allen_geometry_6c",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "allen_geometry_6c",
+        "parameters": {
+          "building": "Science Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Networks' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "networks",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Taylor as unavailable for Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "taylor",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l20 does not surpass 80 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l20",
+      "parameters": {
+        "capacity": 80
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r183 does not surpass 150 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r183",
+      "parameters": {
+        "capacity": 150
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l24 does not surpass 70 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l24",
+      "parameters": {
+        "capacity": 70
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Geometry' taught by Prof. Ramirez: It must not be on Monday, and a room in the Science Wing is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "ramirez_geometry_5a",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "ramirez_geometry_5a",
+        "parameters": {
+          "building": "Science Wing"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Perez's 'Nursing' class, please avoid Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "perez_nursing_3c",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Young's 'Politics' class, please avoid Wednesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "young_politics_2c",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'Networks' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "networks",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Calculus taught by Roberts should ideally be in South Block.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "roberts_calculus_5b",
+      "parameters": {
+        "building": "South Block"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Math' taught by Prof. Johnson: It must not be on Thursday, and a room in the West Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "johnson_math_2a",
+        "parameters": {
+          "on_day": "Thursday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "johnson_math_2a",
+        "parameters": {
+          "building": "West Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Robinson as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "robinson",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Thomas's 'Music' class, please avoid Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "thomas_music_4c",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for r115 does not surpass 80 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "r115",
+      "parameters": {
+        "capacity": 80
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Nelson as unavailable for Saturday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "nelson",
+      "parameters": {
+        "on_day": "Saturday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Ensure the class size for l34 does not surpass 120 seats.",
+    "output": {
+      "constraint_type": "room_capacity",
+      "entity_type": "room",
+      "entity_name": "l34",
+      "parameters": {
+        "capacity": 120
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Young's 'Geography' class, please avoid Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "young_geography_5a",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Literature' taught by Prof. Lee: It must not be on Monday, and a room in the Engineering Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "lee_literature_6c",
+        "parameters": {
+          "on_day": "Monday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "lee_literature_6c",
+        "parameters": {
+          "building": "Engineering Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "English taught by Clark should ideally be in Engineering Hall.",
+    "output": {
+      "constraint_type": "location_preference",
+      "entity_type": "allocation",
+      "entity_name": "clark_english_4c",
+      "parameters": {
+        "building": "Engineering Hall"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Try to schedule 'ML' in the afternoon slots.",
+    "output": {
+      "constraint_type": "slot_preference",
+      "entity_type": "subject",
+      "entity_name": "ml",
+      "parameters": {
+        "preferred_slot": "afternoon"
+      },
+      "hard_constraint": false
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Gonzalez's 'Biology' class, please avoid Wednesday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "gonzalez_biology_6b",
+      "parameters": {
+        "on_day": "Wednesday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Flores as unavailable for Thursday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "flores",
+      "parameters": {
+        "on_day": "Thursday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "For Prof. Torres's 'Nursing' class, please avoid Monday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "allocation",
+      "entity_name": "torres_nursing_7c",
+      "parameters": {
+        "on_day": "Monday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Mark Prof. Miller as unavailable for Friday.",
+    "output": {
+      "constraint_type": "time_unavailability",
+      "entity_type": "faculty",
+      "entity_name": "miller",
+      "parameters": {
+        "on_day": "Friday"
+      },
+      "hard_constraint": true
+    }
+  },
+  {
+    "instruction": "Convert the scheduling rule into a JSON constraint.",
+    "input": "Regarding 'Math' taught by Prof. Jones: It must not be on Tuesday, and a room in the Engineering Hall is preferred.",
+    "output": [
+      {
+        "constraint_type": "time_unavailability",
+        "entity_type": "allocation",
+        "entity_name": "jones_math_3c",
+        "parameters": {
+          "on_day": "Tuesday"
+        },
+        "hard_constraint": true
+      },
+      {
+        "constraint_type": "location_preference",
+        "entity_type": "allocation",
+        "entity_name": "jones_math_3c",
+        "parameters": {
+          "building": "Engineering Hall"
+        },
+        "hard_constraint": false
+      }
+    ]
+  }
+]

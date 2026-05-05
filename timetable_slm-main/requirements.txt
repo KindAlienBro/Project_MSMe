@@ -1,0 +1,8 @@
+streamlit
+fastapi
+uvicorn[standard]
+ortools
+pandas
+requests
+pydantic
+huggingface_hub

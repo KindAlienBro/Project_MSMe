@@ -1,0 +1,67 @@
+# ========================
+# Backend (Django) .gitignore
+# ========================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# --- Virtual environment ---
+env/
+venv/
+.venv/
+ENV/
+
+# --- Environment variables ---
+.env
+.env.*
+!.env.example
+
+# --- Django ---
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+static_collected/
+
+# --- Database dumps & backups ---
+*.sql
+*.backup
+*.dump
+
+# --- Credentials (sensitive) ---
+*_credentials.txt
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Distribution / packaging ---
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# --- Testing / coverage ---
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+
+# --- Misc ---
+*.pem

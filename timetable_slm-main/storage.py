@@ -18,7 +18,7 @@ _scheduler = None
 _scheduler_lock = threading.Lock()
 
 # Directory where persistent JSON files are stored
-DATA_DIR = Path(".")  # Current directory (where the repo is cloned)
+DATA_DIR = Path(__file__).resolve().parent  # Always use the directory where storage.py is located
 
 DATA_FILE     = str(DATA_DIR / 'timetable_data.json')
 SCHEDULE_FILE = str(DATA_DIR / 'saved_schedule.json')

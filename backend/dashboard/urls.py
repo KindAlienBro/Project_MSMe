@@ -15,6 +15,7 @@ from .views import (
 
     ScheduleView,
     UpdateTimetableView,
+    OverwriteScheduleView,
     OriginalScheduleView,
     ChangeHistoryView,
     TimetableDataCRUDView,
@@ -49,6 +50,7 @@ urlpatterns = [
     # Super Teacher / Admin endpoints
     path('schedule/', ScheduleView.as_view(), name='schedule'),
     path('update-timetable/', UpdateTimetableView.as_view(), name='update-timetable'),
+    path('overwrite-timetable/', OverwriteScheduleView.as_view(), name='overwrite-timetable'),
     path('original-schedule/', OriginalScheduleView.as_view(), name='original-schedule'),
     path('change-history/', ChangeHistoryView.as_view(), name='change-history'),
     path('timetable-data/<str:entity>/', TimetableDataCRUDView.as_view(), name='timetable-data-crud'),

@@ -530,6 +530,72 @@ class UpdateTimetableView(views.APIView):
             return Response({'error': str(e), 'traceback': traceback.format_exc()},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class OverwriteScheduleView(views.APIView):
+    """POST an entire schedule manually (e.g. from Drag & Drop Editor)."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        if user.role not in ['ADMIN', 'SUPER_TEACHER']:
+            return Response({'error': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        schedule = request.data.get('schedule')
+        if not schedule:
+            return Response({'error': 'Schedule payload is required.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            from storage import load_schedule, save_schedule, add_history_entry
+            
+            old_raw = load_schedule()
+            old_schedule = old_raw.get('schedule', {}) if old_raw else {}
+            
+            # Helper to clean out task_obj just in case
+            def clean(sched):
+                return {k: {kk: vv for kk, vv in v.items() if kk != 'task_obj'} for k, v in sched.items()}
+                
+            old_clean = clean(old_schedule)
+            new_clean = clean(schedule)
+            
+            # Simple diff
+            changes = []
+            affected = set()
+            all_keys = set(old_clean.keys()) | set(new_clean.keys())
+            for k in all_keys:
+                old_val = old_clean.get(k)
+                new_val = new_clean.get(k)
+                if old_val != new_val:
+                    changes.append({
+                        "task_id": k,
+                        "before": old_val,
+                        "after": new_val
+                    })
+                    if old_val:
+                        sec = old_val.get("section_id", "")
+                        if sec: affected.add(sec.split("-")[0].upper())
+                    if new_val:
+                        sec = new_val.get("section_id", "")
+                        if sec: affected.add(sec.split("-")[0].upper())
+                        
+            save_schedule(new_clean)
+            if changes:
+                add_history_entry(
+                    prompt="Manual drag & drop modifications",
+                    constraints=[],
+                    affected_tasks=list(affected),
+                    status="SUCCESS",
+                    changes_summary=f"Manual drag & drop modifications ({len(changes)} cells affected)"
+                )
+                
+            return Response({
+                'status': 'SUCCESS',
+                'message': 'Schedule overwritten manually.',
+                'changes_count': len(changes)
+            })
+            
+        except Exception as e:
+            import traceback
+            return Response({'error': str(e), 'traceback': traceback.format_exc()},
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class OriginalScheduleView(views.APIView):
     """GET both original and current schedules for comparison."""

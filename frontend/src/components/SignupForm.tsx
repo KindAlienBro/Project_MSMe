@@ -3,6 +3,7 @@
 
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import axios from 'axios';
+import api from '@/lib/api';
 import Link from 'next/link';
 import { Input } from './Input';
 import { Department } from '@/types';
@@ -31,7 +32,7 @@ export default function SignupForm() {
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/auth/departments/');
+        const response = await api.get('/auth/departments/');
         setDepartments(response.data);
       } catch (err) {
         setError('Failed to load initial data. Please try again.');
@@ -89,7 +90,7 @@ export default function SignupForm() {
     }
 
     try {
-      await axios.post('http://127.0.0.1:8000/api/auth/register/', submissionData);
+      await api.post('/auth/register/', submissionData);
       if (formData.role === 'STUDENT') {
         setSuccess('Registration successful! You can now log in.');
       } else {

@@ -96,7 +96,19 @@ class DashboardStatsView(views.APIView):
             'teachers_on_leave': teachers_on_leave,
             'total_students': total_students,
             'total_classes': total_classes,
+            'total_departments': total_classes, # Mapping classes to departments for UI
+            'total_subjects': 0,
         }
+
+        try:
+            import os, sys
+            sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'timetable_slm-main'))
+            from storage import load_data
+            data = load_data()
+            response_data['total_subjects'] = len(data.get("subjects", []))
+            response_data['total_departments'] = len(data.get("sections", []))
+        except Exception:
+            pass
 
         if hasattr(user, 'teacher'):
             teacher = user.teacher

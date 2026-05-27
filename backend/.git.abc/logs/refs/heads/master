@@ -1,3 +1,0 @@
-0000000000000000000000000000000000000000 a65f6c3649383c92ba09132329ddcc1214687b69 Kind <crbstudies005@gmail.com> 1777964217 +0530	commit (initial): added model for saving timetable
-a65f6c3649383c92ba09132329ddcc1214687b69 c8d45818766a77dbfc7ebc003f59602c3c3f945f Kind <crbstudies005@gmail.com> 1778010064 +0530	commit: Changes did in drag n drop and admin approval added
-c8d45818766a77dbfc7ebc003f59602c3c3f945f 3061aa1bb2c4ad023a4b91d7b3a1f3aae043752b Kind <crbstudies005@gmail.com> 1779647931 +0530	commit: add .gitignore for Django backend to exclude unnecessary files

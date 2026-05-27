@@ -1,6 +1,0 @@
-Add storage and substitution engine for timetable management
-
-- Implemented `storage.py` for handling persistent storage of timetable data, schedules, change history, and leave requests using HuggingFace Hub CommitScheduler.
-- Created `substitution_engine.py` to manage leave approvals, find substitutes, and handle substitution requests.
-- Added JSON files for substitution requests and initial timetable data.
-- Developed test scripts for API error handling, local testing, history logging, and solver functionality.

@@ -26,12 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b0bn3%!epi%ut6*(rz2@#lu6r=1in7ug_po17$f0afhf@bw()x'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-b0bn3%!epi%ut6*(rz2@#lu6r=1in7ug_po17$f0afhf@bw()x')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
 
 
 # Application definition
@@ -112,6 +112,9 @@ AUTH_PASSWORD_VALIDATORS = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000", # The default Next.js dev server
 ]
+# Add production domain(s) via env var
+if os.getenv('CORS_ORIGINS'):
+    CORS_ALLOWED_ORIGINS += os.getenv('CORS_ORIGINS').split(',')
 
 # Add this at the end of the file for DRF and JWT configuration
 REST_FRAMEWORK = {
@@ -147,3 +150,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'

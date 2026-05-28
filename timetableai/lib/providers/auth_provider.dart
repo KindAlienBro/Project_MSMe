@@ -96,7 +96,12 @@ class AuthProvider extends ChangeNotifier {
       final str = e.toString();
       // Try to extract DioException response message.
       if (str.contains('DioException')) {
-        return 'Invalid credentials. Please try again.';
+        if (str.contains('401') || str.contains('403')) {
+          return 'Invalid credentials. Please try again.';
+        } else if (str.contains('connectionError') || str.contains('SocketException') || str.contains('timed out')) {
+          return 'Network error. Please check your internet connection.';
+        }
+        return 'Network request failed. Please try again.';
       }
       return str.replaceAll('Exception: ', '');
     }

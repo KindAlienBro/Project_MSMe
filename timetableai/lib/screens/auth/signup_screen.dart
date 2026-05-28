@@ -24,17 +24,16 @@ class _SignupScreenState extends State<SignupScreen> {
   String _lastName = '';
   String _email = '';
   String _password = '';
+  String _confirmPassword = '';
   String _role = 'STUDENT';
 
   // Student specific
   int? _selectedDept;
   int _semester = 1;
   int _year = 1;
-  String _registerNumber = '';
 
   // Teacher specific
   String _designation = 'ASSISTANT_PROFESSOR';
-  String _phone = '';
 
   @override
   void initState() {
@@ -76,11 +75,9 @@ class _SignupScreenState extends State<SignupScreen> {
       data['dept_id'] = _selectedDept;
       data['semester'] = _semester;
       data['year'] = _year;
-      data['register_number'] = _registerNumber;
     } else if (_role == 'TEACHER') {
       data['dept_id'] = _selectedDept;
       data['designation'] = _designation;
-      data['phone'] = _phone;
       data['max_load_per_week'] = 20; // Default
     }
 
@@ -151,7 +148,15 @@ class _SignupScreenState extends State<SignupScreen> {
                       decoration: const InputDecoration(labelText: 'Password'),
                       obscureText: true,
                       validator: (v) => v!.length < 6 ? 'Min 6 characters' : null,
+                      onChanged: (v) => _password = v,
                       onSaved: (v) => _password = v!,
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      decoration: const InputDecoration(labelText: 'Confirm Password'),
+                      obscureText: true,
+                      validator: (v) => v != _password ? 'Passwords do not match' : null,
+                      onSaved: (v) => _confirmPassword = v!,
                     ),
                     const SizedBox(height: 24),
                     DropdownButtonFormField<String>(
@@ -210,11 +215,6 @@ class _SignupScreenState extends State<SignupScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'Register Number'),
-                        onSaved: (v) => _registerNumber = v!,
-                      ),
                     ],
 
                     if (_role == 'TEACHER') ...[
@@ -227,12 +227,6 @@ class _SignupScreenState extends State<SignupScreen> {
                           DropdownMenuItem(value: 'PROFESSOR', child: Text('Professor')),
                         ],
                         onChanged: (v) => setState(() => _designation = v!),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        decoration: const InputDecoration(labelText: 'Phone Number (Optional)'),
-                        keyboardType: TextInputType.phone,
-                        onSaved: (v) => _phone = v ?? '',
                       ),
                     ],
 

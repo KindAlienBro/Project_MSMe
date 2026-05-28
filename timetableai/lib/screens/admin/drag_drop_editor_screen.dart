@@ -28,20 +28,20 @@ class _DragDropEditorScreenState extends State<DragDropEditorScreen> {
     });
   }
 
-  void _saveChanges(BuildContext context) async {
-    final success = await context.read<EditorProvider>().saveChanges();
-    if (mounted) {
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Timetable updated successfully!'), backgroundColor: Colors.green),
-        );
-        Navigator.pop(context);
-      } else {
-        final error = context.read<EditorProvider>().error;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error ?? 'Failed to save changes'), backgroundColor: Colors.red),
-        );
-      }
+  void _saveChanges() async {
+    final provider = context.read<EditorProvider>();
+    final success = await provider.saveChanges();
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Timetable updated successfully!'), backgroundColor: Colors.green),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(provider.error ?? 'Failed to save changes'), backgroundColor: Colors.red),
+      );
     }
   }
 
@@ -61,7 +61,7 @@ class _DragDropEditorScreenState extends State<DragDropEditorScreen> {
           Consumer<EditorProvider>(
             builder: (context, provider, child) {
               return TextButton.icon(
-                onPressed: provider.isSaving ? null : () => _saveChanges(context),
+                onPressed: provider.isSaving ? null : _saveChanges,
                 icon: provider.isSaving 
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.save, color: Colors.white),
@@ -97,11 +97,18 @@ class _DragDropEditorScreenState extends State<DragDropEditorScreen> {
           final teacherList = teachers.toList()..sort();
 
           if (_selectedValue == null) {
-            if (_viewBy == 'Section' && sectionList.isNotEmpty) _selectedValue = sectionList.first;
-            else if (_viewBy == 'Teacher' && teacherList.isNotEmpty) _selectedValue = teacherList.first;
+            if (_viewBy == 'Section' && sectionList.isNotEmpty) {
+              _selectedValue = sectionList.first;
+            } else if (_viewBy == 'Teacher' && teacherList.isNotEmpty) {
+              _selectedValue = teacherList.first;
+            }
           } else {
-            if (_viewBy == 'Section' && !sectionList.contains(_selectedValue)) _selectedValue = sectionList.isNotEmpty ? sectionList.first : null;
-            if (_viewBy == 'Teacher' && !teacherList.contains(_selectedValue)) _selectedValue = teacherList.isNotEmpty ? teacherList.first : null;
+            if (_viewBy == 'Section' && !sectionList.contains(_selectedValue)) {
+              _selectedValue = sectionList.isNotEmpty ? sectionList.first : null;
+            }
+            if (_viewBy == 'Teacher' && !teacherList.contains(_selectedValue)) {
+              _selectedValue = teacherList.isNotEmpty ? teacherList.first : null;
+            }
           }
 
           return Column(

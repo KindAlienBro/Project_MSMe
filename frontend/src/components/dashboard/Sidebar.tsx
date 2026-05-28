@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
@@ -52,9 +53,17 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
     >
       <div className="flex flex-col h-full">
         {/* Logo/Brand */}
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-xl font-semibold text-blue-600">Automatic Timetable Generator</h1>
-          <p className="text-sm text-gray-500 mt-1">
+        <div className="p-6 border-b border-gray-200 flex flex-col items-center">
+          <Image 
+            src="/logo.jpeg" 
+            alt="MSMe Logo" 
+            width={80} 
+            height={80} 
+            className="rounded-xl shadow-sm mb-4 object-cover"
+            priority
+          />
+          <h1 className="text-lg font-semibold text-blue-600 text-center leading-tight">Automatic Timetable Generator</h1>
+          <p className="text-sm text-gray-500 mt-2 text-center">
             {user?.role === 'ADMIN' ? 'Admin Dashboard' : user?.role === 'STUDENT' ? 'Student Dashboard' : 'Faculty Dashboard'}
           </p>
         </div>

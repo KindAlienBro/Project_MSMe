@@ -20,7 +20,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
 
   String? _section;
   String? _subjectCode;
-  String _subjectName = '';
+  final String _subjectName = '';
   int _periodIndex = 0;
 
   bool _loadingStudents = false;
@@ -205,7 +205,7 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(16),
-          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
           width: double.infinity,
           child: Text(
             '${_subjectCode?.toUpperCase()} - Section $_section\nPeriod $_periodIndex',

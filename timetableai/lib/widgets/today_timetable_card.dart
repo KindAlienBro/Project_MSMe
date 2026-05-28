@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../models/timetable.dart';
-import 'package:intl/intl.dart';
 
 enum ClassStatus { completed, current, upcoming }
 

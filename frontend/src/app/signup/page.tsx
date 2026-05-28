@@ -1,6 +1,7 @@
 // frontend/src/app/signup/page.tsx
 import SignupForm from '@/components/SignupForm';
 import { GanttChartSquare } from 'lucide-react';
+import Image from 'next/image';
 
 export default function SignupPage() {
   return (
@@ -8,8 +9,8 @@ export default function SignupPage() {
       <div className="grid w-full max-w-5xl grid-cols-1 overflow-hidden rounded-2xl shadow-2xl md:grid-cols-2">
         {/* Branding Panel */}
         <div className="hidden bg-slate-800 p-12 text-white md:flex md:flex-col md:justify-between">
-          <div className="flex items-center gap-3">
-            <GanttChartSquare size={32} className="text-[--color-primary]" />
+          <div className="flex items-center gap-4">
+            <Image src="/logo.jpeg" alt="MSMe Logo" width={48} height={48} className="rounded-xl shadow-md" priority />
             <span className="text-2xl font-bold">Automatic Timetable</span>
           </div>
           <div>

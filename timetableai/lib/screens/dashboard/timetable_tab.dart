@@ -65,12 +65,19 @@ class _TimetableTabState extends State<TimetableTab> {
           // Set default selected value
           if (isAdminOrSuper) {
             if (_selectedValue == null) {
-              if (_viewBy == 'Section' && sectionList.isNotEmpty) _selectedValue = sectionList.first;
-              else if (_viewBy == 'Teacher' && teacherList.isNotEmpty) _selectedValue = teacherList.first;
+              if (_viewBy == 'Section' && sectionList.isNotEmpty) {
+                _selectedValue = sectionList.first;
+              } else if (_viewBy == 'Teacher' && teacherList.isNotEmpty) {
+                _selectedValue = teacherList.first;
+              }
             } else {
               // Ensure selected value still exists in the list
-              if (_viewBy == 'Section' && !sectionList.contains(_selectedValue)) _selectedValue = sectionList.isNotEmpty ? sectionList.first : null;
-              if (_viewBy == 'Teacher' && !teacherList.contains(_selectedValue)) _selectedValue = teacherList.isNotEmpty ? teacherList.first : null;
+              if (_viewBy == 'Section' && !sectionList.contains(_selectedValue)) {
+                _selectedValue = sectionList.isNotEmpty ? sectionList.first : null;
+              }
+              if (_viewBy == 'Teacher' && !teacherList.contains(_selectedValue)) {
+                _selectedValue = teacherList.isNotEmpty ? teacherList.first : null;
+              }
             }
           }
 
@@ -131,7 +138,7 @@ class _TimetableTabState extends State<TimetableTab> {
                   ),
                 ),
               Expanded(
-                child: (timetableData == null || timetableData.isEmpty)
+                child: (timetableData.isEmpty)
                     ? const Center(child: Text('No classes found for this selection.', style: TextStyle(color: Colors.grey)))
                     : SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),

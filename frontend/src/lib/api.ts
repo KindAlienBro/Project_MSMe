@@ -86,6 +86,7 @@ export const endpoints = {
     },
 
     stats: () => api.get('/dashboard/stats/'),
+    resourceVisualization: () => api.get('/dashboard/resource-visualization/'),
     syncTimetable: (data: any) => api.post('/dashboard/timetable/sync/', data),
 
     student: {

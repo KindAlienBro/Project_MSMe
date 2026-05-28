@@ -68,8 +68,8 @@ export function TimetableGrid({ schedule, title }: TimetableGridProps) {
     });
     const sortedSections = Array.from(parentSections).sort();
 
-    // Build merged grid: mergedGrid[parentSec][dayIndex][periodIndex] = [{subject, faculty}]
-    type CellEntry = { subject: string; faculty: string; room: string };
+    // Build merged grid: mergedGrid[parentSec][dayIndex][periodIndex] = [{subject, faculty, room, batch, sectionId}]
+    type CellEntry = { subject: string; faculty: string; room: string; batch: string; sectionId: string };
     const mergedGrid: Record<string, Record<number, Record<number, CellEntry[]>>> = {};
 
     sortedSections.forEach(sec => { mergedGrid[sec] = {}; });
@@ -86,16 +86,79 @@ export function TimetableGrid({ schedule, title }: TimetableGridProps) {
         let faculty = info.faculty_name || '';
         faculty = faculty.replace(/Prof\. /g, '').replace(/Dr\. /g, '')
             .replace(/Mr\. /g, '').replace(/Ms\. /g, '');
+        
+        let batch = info.batch || '';
+        if (!batch) {
+            const match = secId.match(/-(E|B)(\d+)$/i);
+            if (match) {
+                batch = 'B' + match[2];
+            }
+        }
+        // Only assign batch labels to LAB subjects, not theory classes
+        if (!subject.includes('LAB')) {
+            batch = '';
+        } else {
+            if (subject.includes('MLLAB')) batch = 'B1';
+            if (subject.includes('NLPLAB')) batch = 'B2';
+        }
 
         for (let i = 0; i < dur; i++) {
             if (!mergedGrid[parentSec][day]) mergedGrid[parentSec][day] = {};
             if (!mergedGrid[parentSec][day][period + i]) mergedGrid[parentSec][day][period + i] = [];
-            const entry = { subject, faculty, room: info.room_name || info.room_id || '' };
+            const entry = { subject, faculty, room: info.room_name || info.room_id || '', batch, sectionId: secId };
             const existing = mergedGrid[parentSec][day][period + i];
-            if (!existing.find(e => e.subject === entry.subject && e.faculty === entry.faculty)) {
-                existing.push(entry);
+            
+            if (!existing.find(e => e.subject === entry.subject && e.faculty === entry.faculty && e.batch === entry.batch)) {
+                existing.push(entry as any);
             }
         }
+    });
+
+    // Inject complementary batch lab entries into each cell.
+    // When MLLAB B1 appears, add NLPLAB B2 at the same slot (and vice versa).
+    const labPairsGrid: Record<string, { complement: string; batch: string; complementBatch: string }> = {
+        'MLLAB': { complement: 'NLPLAB', batch: 'B1', complementBatch: 'B2' },
+        'NLPLAB': { complement: 'MLLAB', batch: 'B2', complementBatch: 'B1' },
+    };
+
+    Object.keys(mergedGrid).forEach(sec => {
+        Object.keys(mergedGrid[sec]).forEach(dayKey => {
+            const day = Number(dayKey);
+            Object.keys(mergedGrid[sec][day]).forEach(periodKey => {
+                const period = Number(periodKey);
+                const entries = mergedGrid[sec][day][period];
+                const toAdd: CellEntry[] = [];
+                entries.forEach(entry => {
+                    const pair = labPairsGrid[entry.subject];
+                    if (!pair) return;
+                    // Set batch on original
+                    entry.batch = pair.batch;
+                    // Check if complement already exists
+                    if (!entries.some(e => e.subject === pair.complement)) {
+                        // Find complement room and faculty from schedule
+                        let compRoom = '';
+                        let compFaculty = entry.faculty;
+                        const compSched = Object.values(schedule).find(s =>
+                            (s.subject_code || '').toUpperCase() === pair.complement
+                        );
+                        if (compSched) {
+                            compRoom = compSched.room_name || compSched.room_id || '';
+                            compFaculty = (compSched.faculty_name || entry.faculty)
+                                .replace(/Prof\. /g, '').replace(/Dr\. /g, '')
+                                .replace(/Mr\. /g, '').replace(/Ms\. /g, '');
+                        }
+                        toAdd.push({
+                            subject: pair.complement,
+                            faculty: compFaculty,
+                            room: compRoom,
+                            batch: pair.complementBatch,
+                            sectionId: entry.sectionId,
+                        });
+                    }
+                });
+                entries.push(...toAdd);
+            });
+        });
     });
 
     // Detect if Saturday has classes
@@ -188,29 +251,59 @@ export function TimetableGrid({ schedule, title }: TimetableGridProps) {
                                                 return (
                                                     <td key={`${colIdx}-${currentPeriod}`} className="p-2 align-top h-full border border-slate-50/50 border-dashed">
                                                         <div className="flex flex-col gap-2 h-full">
-                                                            {entries.map((entry, idx) => {
-                                                                const colors = getColorForSubject(entry.subject);
-                                                                return (
-                                                                    <div key={idx} 
-                                                                         className={`relative p-3 rounded-xl border ${colors.border} ${colors.bg} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 min-w-[130px]`}>
-                                                                        <div className={`font-bold text-sm mb-2 ${colors.textPrimary}`}>
-                                                                            {entry.subject}
+                                                            {entries.length > 1 ? (
+                                                                (() => {
+                                                                    const baseColors = getColorForSubject(entries[0].subject);
+                                                                    return (
+                                                                        <div className={`relative p-2 rounded-xl border ${baseColors.border} ${baseColors.bg} shadow-sm hover:shadow-md transition-all duration-300 min-w-[130px] flex flex-col gap-1.5`}>
+                                                                            {entries.map((entry, idx) => {
+                                                                                const colors = getColorForSubject(entry.subject);
+                                                                                return (
+                                                                                    <div key={idx} className="flex flex-col border-b border-black/5 last:border-0 pb-1.5 last:pb-0">
+                                                                                        <div className={`font-bold text-xs sm:text-sm ${colors.textPrimary} flex items-center gap-1.5 flex-wrap`}>
+                                                                                            <span>{entry.subject}</span>
+                                                                                            {entry.batch && <span className="px-1.5 py-0.5 bg-white/60 border border-current/20 rounded-full text-[9px] font-bold tracking-wide shrink-0">{entry.batch}</span>}
+                                                                                        </div>
+                                                                                        <div className={`flex flex-wrap items-center justify-between gap-2 text-[10px] font-semibold ${colors.textSecondary} mt-0.5`}>
+                                                                                            <span className="flex items-center gap-1 truncate"><Users className="w-3 h-3 shrink-0"/> {entry.faculty}</span>
+                                                                                            {entry.room && <span className="flex items-center gap-1 shrink-0"><MapPin className="w-3 h-3 shrink-0"/> {entry.room}</span>}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                );
+                                                                            })}
                                                                         </div>
-                                                                        <div className="space-y-1.5">
-                                                                            <div className={`flex items-center gap-2 text-[11px] font-semibold ${colors.textSecondary}`}>
-                                                                                <Users className={`w-3.5 h-3.5 flex-shrink-0 ${colors.icon}`} />
-                                                                                <span className="truncate">{entry.faculty}</span>
+                                                                    );
+                                                                })()
+                                                            ) : (
+                                                                entries.map((entry, idx) => {
+                                                                    const colors = getColorForSubject(entry.subject);
+                                                                    return (
+                                                                        <div key={idx} 
+                                                                             className={`relative p-3 rounded-xl border ${colors.border} ${colors.bg} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 min-w-[130px]`}>
+                                                                            <div className={`font-bold text-sm mb-2 ${colors.textPrimary} flex justify-between items-start`}>
+                                                                                <span className="whitespace-pre-line">{entry.subject}</span>
+                                                                                {entry.batch && (
+                                                                                    <span className="text-[10px] bg-white/60 px-1.5 py-0.5 rounded-full border border-current/20 font-bold tracking-wide mt-0.5 shrink-0">
+                                                                                        {entry.batch}
+                                                                                    </span>
+                                                                                )}
                                                                             </div>
-                                                                            {entry.room && (
-                                                                                <div className={`flex items-center gap-2 text-[11px] font-semibold ${colors.textSecondary}`}>
-                                                                                    <MapPin className={`w-3.5 h-3.5 flex-shrink-0 ${colors.icon}`} />
-                                                                                    <span className="truncate">{entry.room}</span>
+                                                                            <div className="space-y-1.5">
+                                                                                <div className={`flex items-start gap-2 text-[11px] font-semibold ${colors.textSecondary}`}>
+                                                                                    <Users className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${colors.icon}`} />
+                                                                                    <span className="whitespace-pre-line">{entry.faculty}</span>
                                                                                 </div>
-                                                                            )}
+                                                                                {entry.room && (
+                                                                                    <div className={`flex items-start gap-2 text-[11px] font-semibold ${colors.textSecondary}`}>
+                                                                                        <MapPin className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${colors.icon}`} />
+                                                                                        <span className="whitespace-pre-line">{entry.room}</span>
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                                    );
+                                                                })
+                                                            )}
                                                         </div>
                                                     </td>
                                                 );

@@ -144,6 +144,7 @@ class Student(models.Model):
     register_number = models.CharField(max_length=50, unique=True, null=True, blank=True)
     # e.g. "CSE-3A" — matches section IDs used in the timetable generator
     section = models.CharField(max_length=20, null=True, blank=True)
+    batch = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.get_full_name()} (Sem {self.semester}, {self.section or 'No Section'})"

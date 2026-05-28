@@ -6,6 +6,7 @@ from .views import (
     NotificationListView,
     MarkNotificationReadView,
     DashboardStatsView,
+    ResourceVisualizationView,
 
     LeaveRequestDetailView,
     SubstituteRequestRespondView,
@@ -39,6 +40,7 @@ urlpatterns = [
     path('notifications/', NotificationListView.as_view(), name='notifications'),
     path('notifications/<int:pk>/read/', MarkNotificationReadView.as_view(), name='mark-notification-read'),
     path('stats/', DashboardStatsView.as_view(), name='dashboard-stats'),
+    path('resource-visualization/', ResourceVisualizationView.as_view(), name='resource-visualization'),
 
     path('generate-timetable/', GenerateTimetableView.as_view(), name='generate-timetable'),
     path('timetable/sync/', TimetableSyncView.as_view(), name='timetable-sync'),

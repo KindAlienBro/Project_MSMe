@@ -4,6 +4,8 @@ import { Clock, Download, ChevronLeft, ChevronRight, Users, User as UserIcon, Cl
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { AttendanceModal } from '@/components/dashboard/AttendanceModal';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 const HF_API = 'https://kindalien-timetable-gen.hf.space';
 
@@ -237,10 +239,29 @@ export function TimetableView() {
     const matchFaculty = selectedFaculty !== '';
     const matchSection = selectedSection !== '';
 
+    // Determine the parent section for batch-sibling matching.
+    // e.g. if selectedSection is "6A-E1", parentForBatch = "6A" so we also pick up "6A-E2".
+    let parentForBatch = '';
+    if (matchSection) {
+      const batchMatch = selectedSection.match(/^(.+)-(E|B)\d+$/i);
+      if (batchMatch) {
+        parentForBatch = batchMatch[1]; // e.g. "6A"
+      }
+    }
+
     const { grid } = timetable;
 
     Object.keys(grid).forEach(sectionId => {
-      if (matchSection && sectionId !== selectedSection) return;
+      if (matchSection) {
+        if (parentForBatch) {
+          // Include sibling batches: "6A-E1" and "6A-E2" both match parent "6A"
+          const siblingMatch = sectionId.match(/^(.+)-(E|B)\d+$/i);
+          const sectionParent = siblingMatch ? siblingMatch[1] : sectionId;
+          if (sectionParent !== parentForBatch) return;
+        } else {
+          if (sectionId !== selectedSection) return;
+        }
+      }
 
       const sectionData = grid[sectionId];
       const sectionDays: number[] = sectionData.days || [];
@@ -277,6 +298,18 @@ export function TimetableView() {
             const roomKey = `${sectionId.toUpperCase()}_${dayIdx}_${currentPeriod}_${(cell.subject || '').toUpperCase()}`;
             const room = roomLookup[roomKey] || cell.room || '';
 
+            let batch = cell.batch || '';
+            const subjectUpper = (cell.subject || '').toUpperCase();
+            // Only assign batch labels to LAB subjects, not theory classes
+            if (subjectUpper.includes('LAB')) {
+              if (!batch) {
+                const match = sectionId.match(/-(E|B)(\d+)$/i);
+                if (match) batch = 'B' + match[2];
+              }
+              if (subjectUpper.includes('MLLAB')) batch = 'B1';
+              if (subjectUpper.includes('NLPLAB')) batch = 'B2';
+            }
+
             dataByDay[dayName].push({
               ...cell,
               time_slot: timeSlot,
@@ -284,10 +317,66 @@ export function TimetableView() {
               section: sectionId,
               period_name: h,
               room,
+              batch
             });
           });
         });
       });
+    });
+
+    // Inject complementary batch lab entries.
+    // When MLLAB appears at a time slot, B2 is doing NLPLAB at the same time (and vice versa).
+    // We add the complementary lab entry so both show in the same cell.
+    const labPairs: Record<string, { complement: string; batch: string; complementBatch: string }> = {
+      'MLLAB': { complement: 'NLPLAB', batch: 'B1', complementBatch: 'B2' },
+      'NLPLAB': { complement: 'MLLAB', batch: 'B2', complementBatch: 'B1' },
+    };
+
+    weekDays.forEach((day: string) => {
+      const toAdd: any[] = [];
+      dataByDay[day]?.forEach((entry: any) => {
+        const subjectUpper = (entry.subject || '').toUpperCase();
+        const pair = labPairs[subjectUpper];
+        if (!pair) return;
+
+        // Check if the complement already exists at this period
+        const complementExists = dataByDay[day].some(
+          (e: any) => e.period_index === entry.period_index &&
+            (e.subject || '').toUpperCase() === pair.complement
+        );
+        if (complementExists) return;
+
+        // Look up the complement's room and faculty from the schedule
+        let complementRoom = '';
+        let complementFaculty = entry.faculty;
+        if (timetable.schedule) {
+          const complementEntry = Object.values(timetable.schedule).find((se: any) =>
+            (se.subject_code || '').toUpperCase() === pair.complement
+          );
+          if (complementEntry) {
+            complementRoom = (complementEntry as any).room_name || '';
+            complementFaculty = (complementEntry as any).faculty_name || entry.faculty;
+          }
+        }
+
+        toAdd.push({
+          subject: pair.complement,
+          faculty: complementFaculty,
+          time_slot: entry.time_slot,
+          period_index: entry.period_index,
+          section: entry.section,
+          period_name: entry.period_name,
+          room: complementRoom,
+          batch: pair.complementBatch,
+          is_substituted: false,
+        });
+
+        // Also set the batch on the original entry
+        entry.batch = pair.batch;
+      });
+      if (toAdd.length > 0) {
+        dataByDay[day].push(...toAdd);
+      }
     });
 
     // Sort by period index (actual chronological order)
@@ -296,10 +385,18 @@ export function TimetableView() {
       const uniqueTaughtSlots: Record<string, any> = {};
 
       dataByDay[day].forEach(item => {
+        // Group by period, subject, and faculty. Parallel classes with different subjects will be separate objects,
+        // but they will have the same period_index so they end up in the same cell in the matrix.
         const key = `${item.period_index}_${item.subject}_${item.faculty}`;
+
         if (uniqueTaughtSlots[key]) {
-          // combine sections
-          uniqueTaughtSlots[key].section += `, ${item.section}`;
+          const existing = uniqueTaughtSlots[key];
+          if (!existing.section.includes(item.section)) {
+            existing.section += `, ${item.section}`;
+          }
+          if (item.batch && (!existing.batch || !existing.batch.includes(item.batch))) {
+            existing.batch = existing.batch ? `${existing.batch}, ${item.batch}` : item.batch;
+          }
         } else {
           uniqueTaughtSlots[key] = { ...item };
         }
@@ -334,21 +431,96 @@ export function TimetableView() {
 
 
   const handleExport = () => {
-    let csvContent = "data:text/csv;charset=utf-8,Day,Time Slot,Subject,Faculty,Section,Is Substitute\n";
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+    // Title
+    const title = selectedSection
+      ? `Timetable — Section ${selectedSection}`
+      : selectedFaculty
+        ? `Timetable — ${selectedFaculty}`
+        : 'Timetable';
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text(title, 14, 15);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(120);
+    doc.text(`Generated on ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`, 14, 21);
+    doc.setTextColor(0);
+
+    // Build table headers
+    const breakAfter = timetable?.break_after_index ?? 2;
+    const lunchAfter = timetable?.lunch_after_index ?? 5;
+    const breakHeaderIdx = breakAfter + 1;
+    const lunchHeaderIdx = lunchAfter + 2;
+
+    const periodHeaders = headers.filter((_: string, i: number) => i !== breakHeaderIdx && i !== lunchHeaderIdx);
+    const tableHead = [['DAY', ...periodHeaders]];
+
+    // Build table body
+    const tableBody: any[][] = [];
     weekDays.forEach((day: string) => {
-      filteredData[day]?.forEach((entry: any) => {
-        const row = `${day},"${entry.time_slot || entry.period_name}","${entry.subject}","${entry.faculty}","${entry.section}",${entry.is_substituted ? 'Yes' : 'No'}`;
-        csvContent += row + "\n";
+      const row: any[] = [day.substring(0, 3).toUpperCase()];
+      let periodCounter = 0;
+      headers.forEach((_h: string, hi: number) => {
+        if (hi === breakHeaderIdx || hi === lunchHeaderIdx) return;
+        const classes = matrix[day]?.[periodCounter] || [];
+        periodCounter++;
+        if (classes.length === 0) {
+          row.push('');
+        } else {
+          const cellText = classes.map((cls: any) => {
+            let line = (cls.subject || '').toUpperCase();
+            if (cls.batch) line += ` [${cls.batch}]`;
+            line += `\n${cls.faculty || ''}`;
+            if (cls.room) line += ` | ${cls.room}`;
+            return line;
+          }).join('\n---\n');
+          row.push(cellText);
+        }
       });
+      tableBody.push(row);
     });
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "timetable.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Render table
+    autoTable(doc, {
+      head: tableHead,
+      body: tableBody,
+      startY: 25,
+      theme: 'grid',
+      styles: {
+        fontSize: 7,
+        cellPadding: 2,
+        valign: 'middle',
+        lineColor: [200, 200, 200],
+        lineWidth: 0.3,
+      },
+      headStyles: {
+        fillColor: [67, 56, 202],
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+        fontSize: 7,
+        halign: 'center',
+      },
+      columnStyles: {
+        0: { fontStyle: 'bold', halign: 'center', cellWidth: 18, fillColor: [245, 245, 255] },
+      },
+      bodyStyles: {
+        halign: 'center',
+      },
+      didParseCell: (data: any) => {
+        if (data.section === 'body' && data.column.index > 0 && data.cell.raw) {
+          const raw = String(data.cell.raw);
+          if (raw.includes('LAB')) {
+            data.cell.styles.fillColor = [240, 253, 244];
+          } else if (raw.includes('[')) {
+            data.cell.styles.fillColor = [248, 250, 252];
+          }
+        }
+      },
+    });
+
+    doc.save(`timetable_${(selectedSection || selectedFaculty || 'all').replace(/\s+/g, '_')}.pdf`);
   };
 
   if (loading) {
@@ -447,7 +619,7 @@ export function TimetableView() {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 border border-transparent text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm shrink-0"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
+            <span className="hidden sm:inline">Export PDF</span>
           </button>
         </div>
       </div>
@@ -569,51 +741,79 @@ export function TimetableView() {
                       return (
                         <td key={cell.colIdx} colSpan={cell.colSpan} className="p-1.5 align-top h-full border border-slate-50/50 border-dashed">
                           <div className="flex flex-col gap-1.5 h-full">
-                            {cell.classes.map((cls: any, idx: number) => {
-                              const colors = cls.is_substituted
-                                ? { bg: 'bg-orange-50/90', border: 'border-orange-200', textPrimary: 'text-orange-800', textSecondary: 'text-orange-600/90', icon: 'text-orange-500/80' }
-                                : getColorForSubject(cls.subject);
-                              const isClassToday = dayName === new Date().toLocaleDateString('en-US', { weekday: 'long' });
+                            {cell.classes.length > 1 ? (
+                              (() => {
+                                const baseColors = getColorForSubject(cell.classes[0].subject);
+                                return (
+                                  <div className={`relative p-2 rounded-xl border ${baseColors.border} ${baseColors.bg} shadow-sm hover:shadow-md transition-all duration-300 flex flex-col gap-1.5`}>
+                                    {cell.classes.map((cls: any, idx: number) => {
+                                      const colors = getColorForSubject(cls.subject);
+                                      return (
+                                        <div key={idx} className="flex flex-col border-b border-black/5 last:border-0 pb-1.5 last:pb-0">
+                                          <div className={`font-bold text-xs sm:text-sm ${colors.textPrimary} flex items-center gap-1.5 flex-wrap`}>
+                                            <span>{cls.subject}</span>
+                                            {cls.batch && <span className="px-1.5 py-0.5 bg-white/60 border border-current/20 rounded-full text-[9px] font-bold tracking-wide shrink-0">{cls.batch}</span>}
+                                          </div>
+                                          <div className={`flex flex-wrap items-center justify-between gap-2 text-[10px] font-semibold ${colors.textSecondary} mt-0.5`}>
+                                            <span className="flex items-center gap-1 truncate"><UserIcon className="w-3 h-3 shrink-0" /> {cls.faculty}</span>
+                                            {cls.room && <span className="flex items-center gap-1 shrink-0"><MapPin className="w-3 h-3 shrink-0" /> {cls.room}</span>}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                );
+                              })()
+                            ) : (
+                              cell.classes.map((cls: any, idx: number) => {
+                                const colors = cls.is_substituted
+                                  ? { bg: 'bg-orange-50/90', border: 'border-orange-200', textPrimary: 'text-orange-800', textSecondary: 'text-orange-600/90', icon: 'text-orange-500/80' }
+                                  : getColorForSubject(cls.subject);
+                                const isClassToday = dayName === new Date().toLocaleDateString('en-US', { weekday: 'long' });
 
-                              return (
-                                <div key={idx}
-                                  onClick={() => isTeacherOrAdmin && openAttendance(cls, dayName)}
-                                  className={`relative p-2 rounded-xl border ${colors.border} ${colors.bg} shadow-sm hover:shadow-md transition-all duration-300 ${isTeacherOrAdmin ? 'cursor-pointer hover:-translate-y-0.5' : ''}`}>
-                                  <div className={`font-bold text-xs sm:text-sm mb-1.5 ${colors.textPrimary} flex justify-between items-start gap-1`}>
-                                    <span className="line-clamp-2 leading-tight">{cls.subject}</span>
-                                    {cls.is_substituted && <span className="text-[8px] bg-orange-100 border border-orange-200 text-orange-700 px-1 py-0.5 rounded uppercase tracking-wider shrink-0 mt-0.5">Sub</span>}
+                                return (
+                                  <div key={idx}
+                                    onClick={() => isTeacherOrAdmin && openAttendance(cls, dayName)}
+                                    className={`relative p-2 rounded-xl border ${colors.border} ${colors.bg} shadow-sm hover:shadow-md transition-all duration-300 ${isTeacherOrAdmin ? 'cursor-pointer hover:-translate-y-0.5' : ''}`}>
+                                    <div className={`font-bold text-xs sm:text-sm mb-1.5 ${colors.textPrimary} flex justify-between items-start gap-1`}>
+                                      <span className="whitespace-pre-line leading-tight">{cls.subject}</span>
+                                      <div className="flex flex-col items-end gap-1 shrink-0">
+                                        {cls.batch && <span className="text-[10px] bg-white/60 px-1.5 py-0.5 rounded-full border border-current/20 font-bold tracking-wide">{cls.batch}</span>}
+                                        {cls.is_substituted && <span className="text-[8px] bg-orange-100 border border-orange-200 text-orange-700 px-1 py-0.5 rounded uppercase tracking-wider mt-0.5">Sub</span>}
+                                      </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                      {user?.role === 'STUDENT' ? (
+                                        <div className={`flex items-start gap-1.5 text-[10px] font-semibold ${colors.textSecondary}`}>
+                                          <UserIcon className={`w-3 h-3 flex-shrink-0 mt-0.5 ${colors.icon}`} />
+                                          <span className="whitespace-pre-line">{cls.faculty}</span>
+                                        </div>
+                                      ) : (
+                                        <div className={`flex items-start gap-1.5 text-[10px] font-semibold ${colors.textSecondary}`}>
+                                          <Users className={`w-3 h-3 flex-shrink-0 mt-0.5 ${colors.icon}`} />
+                                          <span className="whitespace-pre-line">Sec {cls.section}</span>
+                                        </div>
+                                      )}
+                                      {cls.room && (
+                                        <div className={`flex items-start gap-1.5 text-[10px] font-semibold ${colors.textSecondary}`}>
+                                          <MapPin className={`w-3 h-3 flex-shrink-0 mt-0.5 ${colors.icon}`} />
+                                          <span className="whitespace-pre-line">{cls.room}</span>
+                                        </div>
+                                      )}
+                                      {isTeacherOrAdmin && (
+                                        <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-end">
+                                          <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold ${isClassToday ? 'bg-blue-600 text-white' : 'bg-white/60 text-slate-500'
+                                            }`}>
+                                            {isClassToday ? <ClipboardList className="w-2.5 h-2.5" /> : <Lock className="w-2 h-2" />}
+                                            {isClassToday ? 'Mark' : 'Locked'}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="space-y-1">
-                                    {user?.role === 'STUDENT' ? (
-                                      <div className={`flex items-center gap-1.5 text-[10px] font-semibold ${colors.textSecondary}`}>
-                                        <UserIcon className={`w-3 h-3 flex-shrink-0 ${colors.icon}`} />
-                                        <span className="truncate">{cls.faculty}</span>
-                                      </div>
-                                    ) : (
-                                      <div className={`flex items-center gap-1.5 text-[10px] font-semibold ${colors.textSecondary}`}>
-                                        <Users className={`w-3 h-3 flex-shrink-0 ${colors.icon}`} />
-                                        <span className="truncate">Sec {cls.section}</span>
-                                      </div>
-                                    )}
-                                    {cls.room && (
-                                      <div className={`flex items-center gap-1.5 text-[10px] font-semibold ${colors.textSecondary}`}>
-                                        <MapPin className={`w-3 h-3 flex-shrink-0 ${colors.icon}`} />
-                                        <span className="truncate">{cls.room}</span>
-                                      </div>
-                                    )}
-                                    {isTeacherOrAdmin && (
-                                      <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-end">
-                                        <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold ${isClassToday ? 'bg-blue-600 text-white' : 'bg-white/60 text-slate-500'
-                                          }`}>
-                                          {isClassToday ? <ClipboardList className="w-2.5 h-2.5" /> : <Lock className="w-2 h-2" />}
-                                          {isClassToday ? 'Mark' : 'Locked'}
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
+                                );
+                              })
+                            )}
                           </div>
                         </td>
                       );

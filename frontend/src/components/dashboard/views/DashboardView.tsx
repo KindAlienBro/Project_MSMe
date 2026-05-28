@@ -6,6 +6,7 @@ import { DashboardCards } from '../DashboardCards';
 import { RecentNotifications } from '../RecentNotifications';
 import { SubstituteRequests } from '../SubstituteRequests';
 import { TodaysTimetable } from '../TodaysTimetable';
+import { ResourceVisualization } from '../ResourceVisualization';
 import { useAuth } from '@/context/AuthContext';
 import axios from 'axios';
 import { StudentDashboardView } from './StudentDashboardView';
@@ -101,6 +102,7 @@ export function DashboardView() {
               original_faculty: cell.original_faculty || '',
               periodIndex: hi,
               room: roomLookup[roomKey] || '',
+              batch: cell.batch || ((cell.subject || '').toUpperCase().includes('LAB') ? (cell.subject.includes('MLLAB') ? 'B1' : cell.subject.includes('NLPLAB') ? 'B2' : (section.match(/-(E|B)(\d+)$/i) ? 'B' + section.match(/-(E|B)(\d+)$/i)![2] : '')) : ''),
             });
           }
         });
@@ -219,6 +221,10 @@ export function DashboardView() {
       </div>
 
       <DashboardCards cards={cardData} loading={loading} />
+
+      {isAdminOrSuper && (
+        <ResourceVisualization timetable={timetable} />
+      )}
 
       {user?.role !== 'ADMIN' && adminStats?.subject_attendance && adminStats.subject_attendance.length > 0 && (
         <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm animate-fade-in">

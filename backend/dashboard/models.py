@@ -19,6 +19,7 @@ class Timetable(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     room_number = models.CharField(max_length=20)
     section = models.CharField(max_length=20) # e.g. "CS-3A"
+    batch = models.CharField(max_length=20, null=True, blank=True) # e.g. "B1", "B2"
 
     def __str__(self):
         return f"{self.day} {self.start_time}-{self.end_time}: {self.subject.subject_name}"

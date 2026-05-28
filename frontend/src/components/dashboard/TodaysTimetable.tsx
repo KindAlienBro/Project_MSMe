@@ -11,6 +11,7 @@ interface ClassItem {
   original_faculty: string;
   periodIndex: number;
   room?: string;
+  batch?: string;
 }
 
 interface Props {
@@ -139,9 +140,16 @@ export function TodaysTimetable({ classes, loading }: Props) {
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">{item.subject}</h3>
-                    <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                      Sec {item.section}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        Sec {item.section}
+                      </span>
+                      {item.batch && (
+                        <span className="text-[10px] font-bold text-indigo-700 bg-indigo-100 px-2 py-1 rounded-full border border-indigo-200">
+                          Batch {item.batch}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     {status === 'current' && (

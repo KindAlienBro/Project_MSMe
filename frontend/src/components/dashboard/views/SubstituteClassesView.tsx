@@ -91,6 +91,14 @@ export function SubstituteClassesView() {
   }, [user]);
 
   const handleAccept = async (id: string) => {
+    // Check if request has expired
+    const req = requests.find(r => r.request_id === id);
+    if (req?.expires_at && new Date(req.expires_at) < new Date()) {
+      alert('This substitution request has expired. Please refresh the page.');
+      fetchRequests();
+      return;
+    }
+
     try {
       await axios.post(`${HF_API}/substitution/${id}/accept`);
       // Invalidate timetable cache so TimetableView fetches fresh data with substitution
@@ -109,16 +117,33 @@ export function SubstituteClassesView() {
 
       alert("Substitution Accepted! Timetable updated. Go to Timetable to see the change.");
     } catch (e: any) {
-      alert('Error accepting substitution: ' + e.message);
+      const serverMsg = e?.response?.data?.error || e?.response?.data?.detail || e?.message || 'Unknown error';
+      const status = e?.response?.status;
+      if (status === 400) {
+        alert(`Could not accept substitution: ${serverMsg}\nThe request may have expired or already been handled.`);
+      } else {
+        alert(`Error accepting substitution: ${serverMsg}`);
+      }
+      fetchRequests();
     }
   };
 
   const handleDecline = async (id: string) => {
+    // Check if request has expired
+    const req = requests.find(r => r.request_id === id);
+    if (req?.expires_at && new Date(req.expires_at) < new Date()) {
+      alert('This substitution request has expired. Please refresh the page.');
+      fetchRequests();
+      return;
+    }
+
     try {
       await axios.post(`${HF_API}/substitution/${id}/decline`);
       fetchRequests();
     } catch (e: any) {
-      alert('Error declining substitution: ' + e.message);
+      const serverMsg = e?.response?.data?.error || e?.response?.data?.detail || e?.message || 'Unknown error';
+      alert(`Error declining substitution: ${serverMsg}`);
+      fetchRequests();
     }
   };
 
@@ -183,23 +208,33 @@ export function SubstituteClassesView() {
                     </div>
                   </div>
 
-                  {!isAdmin && req.status === 'PENDING' && (
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => handleAccept(req.request_id)}
-                        className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2">
-                        <CheckCircle className="w-4 h-4" /> Accept
-                      </button>
-                      <button
-                        onClick={() => handleDecline(req.request_id)}
-                        className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm flex items-center justify-center gap-2">
-                        <XCircle className="w-4 h-4" /> Decline
-                      </button>
-                    </div>
-                  )}
+                  {!isAdmin && req.status === 'PENDING' && (() => {
+                    const isExpired = req.expires_at && new Date(req.expires_at) < new Date();
+                    return isExpired ? (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-500 rounded-lg text-xs font-medium border border-gray-200">
+                        <Clock className="w-3.5 h-3.5" /> Expired
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => handleAccept(req.request_id)}
+                          className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm flex items-center justify-center gap-2">
+                          <CheckCircle className="w-4 h-4" /> Accept
+                        </button>
+                        <button
+                          onClick={() => handleDecline(req.request_id)}
+                          className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm flex items-center justify-center gap-2">
+                          <XCircle className="w-4 h-4" /> Decline
+                        </button>
+                      </div>
+                    );
+                  })()}
 
                   {isAdmin && (
-                    <span className="text-xs text-gray-500 flex items-center gap-1"><Clock className="w-3 h-3" /> Expires: {new Date(req.expires_at).toLocaleTimeString()}</span>
+                    <span className={`text-xs flex items-center gap-1 ${req.expires_at && new Date(req.expires_at) < new Date() ? 'text-red-500 font-medium' : 'text-gray-500'}`}>
+                      <Clock className="w-3 h-3" />
+                      {req.expires_at && new Date(req.expires_at) < new Date() ? 'Expired' : `Expires: ${new Date(req.expires_at).toLocaleTimeString()}`}
+                    </span>
                   )}
                 </div>
               </div>

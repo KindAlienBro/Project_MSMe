@@ -135,6 +135,29 @@ class _TakeAttendanceScreenState extends State<TakeAttendanceScreen> {
           _section = null;
         });
       }
+    } on DioException catch (e) {
+      if (mounted) {
+        final statusCode = e.response?.statusCode;
+        final serverError = e.response?.data?['error'] as String?;
+        
+        if (statusCode == 409) {
+          // Already submitted — treat as success
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Attendance already submitted for this session.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          setState(() {
+            _students = [];
+            _section = null;
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(serverError ?? 'Failed to submit attendance.')),
+          );
+        }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

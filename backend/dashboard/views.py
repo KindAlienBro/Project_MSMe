@@ -917,27 +917,36 @@ class AttendanceSubmitView(views.APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Same-day enforcement (IST)
-        from datetime import date as date_cls, datetime
+        # Same-day enforcement (IST) — with timezone tolerance
+        from datetime import date as date_cls, datetime, timedelta
         try:
             import pytz
             ist = pytz.timezone('Asia/Kolkata')
             today_ist = datetime.now(ist).date()
         except ImportError:
             # fallback if pytz not available
-            from datetime import timezone as tz_mod, timedelta
-            today_ist = datetime.now(tz_mod.utc).date()
+            from datetime import timezone as tz_mod
+            ist_offset = tz_mod(timedelta(hours=5, minutes=30))
+            today_ist = datetime.now(ist_offset).date()
 
         try:
             submitted_date = date_cls.fromisoformat(date_str)
         except Exception:
             return Response({'error': 'Invalid date format. Use YYYY-MM-DD.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if submitted_date != today_ist:
+        # Allow ±1 day tolerance to handle timezone mismatches between browser and server.
+        # e.g. browser in UTC may send yesterday's date after midnight IST, or
+        # browser ahead of IST may send tomorrow's date before midnight IST.
+        day_diff = abs((submitted_date - today_ist).days)
+        if day_diff > 1:
             return Response({
                 'error': f'Attendance can only be marked for today ({today_ist.isoformat()}). '
-                         f'The class date was {date_str}.'
+                         f'The submitted date was {date_str}.',
+                'code': 'DATE_MISMATCH'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Use server's IST date as the canonical date to store
+        canonical_date = today_ist
 
         # Ensure teachers and super teachers can only mark their own classes
         if user.role in ['TEACHER', 'SUPER_TEACHER']:
@@ -954,10 +963,11 @@ class AttendanceSubmitView(views.APIView):
         # Prevent duplicate submission
         if AttendanceSession.objects.filter(
             subject_code=subject_code, section=section,
-            date=submitted_date, period_index=int(period_index)
+            date=canonical_date, period_index=int(period_index)
         ).exists():
             return Response(
-                {'error': 'Attendance already submitted for this session.'},
+                {'error': 'Attendance already submitted for this session.',
+                 'code': 'DUPLICATE_SUBMISSION'},
                 status=status.HTTP_409_CONFLICT
             )
 
@@ -967,7 +977,7 @@ class AttendanceSubmitView(views.APIView):
             subject_name=data.get('subject_name', ''),
             section=section,
             faculty_name=data.get('faculty_name', user.get_full_name()),
-            date=submitted_date,
+            date=canonical_date,
             period_index=int(period_index),
             time_slot=data.get('time_slot', ''),
             created_by=user,

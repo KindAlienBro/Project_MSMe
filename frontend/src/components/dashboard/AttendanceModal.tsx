@@ -129,8 +129,17 @@ export function AttendanceModal({ isOpen, onClose, classInfo, classDate, teacher
       setSuccess(true);
       setAlreadySubmitted(true);
     } catch (e: any) {
+      const status = e?.response?.status;
+      const code = e?.response?.data?.code;
       const msg = e?.response?.data?.error || 'Submission failed. Please try again.';
-      setError(msg);
+
+      if (status === 409 || code === 'DUPLICATE_SUBMISSION') {
+        // Already submitted — treat as success, not error
+        setAlreadySubmitted(true);
+        setSuccess(false); // Show "already recorded" banner instead of "submitted successfully"
+      } else {
+        setError(msg);
+      }
     } finally {
       setSubmitting(false);
     }

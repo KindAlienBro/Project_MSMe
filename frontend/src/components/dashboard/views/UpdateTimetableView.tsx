@@ -78,9 +78,14 @@ export function UpdateTimetableView() {
             });
             setPreviewResult(res.data);
         } catch (err: any) {
-            let errorMsg = err.response?.data?.error || "Failed to preview constraint.";
-            if (errorMsg.includes("503") || errorMsg.includes("Read timed out")) {
+            let errorMsg = err.response?.data?.error || err.response?.data?.detail || "Failed to preview constraint.";
+            const raw = err.response?.data?.raw;
+            if (err.response?.status === 400 && raw) {
+                errorMsg = `Could not parse your instruction. Raw response: ${raw}`;
+            } else if (errorMsg.includes("503") || errorMsg.includes("Read timed out")) {
                 errorMsg = "The AI model is currently waking up from sleep. Please wait a few seconds and try again.";
+            } else if (err.response?.status === 400) {
+                errorMsg = `Could not understand the instruction: ${errorMsg}`;
             }
             setError(errorMsg);
         } finally {
@@ -153,11 +158,16 @@ export function UpdateTimetableView() {
                 }
             }
         } catch (err: any) {
-            let errorMsg = err.response?.data?.error || "Failed to apply update.";
-            if (errorMsg.includes("503") || errorMsg.includes("Read timed out") || errorMsg.includes("504")) {
+            let errorMsg = err.response?.data?.error || err.response?.data?.detail || "Failed to apply update.";
+            const raw = err.response?.data?.raw;
+            if (err.response?.status === 400 && raw) {
+                errorMsg = `Could not parse your instruction. Raw response: ${raw}`;
+            } else if (errorMsg.includes("503") || errorMsg.includes("Read timed out") || errorMsg.includes("504")) {
                 errorMsg = "The AI model is currently waking up from sleep. Please wait a few seconds and try again.";
             } else if (errorMsg.includes("timetable generated yet")) {
                 errorMsg = "The server has lost the timetable (session expired). Please go to Generator view and click 'Generate Timetable' again to sync.";
+            } else if (err.response?.status === 400) {
+                errorMsg = `Could not understand the instruction: ${errorMsg}`;
             }
             setError(errorMsg);
         } finally {

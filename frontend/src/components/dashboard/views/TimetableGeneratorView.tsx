@@ -246,8 +246,15 @@ export function TimetableGeneratorView() {
             setPreviewResult(res.data);
         } catch (err: any) {
             let msg = err.response?.data?.detail || err.response?.data?.error || 'Failed to preview.';
+            const raw = err.response?.data?.raw;
             if (typeof msg !== 'string') msg = JSON.stringify(msg);
-            if (msg.includes('503') || msg.includes('timed out')) msg = 'The AI model is waking up. Please wait and try again.';
+            if (err.response?.status === 400 && raw) {
+                msg = `Could not parse your instruction. Raw response: ${raw}`;
+            } else if (msg.includes('503') || msg.includes('timed out')) {
+                msg = 'The AI model is waking up. Please wait and try again.';
+            } else if (err.response?.status === 400) {
+                msg = `Could not understand the instruction: ${msg}`;
+            }
             setUpdateError(msg);
         } finally {
             setIsPreviewing(false);
@@ -316,9 +323,17 @@ export function TimetableGeneratorView() {
             }
         } catch (err: any) {
             let msg = err.response?.data?.detail || err.response?.data?.error || "Failed to apply.";
+            const raw = err.response?.data?.raw;
             if (typeof msg !== 'string') msg = JSON.stringify(msg);
-            if (msg.includes("503") || msg.includes("timed out")) msg = "The AI model is waking up. Please wait and try again.";
-            if (msg.includes("timetable generated yet")) msg = "Server lost the timetable. Please regenerate first.";
+            if (err.response?.status === 400 && raw) {
+                msg = `Could not parse your instruction. Raw response: ${raw}`;
+            } else if (msg.includes("503") || msg.includes("timed out")) {
+                msg = "The AI model is waking up. Please wait and try again.";
+            } else if (msg.includes("timetable generated yet")) {
+                msg = "Server lost the timetable. Please regenerate first.";
+            } else if (err.response?.status === 400) {
+                msg = `Could not understand the instruction: ${msg}`;
+            }
             setUpdateError(msg);
         } finally {
             setIsApplying(false);

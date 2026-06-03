@@ -52,7 +52,7 @@ function TimetableGrid({
                             </span>
                         </div>
                         <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
-                            <table className="min-w-full text-xs border-collapse">
+                            <table className="w-full min-w-[800px] text-xs border-collapse">
                                 <thead>
                                     <tr className="bg-gray-50">
                                         <th className="border border-gray-200 px-3 py-2 text-left font-semibold text-gray-600 w-16 sticky left-0 bg-gray-50">Day</th>

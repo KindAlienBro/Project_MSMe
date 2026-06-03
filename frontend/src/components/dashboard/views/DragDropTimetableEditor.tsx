@@ -1140,11 +1140,11 @@ export function DragDropTimetableEditor() {
             </div>
 
             {/* ── Main layout: grid + available panel ───────────────────────── */}
-            <div className="flex gap-5">
+            <div className="flex flex-col lg:flex-row gap-5">
                 {/* ── Timetable grid ────────────────────────────────────────── */}
                 <div className="flex-1 min-w-0" ref={gridRef}>
                     <div className="overflow-x-auto scrollbar-hide rounded-2xl border border-gray-200 shadow-sm bg-white">
-                        <table className="w-full text-xs border-collapse table-fixed">
+                        <table className="w-full min-w-[1000px] text-xs border-collapse table-fixed">
                             <thead>
                                 <tr className="bg-gradient-to-r from-gray-50 to-slate-50">
                                     <th className="border border-gray-200 px-3 py-3 text-left font-bold text-gray-600 w-16 sticky left-0 bg-gray-50 z-10">

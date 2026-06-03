@@ -160,6 +160,26 @@ export function Navbar({ onMenuClick }: NavbarProps) {
     return user.teacher_profile?.dept_name || user.role || '';
   };
 
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
+
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setDeferredPrompt(null);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
       <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-4">
@@ -173,7 +193,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           </button>
 
           {/* Search Bar */}
-          <div className="relative flex-1 max-w-md">
+          <div className="relative flex-1 max-w-md hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
@@ -184,7 +204,18 @@ export function Navbar({ onMenuClick }: NavbarProps) {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
+          
+          {/* Install App Button */}
+          {deferredPrompt && (
+            <button
+              onClick={handleInstallApp}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-sm font-medium transition-colors"
+            >
+              Install App
+            </button>
+          )}
+
           {/* Notifications */}
           <div className="relative" ref={dropdownRef}>
             <button
@@ -201,7 +232,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
             {/* Notification Dropdown */}
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
                 <div className="flex items-center justify-between p-4 border-b border-gray-100">
                   <div>
                     <h3 className="font-semibold text-gray-900 text-sm">Notifications</h3>
@@ -259,13 +290,13 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           </div>
 
           {/* Profile */}
-          <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
+          <div className="flex items-center gap-3 pl-2 sm:pl-4 border-l border-gray-200">
             <div className="hidden md:block text-right">
               <p className="text-sm font-medium text-gray-900">{getDisplayName()}</p>
               <p className="text-xs text-gray-500">{getSubtext()}</p>
             </div>
             <button className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 transition-colors">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-medium text-sm sm:text-base">
                 {getInitials()}
               </div>
               <ChevronDown className="w-4 h-4 text-gray-500 hidden md:block" />

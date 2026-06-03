@@ -645,7 +645,7 @@ export function TimetableView() {
       {/* Week View */}
       {viewType === 'week' ? (
         <div className="overflow-x-auto rounded-xl border border-slate-200/80 shadow-sm bg-white/50 backdrop-blur-sm animate-fade-in scrollbar-thin">
-          <table className="w-full text-sm border-collapse table-fixed">
+          <table className="w-full min-w-[1000px] text-sm border-collapse table-fixed">
             <thead>
               <tr className="bg-slate-50/90 border-b border-slate-200/80">
                 <th className="py-3 px-2 text-left font-bold text-slate-600 text-xs uppercase tracking-wider sticky left-0 bg-slate-50 border-r border-slate-200/80 z-10 w-16 shadow-[1px_0_0_0_rgba(226,232,240,0.8)]">

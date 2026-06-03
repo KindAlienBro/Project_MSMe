@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
  
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Automatic Timetable Management',
-    short_name: 'Timetable',
+    name: 'Timetable AI',
+    short_name: 'Timetable AI',
     description: 'A Next-Generation Timetable Management Platform',
     start_url: '/',
     display: 'standalone',

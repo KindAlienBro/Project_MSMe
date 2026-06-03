@@ -51,9 +51,9 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       className={`fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Logo/Brand */}
-        <div className="p-6 border-b border-gray-200 flex flex-col items-center">
+        <div className="p-6 border-b border-gray-200 flex flex-col items-center flex-shrink-0">
           <Image 
             src="/logo.jpeg" 
             alt="MSMe Logo" 
@@ -69,7 +69,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex-1 p-4 overflow-y-auto min-h-0">
           <ul className="space-y-1">
             {menuItems.filter(item => !item.roles || (user && item.roles.includes(user.role))).map((item) => {
               const Icon = item.icon;
@@ -95,7 +95,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </nav>
 
         {/* Logout */}
-        <div className="p-4 border-t border-gray-200 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="p-4 border-t border-gray-200 pb-[max(1rem,env(safe-area-inset-bottom))] flex-shrink-0">
           <button
             onClick={logout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200"

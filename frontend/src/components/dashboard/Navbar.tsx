@@ -48,7 +48,9 @@ export function Navbar({ onMenuClick }: NavbarProps) {
         const items: NotificationItem[] = [];
 
         // Django Notifications (Timetable changes, Substitution alerts, etc.)
-        const djangoNotifs = djangoRes.data.notifications || djangoRes.data || [];
+        let djangoNotifs = djangoRes.data?.notifications || djangoRes.data || [];
+        if (!Array.isArray(djangoNotifs)) djangoNotifs = [];
+
         djangoNotifs.forEach((notif: any) => {
            items.push({
                id: `django-${notif.id}`,
@@ -115,7 +117,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
     // Re-fetch every 2 minutes
     const interval = setInterval(fetchNotifications, 120000);
     return () => clearInterval(interval);
-  }, [readIds]);
+  }, [user, readIds]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -152,7 +154,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
   const getDisplayName = () => {
     if (!user) return 'User';
-    return `${user.first_name} ${user.last_name}`;
+    return `${user.first_name || ''} ${user.last_name || ''}`.trim();
   };
 
   const getSubtext = () => {

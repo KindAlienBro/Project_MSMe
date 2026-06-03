@@ -1930,8 +1930,8 @@ export function DragDropTimetableEditor() {
             {/* ── Action bar (sticky bottom) ─────────────────────────────────── */}
             <div className="fixed bottom-0 left-0 right-0 z-50 lg:left-64">
                 <div className="mx-auto max-w-7xl px-6 py-3">
-                    <div className="flex items-center justify-between bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-2xl px-6 py-3">
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4 bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-2xl px-4 py-3 overflow-x-auto scrollbar-hide">
+                        <div className="flex items-center flex-nowrap shrink-0 gap-2">
                             <button
                                 onClick={handleUndo}
                                 disabled={editHistory.length === 0}
@@ -1983,8 +1983,9 @@ export function DragDropTimetableEditor() {
                                 )}
                             </button>
                         </div>
+                        <div className="flex-1 min-w-[20px]" />
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 shrink-0 flex-nowrap">
                             {savingState === 'saved' && (
                                 <div className="flex items-center gap-1.5 text-emerald-600 text-sm font-medium animate-fade-in">
                                     <CheckCircle className="w-4 h-4" />

@@ -744,12 +744,15 @@ export function TimetableView() {
                             {cell.classes.length > 1 ? (
                               (() => {
                                 const baseColors = getColorForSubject(cell.classes[0].subject);
+                                const isClassToday = dayName === new Date().toLocaleDateString('en-US', { weekday: 'long' });
                                 return (
-                                  <div className={`relative p-2 rounded-xl border ${baseColors.border} ${baseColors.bg} shadow-sm hover:shadow-md transition-all duration-300 flex flex-col gap-1.5`}>
+                                  <div className={`relative p-2 rounded-xl border ${baseColors.border} ${baseColors.bg} shadow-sm transition-all duration-300 flex flex-col gap-1.5`}>
                                     {cell.classes.map((cls: any, idx: number) => {
                                       const colors = getColorForSubject(cls.subject);
                                       return (
-                                        <div key={idx} className="flex flex-col border-b border-black/5 last:border-0 pb-1.5 last:pb-0">
+                                        <div key={idx} 
+                                          onClick={() => isTeacherOrAdmin && openAttendance(cls, dayName)}
+                                          className={`flex flex-col border-b border-black/5 last:border-0 pb-1.5 last:pb-0 ${isTeacherOrAdmin ? 'cursor-pointer hover:bg-black/5 rounded p-1 -mx-1' : ''}`}>
                                           <div className={`font-bold text-xs sm:text-sm ${colors.textPrimary} flex items-center gap-1.5 flex-wrap`}>
                                             <span>{cls.subject}</span>
                                             {cls.batch && <span className="px-1.5 py-0.5 bg-white/60 border border-current/20 rounded-full text-[9px] font-bold tracking-wide shrink-0">{cls.batch}</span>}
@@ -758,6 +761,14 @@ export function TimetableView() {
                                             <span className="flex items-center gap-1 truncate"><UserIcon className="w-3 h-3 shrink-0" /> {cls.faculty}</span>
                                             {cls.room && <span className="flex items-center gap-1 shrink-0"><MapPin className="w-3 h-3 shrink-0" /> {cls.room}</span>}
                                           </div>
+                                          {isTeacherOrAdmin && (
+                                            <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-end">
+                                              <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold ${isClassToday ? 'bg-blue-600 text-white' : 'bg-white/60 text-slate-500'}`}>
+                                                {isClassToday ? <ClipboardList className="w-2.5 h-2.5" /> : <Lock className="w-2 h-2" />}
+                                                {isClassToday ? 'Mark' : 'Locked'}
+                                              </span>
+                                            </div>
+                                          )}
                                         </div>
                                       );
                                     })}

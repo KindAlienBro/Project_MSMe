@@ -108,7 +108,7 @@ export function AttendanceModal({ isOpen, onClose, classInfo, classDate, teacher
   };
 
   const presentCount = Object.values(attendance).filter(v => v === 'P').length;
-  const absentCount  = Object.values(attendance).filter(v => v === 'A').length;
+  const absentCount = Object.values(attendance).filter(v => v === 'A').length;
 
   const handleSubmit = async () => {
     if (!isToday || alreadySubmitted || students.length === 0) return;
@@ -290,15 +290,14 @@ export function AttendanceModal({ isOpen, onClose, classInfo, classDate, teacher
                     <div
                       key={student.id}
                       onClick={() => toggle(student.id)}
-                      className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${
-                        alreadySubmitted
+                      className={`flex items-center justify-between p-3 rounded-xl border transition-all duration-200 ${alreadySubmitted
                           ? isPresent
                             ? 'bg-green-50 border-green-200'
                             : 'bg-red-50 border-red-200'
                           : isPresent
                             ? 'bg-green-50 border-green-200 cursor-pointer hover:bg-green-100'
                             : 'bg-red-50 border-red-200 cursor-pointer hover:bg-red-100'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         {/* Rank */}
@@ -306,9 +305,8 @@ export function AttendanceModal({ isOpen, onClose, classInfo, classDate, teacher
                           {idx + 1}
                         </span>
                         {/* Avatar */}
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${
-                          isPresent ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
-                        }`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 ${isPresent ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+                          }`}>
                           {student.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                         </div>
                         <div>
@@ -319,11 +317,10 @@ export function AttendanceModal({ isOpen, onClose, classInfo, classDate, teacher
 
                       {/* Toggle button */}
                       <button
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-                          isPresent
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${isPresent
                             ? 'bg-green-500 text-white border-green-500 shadow-sm'
                             : 'bg-red-500 text-white border-red-500 shadow-sm'
-                        } ${alreadySubmitted ? 'opacity-80 cursor-default' : ''}`}
+                          } ${alreadySubmitted ? 'opacity-80 cursor-default' : ''}`}
                         onClick={(e) => { e.stopPropagation(); toggle(student.id); }}
                         disabled={alreadySubmitted}
                       >

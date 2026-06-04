@@ -750,7 +750,7 @@ export function TimetableView() {
                                     {cell.classes.map((cls: any, idx: number) => {
                                       const colors = getColorForSubject(cls.subject);
                                       return (
-                                        <div key={idx} 
+                                        <div key={idx}
                                           onClick={() => isTeacherOrAdmin && openAttendance(cls, dayName)}
                                           className={`flex flex-col border-b border-black/5 last:border-0 pb-1.5 last:pb-0 ${isTeacherOrAdmin ? 'cursor-pointer hover:bg-black/5 rounded p-1 -mx-1' : ''}`}>
                                           <div className={`font-bold text-xs sm:text-sm ${colors.textPrimary} flex items-center gap-1.5 flex-wrap`}>

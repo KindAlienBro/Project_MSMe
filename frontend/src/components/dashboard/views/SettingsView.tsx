@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from 'react';
-import { User, Mail, Phone, Lock, Bell, Globe, Moon, Save } from 'lucide-react';
+import React from 'react';
+import { User, Mail, Building2, Briefcase, Shield, Save } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export function SettingsView() {
@@ -12,125 +12,131 @@ export function SettingsView() {
   };
 
   return (
-    <div>
+    <div className="w-full space-y-6">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your account settings and preferences</p>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Settings</h1>
+        <p className="text-sm text-gray-500 mt-1">Manage your account settings and profile preferences</p>
       </div>
 
-      {/* Profile Tab */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-6">Profile Information</h2>
-
-          <div className="flex items-center gap-6 mb-8">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-3xl font-semibold">
-              {getInitials()}
-            </div>
-            <div>
-              <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors mb-2">
-                Change Photo
-              </button>
-              <p className="text-xs text-gray-500">JPG, GIF or PNG. Max size of 2MB</p>
-            </div>
+      {/* Profile Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-2xl sm:text-3xl font-bold shadow-md shrink-0">
+            {getInitials()}
           </div>
+          <div>
+            <h2 className="text-xl sm:text-2xl font-semibold text-gray-900">
+              {user?.first_name} {user?.last_name}
+            </h2>
+            <p className="text-sm text-gray-500 font-medium capitalize mt-1">
+              {user?.role?.toLowerCase() || 'User'}
+            </p>
+          </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                First Name
-              </label>
+        <hr className="border-gray-100 mb-8" />
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">Personal Information</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          {/* First Name */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">First Name</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="text"
                 defaultValue={user?.first_name || ''}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="block w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors"
               />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Last Name
-              </label>
+          {/* Last Name */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Last Name</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="text"
                 defaultValue={user?.last_name || ''}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="block w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-900 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-colors"
               />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  defaultValue={user?.email || ''}
-                  readOnly
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
-                />
+          {/* Email Address */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Email Address</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
               </div>
+              <input
+                type="email"
+                defaultValue={user?.email || ''}
+                readOnly
+                className="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-sm outline-none cursor-not-allowed"
+              />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="tel"
-                  defaultValue={user?.teacher_profile?.phone || ''}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
+          {/* Department */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Department</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Building2 className="h-5 w-5 text-gray-400" />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Department
-              </label>
               <input
                 type="text"
                 defaultValue={user?.teacher_profile?.dept_name || ''}
                 readOnly
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                className="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-sm outline-none cursor-not-allowed"
               />
             </div>
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Designation
-              </label>
+          {/* Designation */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Designation</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Briefcase className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="text"
                 defaultValue={user?.teacher_profile?.designation || ''}
-                disabled
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
+                readOnly
+                className="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-sm outline-none cursor-not-allowed"
               />
             </div>
           </div>
 
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Role
-            </label>
-            <input
-              type="text"
-              defaultValue={user?.role || ''}
-              readOnly
-              className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed"
-            />
+          {/* Role */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Role</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Shield className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                defaultValue={user?.role || ''}
+                readOnly
+                className="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 text-sm outline-none cursor-not-allowed uppercase"
+              />
+            </div>
           </div>
 
-          <div className="flex justify-end mt-6">
-            <button className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-              <Save className="w-4 h-4" />
-              Save Changes
-            </button>
-          </div>
         </div>
+      </div>
     </div>
   );
 }

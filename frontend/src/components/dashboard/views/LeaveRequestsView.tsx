@@ -272,7 +272,7 @@ export function LeaveRequestsView() {
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="submit"
                 className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -282,7 +282,7 @@ export function LeaveRequestsView() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                className="flex-1 sm:flex-none px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
@@ -307,9 +307,9 @@ export function LeaveRequestsView() {
                 key={request.leave_id}
                 className="p-5 rounded-xl border border-gray-200 hover:border-blue-200 hover:shadow-sm transition-all duration-200"
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
                   <div>
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
                       <h3 className="font-semibold text-gray-900">
                         {request.faculty_id}
                       </h3>
@@ -331,22 +331,24 @@ export function LeaveRequestsView() {
                   </div>
 
                   {isAdmin && request.status === 'PENDING' && (
-                    <div className="flex gap-2">
+                    <div className="flex w-full sm:w-auto gap-2">
                       <button
                         onClick={() => handleApprove(request.leave_id)}
-                        className="bg-green-600 text-white px-3 py-1.5 rounded text-sm hover:bg-green-700">Approve</button>
+                        className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-green-700 transition-colors">Approve</button>
                       <button
                         onClick={() => handleReject(request.leave_id)}
-                        className="bg-red-600 text-white px-3 py-1.5 rounded text-sm hover:bg-red-700">Reject</button>
+                        className="flex-1 sm:flex-none bg-red-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-red-700 transition-colors">Reject</button>
                     </div>
                   )}
 
                   {!isAdmin && request.status === 'PENDING' && (
-                    <button
-                      className="text-red-500 hover:text-red-700 text-sm font-medium"
-                    >
-                      Pending Approval
-                    </button>
+                    <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                      <button
+                        className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg w-full sm:w-auto text-sm font-medium cursor-default"
+                      >
+                        Pending Approval
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

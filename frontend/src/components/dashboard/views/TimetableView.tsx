@@ -63,7 +63,16 @@ export function TimetableView() {
         .split(',')
         .map((f: string) => cleanName(f));
 
-      const isAuthorized = faculties.some((f: string) => teacherName.includes(f) || f.includes(teacherName));
+      const isAuthorized = faculties.some((f: string) => {
+        if (teacherName.includes(f) || f.includes(teacherName)) return true;
+        // Relaxed fallback: remove all non-alphabetic chars and check if they share a significant common part
+        const tAlpha = teacherName.replace(/[^a-z]/g, '');
+        const fAlpha = f.replace(/[^a-z]/g, '');
+        if (tAlpha.length >= 5 && fAlpha.length >= 5) {
+          if (tAlpha.includes(fAlpha.substring(0, 5)) || fAlpha.includes(tAlpha.substring(0, 5))) return true;
+        }
+        return false;
+      });
 
       if (!isAuthorized) {
         alert(`You can only mark attendance for your own classes.\nThis class is assigned to ${classItem.faculty}.`);

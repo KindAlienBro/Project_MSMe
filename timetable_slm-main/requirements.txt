@@ -6,3 +6,6 @@ pandas
 requests
 pydantic
 huggingface_hub
+
+python-multipart
+openpyxl

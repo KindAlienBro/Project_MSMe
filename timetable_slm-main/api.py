@@ -236,6 +236,7 @@ class AllocationIn(BaseModel):
 class GenerateRequest(BaseModel):
     time_limit_seconds: int = 30
     version_label: Optional[str] = None
+    semesters: Optional[List[int]] = None  # e.g. [5, 7] for odd sems only
 
 class UpdateRequest(BaseModel):
     prompt: str
@@ -396,6 +397,14 @@ def clear_sections():
     save_data(data)
     return {"message": "All sections cleared."}
 
+@app.get("/data/semesters")
+def list_semesters():
+    """Return all unique semester numbers from sections data."""
+    data = load_data()
+    semesters = sorted(set(s["semester"] for s in data.get("sections", [])))
+    return {"semesters": semesters}
+
+
 @app.delete("/data/sections/{section_id}")
 def delete_section(section_id: str):
     data = load_data()
@@ -518,6 +527,39 @@ def generate(req: GenerateRequest):
         if missing:
             raise HTTPException(400, f"Missing data for: {', '.join(missing)}.")
 
+        # ── Semester filtering ────────────────────────────────────────────
+        if req.semesters:
+            selected_sems = set(req.semesters)
+            # 1. Filter sections to only selected semesters
+            data["sections"] = [
+                s for s in data["sections"] if s["semester"] in selected_sems
+            ]
+            if not data["sections"]:
+                raise HTTPException(400, f"No sections found for semesters: {req.semesters}")
+
+            # 2. Filter allocations to only reference surviving sections
+            valid_section_ids = {s["id"] for s in data["sections"]}
+            data["allocations"] = [
+                a for a in data["allocations"]
+                if a["section_id"] in valid_section_ids
+            ]
+
+            # 3. Filter subjects to only those referenced by surviving allocations
+            used_subject_codes = {a["subject_code"] for a in data["allocations"]}
+            data["subjects"] = [
+                s for s in data["subjects"] if s["code"] in used_subject_codes
+            ]
+
+            # 4. Filter faculties to only those referenced by surviving allocations
+            used_faculty_ids = {a["faculty_id"] for a in data["allocations"]}
+            data["faculties"] = [
+                f for f in data["faculties"] if f["id"] in used_faculty_ids
+            ]
+
+            print(f"[generate] Filtered to semesters {req.semesters}: "
+                  f"{len(data['sections'])} sections, {len(data['allocations'])} allocations, "
+                  f"{len(data['subjects'])} subjects, {len(data['faculties'])} faculties")
+
         facs, subs, secs, rooms, allocs = _build_objects(data)
         tasks = prepare_scheduling_tasks(allocs, facs, subs, secs)
 
@@ -545,6 +587,7 @@ def generate(req: GenerateRequest):
         return {
             "status": status,
             "task_count": len(tasks),
+            "semesters_generated": req.semesters or "all",
             "schedule": clean,
             "grid": _build_grid(clean),
             **_timetable_constants(),

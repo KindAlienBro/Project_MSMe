@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { RefreshCw, Send, AlertCircle, CheckCircle, Wand2, Eye, RotateCcw, Archive, ChevronDown, ChevronUp, X, MessageSquare } from 'lucide-react';
+import { RefreshCw, Send, AlertCircle, CheckCircle, Wand2, Eye, RotateCcw, Archive, ChevronDown, ChevronUp, X, MessageSquare, BookOpen } from 'lucide-react';
 import axios from 'axios';
 import { endpoints } from '@/lib/api';
 
@@ -146,6 +146,11 @@ export function TimetableGeneratorView() {
     const [isRestoringVersion, setIsRestoringVersion] = useState<string | null>(null);
     const [versionLabel, setVersionLabel] = useState('');
 
+    // Semester selection state
+    const [availableSemesters, setAvailableSemesters] = useState<number[]>([]);
+    const [semesterType, setSemesterType] = useState<'ODD' | 'EVEN' | null>(null);
+    const [selectedSemesters, setSelectedSemesters] = useState<number[]>([]);
+
     // ── Load timetable on mount ──────────────────────────────────────────
     useEffect(() => {
         const loadSaved = async () => {
@@ -181,6 +186,36 @@ export function TimetableGeneratorView() {
         fetchVersions();
     }, []);
 
+    // ── Fetch available semesters ────────────────────────────────────────
+    useEffect(() => {
+        const fetchSemesters = async () => {
+            try {
+                const res = await axios.get(`${HF_API}/data/semesters`);
+                setAvailableSemesters(res.data.semesters || []);
+            } catch { /* ignore */ }
+        };
+        fetchSemesters();
+    }, []);
+
+    // ── Handle semester type toggle ──────────────────────────────────────
+    const handleSemesterType = (type: 'ODD' | 'EVEN') => {
+        setSemesterType(type);
+        const filtered = availableSemesters.filter(s =>
+            type === 'ODD' ? s % 2 !== 0 : s % 2 === 0
+        );
+        setSelectedSemesters(filtered); // Pre-select all
+    };
+
+    const toggleSemester = (sem: number) => {
+        setSelectedSemesters(prev =>
+            prev.includes(sem) ? prev.filter(s => s !== sem) : [...prev, sem].sort()
+        );
+    };
+
+    const filteredSemesters = availableSemesters.filter(s =>
+        semesterType === 'ODD' ? s % 2 !== 0 : semesterType === 'EVEN' ? s % 2 === 0 : false
+    );
+
     if (!user || !['ADMIN', 'SUPER_TEACHER'].includes(user.role)) {
         return (
             <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl shadow-sm border mt-6">
@@ -197,6 +232,7 @@ export function TimetableGeneratorView() {
         try {
             const res = await axios.post(`${HF_API}/generate`, {
                 time_limit_seconds: timeLimit,
+                semesters: selectedSemesters.length > 0 ? selectedSemesters : undefined,
                 version_label: versionLabel.trim() ? versionLabel.trim() : undefined,
             });
             if (res.data.status === 'OPTIMAL' || res.data.status === 'FEASIBLE') {
@@ -204,7 +240,7 @@ export function TimetableGeneratorView() {
                 localStorage.setItem('timetable_v2', JSON.stringify(res.data));
                 fetchVersions(); // Refresh versions list
                 setVersionLabel(''); // Clear label after successful generation
-                
+
                 try {
                     await endpoints.syncTimetable(res.data);
                 } catch (syncErr) {
@@ -307,7 +343,7 @@ export function TimetableGeneratorView() {
                 };
                 setTimetable(newTT);
                 localStorage.setItem('timetable_v2', JSON.stringify(newTT));
-                
+
                 try {
                     const newSchedule = await axios.get(`${HF_API}/schedule`);
                     await endpoints.syncTimetable(newSchedule.data);
@@ -387,37 +423,101 @@ export function TimetableGeneratorView() {
 
             {/* ═══ Config Panel ═══ */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            ⏱ Solver Time Limit: <span className="text-blue-600">{timeLimit}s</span>
-                        </label>
-                        <input type="range" min={10} max={120} value={timeLimit}
-                            onChange={e => setTimeLimit(parseInt(e.target.value))}
-                            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                        />
-                        <div className="flex justify-between text-xs text-gray-400 mt-1"><span>10s</span><span>120s</span></div>
+
+                {/* ── Semester Selector ── */}
+                <div className="mb-6">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3">
+                        <BookOpen className="w-4 h-4 text-blue-600" />
+                        Select Semesters to Generate
+                    </label>
+
+                    {/* Odd / Even toggle */}
+                    <div className="flex gap-3 mb-4">
+                        <button
+                            onClick={() => handleSemesterType('ODD')}
+                            className={`flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm border-2 transition-all duration-200 ${semesterType === 'ODD'
+                                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-200'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50'
+                                }`}
+                        >
+                            🔷 Odd Semesters (1, 3, 5, 7...)
+                        </button>
+                        <button
+                            onClick={() => handleSemesterType('EVEN')}
+                            className={`flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm border-2 transition-all duration-200 ${semesterType === 'EVEN'
+                                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-200'
+                                    : 'bg-white text-gray-600 border-gray-200 hover:border-emerald-300 hover:bg-emerald-50'
+                                }`}
+                        >
+                            🔶 Even Semesters (2, 4, 6, 8...)
+                        </button>
                     </div>
-                    <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            🏷️ Save Current as Version :
-                        </label>
-                        <input type="text" value={versionLabel}
-                            onChange={e => setVersionLabel(e.target.value)}
-                            placeholder="e.g. Midterm Schedule v1"
-                            className="w-full rounded-lg border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">Provide a label before regenerating or clearing to name the snapshot.</p>
+
+                    {/* Semester checkboxes */}
+                    {semesterType && (
+                        <div className="flex flex-wrap gap-2 animate-in fade-in">
+                            {filteredSemesters.length === 0 ? (
+                                <p className="text-sm text-gray-400 italic">No {semesterType.toLowerCase()} semesters found in the data.</p>
+                            ) : (
+                                filteredSemesters.map(sem => (
+                                    <button
+                                        key={sem}
+                                        onClick={() => toggleSemester(sem)}
+                                        className={`px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-all duration-200 ${selectedSemesters.includes(sem)
+                                                ? semesterType === 'ODD'
+                                                    ? 'bg-indigo-100 text-indigo-800 border-indigo-300 shadow-sm'
+                                                    : 'bg-emerald-100 text-emerald-800 border-emerald-300 shadow-sm'
+                                                : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'
+                                            }`}
+                                    >
+                                        {selectedSemesters.includes(sem) ? '✅' : '⬜'} Semester {sem}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    )}
+
+                    {!semesterType && (
+                        <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                            ⚠️ Please select Odd or Even semesters first to proceed.
+                        </p>
+                    )}
+                </div>
+
+                <div className="border-t border-gray-100 pt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                ⏱ Solver Time Limit: <span className="text-blue-600">{timeLimit}s</span>
+                            </label>
+                            <input type="range" min={10} max={120} value={timeLimit}
+                                onChange={e => setTimeLimit(parseInt(e.target.value))}
+                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                            />
+                            <div className="flex justify-between text-xs text-gray-400 mt-1"><span>10s</span><span>120s</span></div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                🏷️ Save Current as Version :
+                            </label>
+                            <input type="text" value={versionLabel}
+                                onChange={e => setVersionLabel(e.target.value)}
+                                placeholder="e.g. Midterm Schedule v1"
+                                className="w-full rounded-lg border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Provide a label before regenerating or clearing to name the snapshot.</p>
+                        </div>
                     </div>
                 </div>
 
                 {['ADMIN', 'SUPER_TEACHER'].includes(user?.role) && (
                     <div className="flex justify-end pt-4 border-t border-gray-100">
-                        <button onClick={handleGenerate} disabled={isGenerating}
-                            className={`flex items-center gap-2 px-7 py-2.5 rounded-lg text-white font-semibold shadow-sm transition-colors ${isGenerating ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
+                        <button onClick={handleGenerate} disabled={isGenerating || selectedSemesters.length === 0}
+                            title={selectedSemesters.length === 0 ? 'Select at least one semester' : ''}
+                            className={`flex items-center gap-2 px-7 py-2.5 rounded-lg text-white font-semibold shadow-sm transition-colors ${isGenerating || selectedSemesters.length === 0 ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
                             {isGenerating
                                 ? <><RefreshCw className="w-5 h-5 animate-spin" /> Generating...</>
-                                : <><Send className="w-5 h-5" /> Generate Timetable</>
+                                : <><Send className="w-5 h-5" /> Generate Timetable ({selectedSemesters.length > 0 ? `Sem ${selectedSemesters.join(', ')}` : 'Select semesters'})</>
                             }
                         </button>
                     </div>

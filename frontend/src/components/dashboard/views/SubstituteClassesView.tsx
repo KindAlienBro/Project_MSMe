@@ -52,6 +52,16 @@ export function SubstituteClassesView() {
         const firstName = (user?.first_name || '').toLowerCase();
         const lastName = (user?.last_name || '').toLowerCase();
         const fullName = `${firstName} ${lastName}`.trim();
+        
+        const fuzzyMatch = (a: string, b: string) => {
+          const aAlpha = a.replace(/[^a-z]/g, '');
+          const bAlpha = b.replace(/[^a-z]/g, '');
+          if (!aAlpha || !bAlpha) return false;
+          if (aAlpha.includes(bAlpha) || bAlpha.includes(aAlpha)) return true;
+          if (aAlpha.length >= 5 && bAlpha.length >= 5 && (aAlpha.includes(bAlpha.substring(0, 5)) || bAlpha.includes(aAlpha.substring(0, 5)))) return true;
+          return false;
+        };
+
         allReqs = allReqs.filter((r: SubstitutionRequest) => {
           const candidateId = r.candidate_faculty_id.toLowerCase();
           const originalId = r.original_faculty_id.toLowerCase();
@@ -60,7 +70,10 @@ export function SubstituteClassesView() {
           if ((firstName && originalId.includes(firstName)) ||
             (originalId && firstName.includes(originalId)) ||
             originalId === fullName ||
-            (lastName && originalId.includes(lastName))) {
+            (lastName && originalId.includes(lastName)) ||
+            (originalId && lastName.includes(originalId)) ||
+            fuzzyMatch(firstName, originalId) ||
+            fuzzyMatch(fullName, originalId)) {
             return false;
           }
 
@@ -68,7 +81,10 @@ export function SubstituteClassesView() {
           return (firstName && candidateId.includes(firstName)) ||
             (candidateId && firstName.includes(candidateId)) ||
             candidateId === fullName ||
-            (lastName && candidateId.includes(lastName));
+            (lastName && candidateId.includes(lastName)) ||
+            (candidateId && lastName.includes(candidateId)) ||
+            fuzzyMatch(firstName, candidateId) ||
+            fuzzyMatch(fullName, candidateId);
         });
       }
       setRequests(allReqs);

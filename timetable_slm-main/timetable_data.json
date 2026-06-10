@@ -61,7 +61,7 @@
             "max_hours": 18
         },
         {
-            "id": "adrash",
+            "id": "adarsha",
             "name": "Mr. Adarsha S P",
             "designation": "Asst. Prof",
             "max_hours": 18
@@ -639,7 +639,7 @@
             "elective_group": null
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "forum",
             "section_id": "6b-E1",
             "elective_group": null
@@ -681,7 +681,7 @@
             "elective_group": null
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "cn",
             "section_id": "5a",
             "elective_group": null
@@ -693,7 +693,7 @@
             "elective_group": null
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "cnlab",
             "section_id": "5a",
             "elective_group": null
@@ -855,7 +855,7 @@
             "elective_group": "sem7_elec_common"
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "bda",
             "section_id": "7b-B2",
             "elective_group": "sem7_elec_common"
@@ -873,13 +873,13 @@
             "elective_group": "oe7_common"
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "major2",
             "section_id": "7b-B1",
             "elective_group": "sem7_proj_common"
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "major2",
             "section_id": "7b-B2",
             "elective_group": "sem7_proj_common"
@@ -951,7 +951,7 @@
             "elective_group": "sem7_elec_common"
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "bda",
             "section_id": "7a-B2",
             "elective_group": "sem7_elec_common"
@@ -969,7 +969,7 @@
             "elective_group": "oe7_common"
         },
         {
-            "faculty_id": "adrash",
+            "faculty_id": "adarsha",
             "subject_code": "major2",
             "section_id": "7a-B1",
             "elective_group": "sem7_proj_common"

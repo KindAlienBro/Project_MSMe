@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { AlertCircle, Plus, Trash2, RefreshCw, Users, BookOpen, Layers, DoorOpen, Link2 } from 'lucide-react';
 import axios from 'axios';
 
-const HF_API = 'http://127.0.0.1:7860'; // Pointing to local FastAPI
+const HF_API = process.env.NEXT_PUBLIC_TIMETABLE_API_URL || 'https://kindalien-timetable-gen.hf.space';
 
 const TABS = [
     { key: 'faculties', label: 'Faculties', icon: Users },

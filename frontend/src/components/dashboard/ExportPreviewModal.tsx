@@ -210,6 +210,8 @@ function generatePDF(opts: {
   const tableHead = [['DAY', ...headers]];
 
   const tableBody: any[][] = [];
+  let maxLinesInCell = 0;
+
   weekDays.forEach((day: string, dayIndex: number) => {
     const row: any[] = [day.substring(0, 3).toUpperCase()];
     let periodCounter = 0;
@@ -247,12 +249,31 @@ function generatePDF(opts: {
           line += `\n${cls.faculty || ''}`;
           if (cls.room) line += ` | ${cls.room}`;
           return line;
-        }).join('\n---\n');
+        }).join('\n------\n');
+        
+        const linesCount = cellText.split('\n').length;
+        if (linesCount > maxLinesInCell) maxLinesInCell = linesCount;
+        
         row.push(cellText);
       }
     });
     tableBody.push(row);
   });
+
+  // ─── Adaptive Sizing ─────────────────────────────────────
+  let smartFontSize = 7;
+  let smartCellPadding = 2;
+  
+  if (maxLinesInCell >= 12) {
+    smartFontSize = 5;
+    smartCellPadding = 0.5;
+  } else if (maxLinesInCell >= 8) {
+    smartFontSize = 5.5;
+    smartCellPadding = 1;
+  } else if (maxLinesInCell >= 5) {
+    smartFontSize = 6;
+    smartCellPadding = 1;
+  }
 
   // ─── Template-specific Table Styles ────────────────────
   let tableConfig: any = {};
@@ -261,15 +282,15 @@ function generatePDF(opts: {
     tableConfig = {
       theme: 'grid',
       styles: {
-        fontSize: 7, cellPadding: 2, valign: 'middle',
-        lineColor: [200, 200, 220], lineWidth: 0.3,
+        fontSize: smartFontSize, cellPadding: smartCellPadding, valign: 'middle',
+        lineColor: [200, 200, 220], lineWidth: 0.3, overflow: 'linebreak'
       },
       headStyles: {
         fillColor: [67, 56, 202], textColor: [255, 255, 255],
-        fontStyle: 'bold', fontSize: 7, halign: 'center',
+        fontStyle: 'bold', fontSize: smartFontSize + 0.5, halign: 'center', cellPadding: 2
       },
       columnStyles: {
-        0: { fontStyle: 'bold', halign: 'center', cellWidth: 18, fillColor: [238, 238, 255] },
+        0: { fontStyle: 'bold', halign: 'center', cellWidth: 16, fillColor: [238, 238, 255] },
       },
       bodyStyles: { halign: 'center' },
       alternateRowStyles: { fillColor: [248, 248, 255] },
@@ -286,15 +307,15 @@ function generatePDF(opts: {
     tableConfig = {
       theme: 'grid',
       styles: {
-        fontSize: 7, cellPadding: 2.5, valign: 'middle',
-        lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0],
+        fontSize: smartFontSize, cellPadding: smartCellPadding, valign: 'middle',
+        lineColor: [0, 0, 0], lineWidth: 0.4, textColor: [0, 0, 0], overflow: 'linebreak'
       },
       headStyles: {
         fillColor: [30, 30, 30], textColor: [255, 255, 255],
-        fontStyle: 'bold', fontSize: 7.5, halign: 'center',
+        fontStyle: 'bold', fontSize: smartFontSize + 0.5, halign: 'center', cellPadding: 2
       },
       columnStyles: {
-        0: { fontStyle: 'bold', halign: 'center', cellWidth: 18, fillColor: [240, 240, 240] },
+        0: { fontStyle: 'bold', halign: 'center', cellWidth: 16, fillColor: [240, 240, 240] },
       },
       bodyStyles: { halign: 'center' },
       alternateRowStyles: { fillColor: [245, 245, 245] },
@@ -304,15 +325,15 @@ function generatePDF(opts: {
     tableConfig = {
       theme: 'grid',
       styles: {
-        fontSize: 7, cellPadding: 2, valign: 'middle',
-        lineColor: [180, 160, 220], lineWidth: 0.25,
+        fontSize: smartFontSize, cellPadding: smartCellPadding, valign: 'middle',
+        lineColor: [180, 160, 220], lineWidth: 0.25, overflow: 'linebreak'
       },
       headStyles: {
         fillColor: [124, 58, 237], textColor: [255, 255, 255],
-        fontStyle: 'bold', fontSize: 7, halign: 'center',
+        fontStyle: 'bold', fontSize: smartFontSize + 0.5, halign: 'center', cellPadding: 2
       },
       columnStyles: {
-        0: { fontStyle: 'bold', halign: 'center', cellWidth: 18, fillColor: [250, 245, 255] },
+        0: { fontStyle: 'bold', halign: 'center', cellWidth: 16, fillColor: [250, 245, 255] },
       },
       bodyStyles: { halign: 'center' },
       alternateRowStyles: { fillColor: [252, 248, 255] },
@@ -348,6 +369,8 @@ function generatePDF(opts: {
     head: tableHead,
     body: tableBody,
     startY,
+    rowPageBreak: 'avoid',
+    margin: { bottom: 5 },
     ...tableConfig,
   });
 

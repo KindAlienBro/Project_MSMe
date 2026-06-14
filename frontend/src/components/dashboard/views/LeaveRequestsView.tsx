@@ -73,9 +73,13 @@ export function LeaveRequestsView() {
         const cRes = await axios.get(`${HF_API}/cancellations`);
         let allCancels = cRes.data.cancellations || [];
         if (!isAdmin) {
-          allCancels = allCancels.filter((c: any) => 
-            c.faculty_id === user?.id || c.faculty_id === user?.username || c.faculty_id === 'teacher'
-          );
+          const currentTeacherName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim().toLowerCase();
+          const currentTeacherNameStripped = currentTeacherName.replace(/^(mr\.|ms\.|mrs\.|dr\.|prof\.)\s*/i, '').trim();
+          allCancels = allCancels.filter((c: any) => {
+            if (!c.faculty_id) return false;
+            const fac = c.faculty_id.toLowerCase().replace(/^(mr\.|ms\.|mrs\.|dr\.|prof\.)\s*/i, '').trim();
+            return fac.includes(currentTeacherNameStripped) || currentTeacherNameStripped.includes(fac) || c.faculty_id === 'teacher';
+          });
         }
         setCancellations(allCancels);
       } catch (err) { console.error("Failed to fetch cancellations", err); }

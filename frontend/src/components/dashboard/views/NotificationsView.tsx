@@ -94,7 +94,13 @@ export function NotificationsView() {
       // Cancellation Notifications
       (cRes.data?.cancellations || []).forEach((c: any) => {
         if (user?.role === 'STUDENT') return;
-        if (user?.role === 'TEACHER' && c.faculty_id !== getDisplayName() && c.faculty_id !== user?.username && c.faculty_id !== user?.id) return;
+        if (user?.role === 'TEACHER') {
+          if (!c.faculty_id) return;
+          const currentTeacherName = getDisplayName().toLowerCase();
+          const currentTeacherNameStripped = currentTeacherName.replace(/^(mr\.|ms\.|mrs\.|dr\.|prof\.)\s*/i, '').trim();
+          const fac = c.faculty_id.toLowerCase().replace(/^(mr\.|ms\.|mrs\.|dr\.|prof\.)\s*/i, '').trim();
+          if (!fac.includes(currentTeacherNameStripped) && !currentTeacherNameStripped.includes(fac) && c.faculty_id !== 'teacher') return;
+        }
 
         const id = `cancel-${c.id}`;
         items.push({

@@ -71,6 +71,8 @@ class ConstraintEngine:
                 intervals_by_faculty[fid].append(interval)
         
         for faculty_id in intervals_by_faculty:
+            if faculty_id == "DUMMY_STAFF":
+                continue
             self.model.AddNoOverlap(intervals_by_faculty[faculty_id])
 
         # 2. Section Clash Prevention (MODIFIED FOR ELECTIVES)
@@ -111,7 +113,8 @@ class ConstraintEngine:
     def _apply_stretch_constraints(self):
         tasks_by_entity = defaultdict(list)
         for task in self.tasks:
-            tasks_by_entity[f"fac_{task.faculty.id}"].append(task)
+            if task.faculty.id != "DUMMY_STAFF":
+                tasks_by_entity[f"fac_{task.faculty.id}"].append(task)
             tasks_by_entity[f"sec_{task.section.section_id}"].append(task)
         for name, tasks in tasks_by_entity.items():
             self._add_stretch_constraint_for_entity(tasks, name)
@@ -224,6 +227,9 @@ class ConstraintEngine:
         return sorted(list(full_range))
 
     def _get_allowed_rooms(self, task: Task) -> List[int]:
+        if task.subject.subject_code in ["LIB_HR", "STU_HR", "FAC_HR", "STDY_HR"]:
+            return [-1]
+            
         allowed = []
         for i, room in enumerate(self.rooms):
             type_match = (task.subject.subject_type == SubjectType.LAB) == room.is_lab

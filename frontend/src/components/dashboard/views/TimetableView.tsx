@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import { Clock, Download, ChevronLeft, ChevronRight, Users, User as UserIcon, ClipboardList, Lock, MapPin } from 'lucide-react';
+import { Clock, Download, ChevronLeft, ChevronRight, Users, User as UserIcon, ClipboardList, Lock, MapPin, AlertCircle, Calendar, Printer, Settings, Share2, Plus, Info, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { AttendanceModal } from '@/components/dashboard/AttendanceModal';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { ExportPreviewModal } from '@/components/dashboard/ExportPreviewModal';
 
 const HF_API = 'https://kindalien-timetable-gen.hf.space';
 
@@ -32,10 +32,21 @@ export function TimetableView() {
   const [selectedDay, setSelectedDay] = useState('Monday');
   const [viewType, setViewType] = useState<'week' | 'day'>('week');
   const [loading, setLoading] = useState(true);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
-  // Filters
-  const [selectedSection, setSelectedSection] = useState<string>('');
-  const [selectedFaculty, setSelectedFaculty] = useState<string>('');
+  const searchParams = useSearchParams();
+
+  // Filters initialized from URL if present
+  const [selectedSection, setSelectedSection] = useState<string>(searchParams?.get('section') || '');
+  const [selectedFaculty, setSelectedFaculty] = useState<string>(searchParams?.get('faculty') || '');
+
+  // Update if URL changes while component is mounted
+  useEffect(() => {
+      const sec = searchParams?.get('section');
+      const fac = searchParams?.get('faculty');
+      if (sec !== null) setSelectedSection(sec);
+      if (fac !== null) setSelectedFaculty(fac);
+  }, [searchParams]);
 
   // Attendance modal state
   const [attendanceModal, setAttendanceModal] = useState<{
@@ -48,36 +59,49 @@ export function TimetableView() {
     classDate: '',
   });
 
-  const isTeacherOrAdmin = user?.role === 'TEACHER' || user?.role === 'SUPER_TEACHER' || user?.role === 'ADMIN';
+  // Class Cancellation State
+  const [cancellations, setCancellations] = useState<any[]>([]);
+  const [cancelModal, setCancelModal] = useState<{
+    isOpen: boolean;
+    classInfo: any;
+    reason: string;
+    submitting: boolean;
+  }>({ isOpen: false, classInfo: null, reason: '', submitting: false });
+
+  const currentTeacherName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim().toLowerCase();
+  const isAdminOrSuper = user?.role === 'ADMIN' || user?.role === 'SUPER_TEACHER';
+  const isTeacherOrAdmin = user?.role === 'TEACHER' || isAdminOrSuper;
+
+  // Helper to check if the current teacher is authorized to manage a specific class block
+  const isTeacherAuthorizedForClass = (classItem: any) => {
+    if (isAdminOrSuper) return true;
+    if (user?.role !== 'TEACHER') return false;
+
+    const cleanName = (name: string) =>
+      name.toLowerCase().replace(/^(prof\.?\s*|dr\.?\s*|mr\.?\s*|mrs\.?\s*|ms\.?\s*)/gi, '').trim();
+
+    const teacherName = cleanName(`${user?.first_name || ''} ${user?.last_name || ''}`);
+    const faculties = (classItem.faculty || '').split(',').map((f: string) => cleanName(f));
+
+    return faculties.some((f: string) => {
+      if (teacherName.includes(f) || f.includes(teacherName)) return true;
+      // Relaxed fallback: remove all non-alphabetic chars and check if they share a significant common part
+      const tAlpha = teacherName.replace(/[^a-z]/g, '');
+      const fAlpha = f.replace(/[^a-z]/g, '');
+      if (tAlpha.length >= 5 && fAlpha.length >= 5) {
+        if (tAlpha.includes(fAlpha.substring(0, 5)) || fAlpha.includes(tAlpha.substring(0, 5))) return true;
+      }
+      return false;
+    });
+  };
 
   const openAttendance = (classItem: any, day: string) => {
     if (!isTeacherOrAdmin) return;
 
-    // Enforce that regular teachers and super teachers can only mark their own classes
-    if (user?.role === 'TEACHER' || user?.role === 'SUPER_TEACHER') {
-      const cleanName = (name: string) =>
-        name.toLowerCase().replace(/^(prof\.?\s*|dr\.?\s*|mr\.?\s*|mrs\.?\s*|ms\.?\s*)/gi, '').trim();
-
-      const teacherName = cleanName(`${user?.first_name || ''} ${user?.last_name || ''}`);
-      const faculties = (classItem.faculty || '')
-        .split(',')
-        .map((f: string) => cleanName(f));
-
-      const isAuthorized = faculties.some((f: string) => {
-        if (teacherName.includes(f) || f.includes(teacherName)) return true;
-        // Relaxed fallback: remove all non-alphabetic chars and check if they share a significant common part
-        const tAlpha = teacherName.replace(/[^a-z]/g, '');
-        const fAlpha = f.replace(/[^a-z]/g, '');
-        if (tAlpha.length >= 5 && fAlpha.length >= 5) {
-          if (tAlpha.includes(fAlpha.substring(0, 5)) || fAlpha.includes(tAlpha.substring(0, 5))) return true;
-        }
-        return false;
-      });
-
-      if (!isAuthorized) {
-        alert(`You can only mark attendance for your own classes.\nThis class is assigned to ${classItem.faculty}.`);
-        return;
-      }
+    // Enforce that regular teachers can only mark their own classes
+    if (!isTeacherAuthorizedForClass(classItem)) {
+      alert("You can only mark attendance for your own classes.");
+      return;
     }
 
     const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
@@ -143,12 +167,50 @@ export function TimetableView() {
       setLoading(false);
     };
     loadSaved();
+    
+    // Fetch existing cancellations
+    axios.get(`${HF_API}/cancellations`)
+      .then(res => setCancellations(res.data.cancellations || []))
+      .catch(err => console.error("Failed to load cancellations", err));
   }, []);
+
+  const handleCancelSubmit = async () => {
+    if (!cancelModal.reason.trim()) return alert("Please provide a reason.");
+    setCancelModal(prev => ({ ...prev, submitting: true }));
+    try {
+        const cls = cancelModal.classInfo;
+        const payload = {
+            section_id: String(cls.section?.split(',')[0]?.trim() || selectedSection || 'UNKNOWN'),
+            day: String(cls.dayName || 'Monday'),
+            period: Number(cls.period_index || 0),
+            subject: String(cls.subject || 'Unknown'),
+            reason: String(cancelModal.reason),
+            faculty_id: String(`${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'teacher')
+        };
+        const res = await axios.post(`${HF_API}/cancellations/request`, payload);
+        setCancellations(prev => [...prev, res.data.cancellation]);
+        setCancelModal({ isOpen: false, classInfo: null, reason: '', submitting: false });
+    } catch (err) {
+        console.error(err);
+        alert("Failed to submit cancellation request.");
+        setCancelModal(prev => ({ ...prev, submitting: false }));
+    }
+  };
 
   const allSections = useMemo(() => {
     if (!timetable?.grid) return [];
     return Object.keys(timetable.grid).sort();
   }, [timetable]);
+
+  // Robust fallback: if selectedSection is lowercase (e.g. "6a") from DB, 
+  // but grid sections are uppercase ("6A"), safely match them.
+  useEffect(() => {
+      if (selectedSection && allSections.length > 0 && !allSections.includes(selectedSection)) {
+          const lowerSec = selectedSection.toLowerCase();
+          const match = allSections.find(s => s.toLowerCase() === lowerSec || s.toLowerCase().includes(lowerSec));
+          if (match) setSelectedSection(match);
+      }
+  }, [selectedSection, allSections]);
 
   const allFaculties = useMemo(() => {
     if (!timetable?.grid) return [];
@@ -164,6 +226,22 @@ export function TimetableView() {
     });
     return Array.from(faculties).sort();
   }, [timetable]);
+
+  // Robust fallback: if selectedFaculty is an ID (e.g. "anu") or full name ("Mr. Adarsha"), 
+  // try to match them against the grid's shortened faculty names.
+  useEffect(() => {
+      if (selectedFaculty && allFaculties.length > 0 && !allFaculties.includes(selectedFaculty)) {
+          const cleanName = (name: string) => name.toLowerCase().replace(/^(prof\.?\s*|dr\.?\s*|mr\.?\s*|mrs\.?\s*|ms\.?\s*)/gi, '').trim();
+          const target = cleanName(selectedFaculty);
+          
+          const match = allFaculties.find(f => {
+              const fClean = cleanName(f);
+              return fClean.includes(target) || target.includes(fClean) || target === f.toLowerCase();
+          });
+          
+          if (match) setSelectedFaculty(match);
+      }
+  }, [selectedFaculty, allFaculties]);
 
   // Set default selection based on user role
   useEffect(() => {
@@ -439,98 +517,7 @@ export function TimetableView() {
   }, [filteredData, weekDays]);
 
 
-  const handleExport = () => {
-    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-
-    // Title
-    const title = selectedSection
-      ? `Timetable — Section ${selectedSection}`
-      : selectedFaculty
-        ? `Timetable — ${selectedFaculty}`
-        : 'Timetable';
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text(title, 14, 15);
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(120);
-    doc.text(`Generated on ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}`, 14, 21);
-    doc.setTextColor(0);
-
-    // Build table headers
-    const breakAfter = timetable?.break_after_index ?? 2;
-    const lunchAfter = timetable?.lunch_after_index ?? 5;
-    const breakHeaderIdx = breakAfter + 1;
-    const lunchHeaderIdx = lunchAfter + 2;
-
-    const periodHeaders = headers.filter((_: string, i: number) => i !== breakHeaderIdx && i !== lunchHeaderIdx);
-    const tableHead = [['DAY', ...periodHeaders]];
-
-    // Build table body
-    const tableBody: any[][] = [];
-    weekDays.forEach((day: string) => {
-      const row: any[] = [day.substring(0, 3).toUpperCase()];
-      let periodCounter = 0;
-      headers.forEach((_h: string, hi: number) => {
-        if (hi === breakHeaderIdx || hi === lunchHeaderIdx) return;
-        const classes = matrix[day]?.[periodCounter] || [];
-        periodCounter++;
-        if (classes.length === 0) {
-          row.push('');
-        } else {
-          const cellText = classes.map((cls: any) => {
-            let line = (cls.subject || '').toUpperCase();
-            if (cls.batch) line += ` [${cls.batch}]`;
-            line += `\n${cls.faculty || ''}`;
-            if (cls.room) line += ` | ${cls.room}`;
-            return line;
-          }).join('\n---\n');
-          row.push(cellText);
-        }
-      });
-      tableBody.push(row);
-    });
-
-    // Render table
-    autoTable(doc, {
-      head: tableHead,
-      body: tableBody,
-      startY: 25,
-      theme: 'grid',
-      styles: {
-        fontSize: 7,
-        cellPadding: 2,
-        valign: 'middle',
-        lineColor: [200, 200, 200],
-        lineWidth: 0.3,
-      },
-      headStyles: {
-        fillColor: [67, 56, 202],
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-        fontSize: 7,
-        halign: 'center',
-      },
-      columnStyles: {
-        0: { fontStyle: 'bold', halign: 'center', cellWidth: 18, fillColor: [245, 245, 255] },
-      },
-      bodyStyles: {
-        halign: 'center',
-      },
-      didParseCell: (data: any) => {
-        if (data.section === 'body' && data.column.index > 0 && data.cell.raw) {
-          const raw = String(data.cell.raw);
-          if (raw.includes('LAB')) {
-            data.cell.styles.fillColor = [240, 253, 244];
-          } else if (raw.includes('[')) {
-            data.cell.styles.fillColor = [248, 250, 252];
-          }
-        }
-      },
-    });
-
-    doc.save(`timetable_${(selectedSection || selectedFaculty || 'all').replace(/\s+/g, '_')}.pdf`);
-  };
+  // Export modal is now used instead of direct download
 
   if (loading) {
     return <div className="flex justify-center p-10">Loading timetable...</div>;
@@ -624,7 +611,7 @@ export function TimetableView() {
           </div>
 
           <button
-            onClick={handleExport}
+            onClick={() => setExportModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 border border-transparent text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm shrink-0"
           >
             <Download className="w-4 h-4" />
@@ -771,8 +758,22 @@ export function TimetableView() {
                                             {cls.room && <span className="flex items-center gap-1 shrink-0"><MapPin className="w-3 h-3 shrink-0" /> {cls.room}</span>}
                                           </div>
                                           {isTeacherOrAdmin && (
-                                            <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-end">
-                                              <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold ${isClassToday ? 'bg-blue-600 text-white' : 'bg-white/60 text-slate-500'}`}>
+                                            <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-between items-center relative z-20" onClick={e => e.stopPropagation()}>
+                                              {isTeacherAuthorizedForClass(cls) ? (
+                                                <span 
+                                                  onClick={() => setCancelModal({ isOpen: true, classInfo: { ...cls, dayName, period_index: cls.period_index }, reason: '', submitting: false })}
+                                                  className="flex items-center justify-center w-5 h-5 rounded hover:bg-red-100 text-red-500 transition-colors cursor-pointer"
+                                                  title="Request Cancellation"
+                                                >
+                                                  <X className="w-3 h-3" strokeWidth={3} />
+                                                </span>
+                                              ) : (
+                                                <span className="w-5 h-5"></span>
+                                              )}
+                                              <span 
+                                                onClick={() => openAttendance(cls, dayName)}
+                                                className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold cursor-pointer transition-colors ${isClassToday ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm' : 'bg-white/60 hover:bg-white text-slate-500'}`}
+                                              >
                                                 {isClassToday ? <ClipboardList className="w-2.5 h-2.5" /> : <Lock className="w-2 h-2" />}
                                                 {isClassToday ? 'Mark' : 'Locked'}
                                               </span>
@@ -793,13 +794,33 @@ export function TimetableView() {
 
                                 return (
                                   <div key={idx}
-                                    onClick={() => isTeacherOrAdmin && openAttendance(cls, dayName)}
-                                    className={`relative p-2 rounded-xl border ${colors.border} ${colors.bg} shadow-sm hover:shadow-md transition-all duration-300 ${isTeacherOrAdmin ? 'cursor-pointer hover:-translate-y-0.5' : ''}`}>
+                                    className={`relative p-2 rounded-xl border ${colors.border} ${colors.bg} shadow-sm transition-all duration-300`}>
                                     <div className={`font-bold text-xs sm:text-sm mb-1.5 ${colors.textPrimary} flex justify-between items-start gap-1`}>
                                       <span className="whitespace-pre-line leading-tight">{cls.subject}</span>
                                       <div className="flex flex-col items-end gap-1 shrink-0">
+                                        {(() => {
+                                           const sec = cls.section?.split(',')[0]?.trim() || selectedSection;
+                                           const cancelReq = cancellations.find(c => 
+                                              c.day === dayName && 
+                                              c.period === cls.period_index && 
+                                              c.subject === cls.subject && 
+                                              (c.section_id === sec || sec === 'UNKNOWN')
+                                           );
+                                           if (cancelReq) {
+                                               return (
+                                                  <span className={`text-[8px] px-1 py-0.5 rounded uppercase tracking-wider mt-0.5 font-bold ${
+                                                    cancelReq.status === 'APPROVED' ? 'bg-red-100 border border-red-200 text-red-700' :
+                                                    cancelReq.status === 'REJECTED' ? 'bg-gray-100 border border-gray-200 text-gray-700' :
+                                                    'bg-yellow-100 border border-yellow-200 text-yellow-700'
+                                                  }`}>
+                                                    {cancelReq.status === 'APPROVED' ? 'Cancelled' : 
+                                                     cancelReq.status === 'REJECTED' ? 'Cancel Rejected' : 'Cancel Pending'}
+                                                  </span>
+                                               );
+                                           }
+                                           return cls.is_substituted ? <span className="text-[8px] bg-orange-100 border border-orange-200 text-orange-700 px-1 py-0.5 rounded uppercase tracking-wider mt-0.5 font-bold">Sub</span> : null;
+                                        })()}
                                         {cls.batch && <span className="text-[10px] bg-white/60 px-1.5 py-0.5 rounded-full border border-current/20 font-bold tracking-wide">{cls.batch}</span>}
-                                        {cls.is_substituted && <span className="text-[8px] bg-orange-100 border border-orange-200 text-orange-700 px-1 py-0.5 rounded uppercase tracking-wider mt-0.5">Sub</span>}
                                       </div>
                                     </div>
                                     <div className="space-y-1">
@@ -821,12 +842,25 @@ export function TimetableView() {
                                         </div>
                                       )}
                                       {isTeacherOrAdmin && (
-                                        <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-end">
-                                          <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold ${isClassToday ? 'bg-blue-600 text-white' : 'bg-white/60 text-slate-500'
-                                            }`}>
-                                            {isClassToday ? <ClipboardList className="w-2.5 h-2.5" /> : <Lock className="w-2 h-2" />}
-                                            {isClassToday ? 'Mark' : 'Locked'}
-                                          </span>
+                                        <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-between items-center relative z-20" onClick={e => e.stopPropagation()}>
+                                            {isTeacherAuthorizedForClass(cls) ? (
+                                              <span 
+                                                onClick={() => setCancelModal({ isOpen: true, classInfo: { ...cls, dayName, period_index: cls.period_index }, reason: '', submitting: false })}
+                                                className="flex items-center justify-center w-5 h-5 rounded hover:bg-red-100 text-red-500 transition-colors cursor-pointer"
+                                                title="Request Cancellation"
+                                              >
+                                                <X className="w-3 h-3" strokeWidth={3} />
+                                              </span>
+                                            ) : (
+                                              <span className="w-5 h-5"></span>
+                                            )}
+                                            <span 
+                                              onClick={() => openAttendance(cls, dayName)}
+                                              className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-bold cursor-pointer transition-colors ${isClassToday ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-sm' : 'bg-white/60 hover:bg-white text-slate-500'}`}
+                                            >
+                                              {isClassToday ? <ClipboardList className="w-2.5 h-2.5" /> : <Lock className="w-2 h-2" />}
+                                              {isClassToday ? 'Mark' : 'Locked'}
+                                            </span>
                                         </div>
                                       )}
                                     </div>
@@ -882,11 +916,10 @@ export function TimetableView() {
                 return (
                   <div
                     key={idx}
-                    onClick={() => isTeacherOrAdmin && openAttendance(classItem, selectedDay)}
                     className={`flex flex-col md:flex-row gap-5 p-5 rounded-xl border transition-all duration-200 group ${classItem.is_substituted
                       ? 'bg-[#fff7ed] border-orange-200 shadow-orange-100/50'
                       : 'bg-[#f0fdf4] border-[#bbf7d0] shadow-green-100/30'
-                      } ${isTeacherOrAdmin ? 'cursor-pointer hover:shadow-lg hover:scale-[1.005]' : ''}`}
+                      }`}
                   >
                     <div className="flex flex-col items-center justify-center shrink-0 md:w-28 gap-2">
                       <div className={`p-3 font-bold text-lg rounded-xl shadow-sm w-full text-center ${classItem.is_substituted
@@ -897,9 +930,11 @@ export function TimetableView() {
                       </div>
                       {isTeacherOrAdmin && (
                         <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-semibold w-full justify-center ${isClassToday
-                          ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                          ? 'bg-blue-100 text-blue-700 border border-blue-200 cursor-pointer hover:bg-blue-200'
                           : 'bg-gray-100 text-gray-400 border border-gray-200'
-                          }`}>
+                          }`}
+                          onClick={() => isClassToday && openAttendance(classItem, selectedDay)}
+                        >
                           {isClassToday ? <ClipboardList className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
                           {isClassToday ? 'Mark Attendance' : 'Not Today'}
                         </div>
@@ -918,12 +953,6 @@ export function TimetableView() {
                           <UserIcon className={`w-4 h-4 ${classItem.is_substituted ? 'text-orange-400' : 'text-emerald-500'}`} />
                           <p className={`text-sm font-semibold ${classItem.is_substituted ? 'text-orange-700' : 'text-emerald-700'}`}>{classItem.faculty}</p>
                         </div>
-                        {classItem.is_substituted && classItem.original_faculty && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <UserIcon className="w-3.5 h-3.5 text-orange-400" />
-                            <p className="text-xs text-orange-600 italic">Original: {classItem.original_faculty}</p>
-                          </div>
-                        )}
                       </div>
 
                       <div className="flex flex-wrap gap-4 pt-2">
@@ -953,6 +982,69 @@ export function TimetableView() {
         classInfo={attendanceModal.classInfo}
         classDate={attendanceModal.classDate}
         teacherName={`${user?.first_name ?? ''} ${user?.last_name ?? ''}`.trim()}
+      />
+
+      {/* Cancellation Request Modal */}
+      {cancelModal.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setCancelModal({ ...cancelModal, isOpen: false })}></div>
+          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-fade-in border border-slate-100">
+            <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex items-center justify-between">
+              <h3 className="font-bold text-red-900 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600" />
+                Request Cancellation
+              </h3>
+              <button onClick={() => setCancelModal({ ...cancelModal, isOpen: false })} className="text-red-400 hover:text-red-600 p-1 rounded-lg hover:bg-red-100/50 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-4 text-sm">
+                <div className="font-semibold text-slate-800">{cancelModal.classInfo?.subject}</div>
+                <div className="text-slate-600 mt-1">
+                  {cancelModal.classInfo?.dayName} • Period {cancelModal.classInfo?.period_index + 1}
+                </div>
+              </div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">Reason for Cancellation</label>
+              <textarea
+                autoFocus
+                className="w-full rounded-xl border-slate-200 shadow-sm focus:border-red-500 focus:ring-red-500 text-sm p-3 min-h-[100px]"
+                placeholder="E.g., Medical emergency, attending a conference, etc."
+                value={cancelModal.reason}
+                onChange={e => setCancelModal(prev => ({ ...prev, reason: e.target.value }))}
+              />
+              <div className="flex gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setCancelModal({ ...cancelModal, isOpen: false })}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={handleCancelSubmit}
+                  disabled={cancelModal.submitting}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                >
+                  {cancelModal.submitting ? 'Submitting...' : 'Submit Request'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Export Modal */}
+      <ExportPreviewModal 
+        isOpen={exportModalOpen}
+        onClose={() => setExportModalOpen(false)}
+        matrix={matrix}
+        headers={headers}
+        weekDays={weekDays}
+        breakAfterIndex={timetable?.break_after_index ?? 2}
+        lunchAfterIndex={timetable?.lunch_after_index ?? 5}
+        selectedSection={selectedSection}
+        selectedFaculty={selectedFaculty}
       />
     </div>
   );

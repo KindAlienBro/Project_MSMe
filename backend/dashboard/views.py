@@ -1098,3 +1098,98 @@ class StudentMyAttendanceView(views.APIView):
             'subject_wise': subject_wise,
             'recent_records': recent_records,
         })
+
+
+class FacultyAttendanceHistoryView(views.APIView):
+    """
+    GET /dashboard/attendance/history/
+    Returns all attendance sessions created by the logged-in teacher/admin,
+    with per-session attendance percentage and student counts.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.role not in ['ADMIN', 'SUPER_TEACHER', 'TEACHER']:
+            return Response(
+                {'error': 'Only faculty/admin can access this endpoint.'},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        from .models import AttendanceSession, AttendanceRecord
+        from django.db.models import Count, Q
+
+        # For admin, show all sessions; for teachers, show only their own
+        if user.role == 'ADMIN':
+            sessions = AttendanceSession.objects.all()
+        else:
+            sessions = AttendanceSession.objects.filter(created_by=user)
+
+        sessions = sessions.annotate(
+            total_students=Count('records'),
+            present_count=Count('records', filter=Q(records__status='P')),
+            absent_count=Count('records', filter=Q(records__status='A')),
+        ).order_by('-date', '-period_index')
+
+        # Overall stats
+        total_sessions = sessions.count()
+        total_records = sum(s.total_students for s in sessions)
+        total_present = sum(s.present_count for s in sessions)
+        overall_pct = round((total_present / total_records * 100), 1) if total_records > 0 else 0.0
+
+        # Build session list
+        session_list = []
+        for s in sessions:
+            pct = round((s.present_count / s.total_students * 100), 1) if s.total_students > 0 else 0.0
+            session_list.append({
+                'id': s.id,
+                'subject_code': s.subject_code,
+                'subject_name': s.subject_name or s.subject_code,
+                'section': s.section,
+                'faculty_name': s.faculty_name,
+                'date': s.date.isoformat(),
+                'period_index': s.period_index,
+                'time_slot': s.time_slot,
+                'total_students': s.total_students,
+                'present': s.present_count,
+                'absent': s.absent_count,
+                'percentage': pct,
+                'created_at': s.created_at.isoformat() if s.created_at else '',
+            })
+
+        # Subject-wise summary
+        subject_map: dict = {}
+        for s in sessions:
+            key = f"{s.subject_code}_{s.section}"
+            if key not in subject_map:
+                subject_map[key] = {
+                    'subject_code': s.subject_code,
+                    'subject_name': s.subject_name or s.subject_code,
+                    'section': s.section,
+                    'total_sessions': 0,
+                    'total_students': 0,
+                    'present': 0,
+                }
+            subject_map[key]['total_sessions'] += 1
+            subject_map[key]['total_students'] += s.total_students
+            subject_map[key]['present'] += s.present_count
+
+        subject_summary = []
+        for sub in subject_map.values():
+            sub['percentage'] = round(
+                (sub['present'] / sub['total_students'] * 100), 1
+            ) if sub['total_students'] > 0 else 0.0
+            subject_summary.append(sub)
+        subject_summary.sort(key=lambda x: x['subject_code'])
+
+        return Response({
+            'overall': {
+                'total_sessions': total_sessions,
+                'total_records': total_records,
+                'total_present': total_present,
+                'percentage': overall_pct,
+            },
+            'subject_summary': subject_summary,
+            'sessions': session_list,
+        })
+

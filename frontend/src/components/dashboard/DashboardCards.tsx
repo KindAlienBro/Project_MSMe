@@ -1,5 +1,6 @@
 "use client";
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { LucideIcon } from 'lucide-react';
 
 interface CardData {
@@ -8,6 +9,7 @@ interface CardData {
   subtitle: string;
   icon: LucideIcon;
   color: 'blue' | 'orange' | 'green' | 'purple' | 'pink';
+  href?: string;
 }
 
 const colorClasses = {
@@ -24,6 +26,8 @@ interface Props {
 }
 
 export function DashboardCards({ cards, loading }: Props) {
+  const router = useRouter();
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       {cards.map((card, index) => {
@@ -33,7 +37,8 @@ export function DashboardCards({ cards, loading }: Props) {
         return (
           <div
             key={index}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200"
+            onClick={() => card.href && router.push(card.href)}
+            className={`bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 ${card.href ? 'cursor-pointer hover:scale-[1.02] active:scale-[0.98]' : ''}`}
           >
             <div className="flex items-start justify-between mb-4">
               <div className={`p-3 rounded-lg ${colorClass}`}>

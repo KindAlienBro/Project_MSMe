@@ -1,15 +1,24 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Bell, Menu, ChevronDown, CheckCircle2, UserCog, FileText, X } from 'lucide-react';
+import { Search, Bell, Menu, ChevronDown, CheckCircle2, UserCog, FileText, X, BookOpen, Users, Layers, Calendar, Cpu, Database } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '@/context/AuthContext';
 import { endpoints } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 
 const HF_API = 'https://kindalien-timetable-gen.hf.space';
 
 interface NavbarProps {
   onMenuClick: () => void;
 }
+
+const COMMANDS = [
+    { id: '/dashboard/timetable', name: 'Your Timetable', desc: 'View personalized weekly schedules', icon: <Calendar className="w-4 h-4 text-indigo-500" /> },
+    { id: '/dashboard/generate-timetable', name: 'Timetable Generator', desc: 'Generate and export timetables', icon: <Cpu className="w-4 h-4 text-emerald-500" /> },
+    { id: '/dashboard/manage-data', name: 'Manage Data', desc: 'Add or edit faculties, subjects, sections', icon: <Database className="w-4 h-4 text-orange-500" /> },
+    { id: '/dashboard/leave-management', name: 'Leave Management', desc: 'Manage leaves and substitutions', icon: <FileText className="w-4 h-4 text-pink-500" /> },
+    { id: '/dashboard/attendance', name: 'Attendance', desc: 'Mark or view student attendance', icon: <CheckCircle2 className="w-4 h-4 text-teal-500" /> },
+];
 
 interface NotificationItem {
   id: string;
@@ -26,6 +35,74 @@ export function Navbar({ onMenuClick }: NavbarProps) {
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
   const { user } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [searchData, setSearchData] = useState<{ faculties: any[], subjects: any[], sections: any[] }>({ faculties: [], subjects: [], sections: [] });
+  const [filteredResults, setFilteredResults] = useState<any[]>([]);
+
+  // Fetch search data on focus
+  const handleSearchFocus = async () => {
+    setIsSearchFocused(true);
+    if (searchData.faculties.length === 0) {
+      try {
+        const [facRes, subRes, secRes] = await Promise.all([
+          axios.get(`${HF_API}/data/faculties`),
+          axios.get(`${HF_API}/data/subjects`),
+          axios.get(`${HF_API}/data/sections`)
+        ]);
+        setSearchData({
+          faculties: facRes.data.faculties || [],
+          subjects: subRes.data.subjects || [],
+          sections: secRes.data.sections || []
+        });
+      } catch (err) { console.error("Search fetch failed", err); }
+    }
+  };
+
+  useEffect(() => {
+    if (!searchQuery) {
+        setFilteredResults([]);
+        return;
+    }
+    const query = searchQuery.toLowerCase();
+    const results: any[] = [];
+    
+    searchData.sections.forEach(s => {
+        if (s.id.toLowerCase().includes(query)) results.push({ type: 'section', id: s.id, name: `Section ${s.id}`, desc: `Semester ${s.semester}`, icon: <Layers className="w-4 h-4 text-purple-500" /> });
+    });
+    searchData.faculties.forEach(f => {
+        if (f.name.toLowerCase().includes(query) || f.id.toLowerCase().includes(query)) results.push({ type: 'faculty', id: f.id, name: f.name, desc: `${f.id} • ${f.designation}`, icon: <Users className="w-4 h-4 text-blue-500" /> });
+    });
+    searchData.subjects.forEach(s => {
+        if (s.name.toLowerCase().includes(query) || s.code.toLowerCase().includes(query)) results.push({ type: 'subject', id: s.code, name: s.name, desc: `${s.code} • ${s.type}`, icon: <BookOpen className="w-4 h-4 text-green-500" /> });
+    });
+    
+    COMMANDS.forEach(cmd => {
+        if (cmd.name.toLowerCase().includes(query) || cmd.desc.toLowerCase().includes(query)) {
+            results.push({ type: 'command', id: cmd.id, name: cmd.name, desc: cmd.desc, icon: cmd.icon });
+        }
+    });
+
+    setFilteredResults(results.slice(0, 10)); // Top 10 results
+  }, [searchQuery, searchData]);
+
+  const handleSearchResultClick = (item: any) => {
+    setSearchQuery('');
+    setIsSearchFocused(false);
+    if (item.type === 'section') {
+        router.push(`/dashboard/timetable?section=${encodeURIComponent(item.id)}`);
+    } else if (item.type === 'faculty') {
+        router.push(`/dashboard/timetable?faculty=${encodeURIComponent(item.name)}`);
+    } else if (item.type === 'subject') {
+        router.push(`/dashboard/manage-data`);
+    } else if (item.type === 'command') {
+        router.push(item.id);
+    }
+  };
 
   // Load read IDs from localStorage
   useEffect(() => {
@@ -119,11 +196,14 @@ export function Navbar({ onMenuClick }: NavbarProps) {
     return () => clearInterval(interval);
   }, [user, readIds]);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setShowNotifications(false);
+      }
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setIsSearchFocused(false);
       }
     };
     document.addEventListener('mousedown', handleClick);
@@ -195,13 +275,43 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           </button>
 
           {/* Search Bar */}
-          <div className="relative flex-1 max-w-md hidden sm:block">
+          <div className="relative flex-1 max-w-md hidden sm:block" ref={searchContainerRef}>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              onFocus={handleSearchFocus}
               placeholder="Search classes or subjects..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 bg-gray-50/50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
+            
+            {/* Search Dropdown */}
+            {isSearchFocused && searchQuery && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {filteredResults.length === 0 ? (
+                      <div className="p-4 text-sm text-gray-500 text-center">No results found for "{searchQuery}"</div>
+                  ) : (
+                      <div className="py-2">
+                          {filteredResults.map((item, idx) => (
+                              <button
+                                  key={`${item.type}-${item.id}-${idx}`}
+                                  onClick={() => handleSearchResultClick(item)}
+                                  className="w-full text-left px-4 py-2.5 hover:bg-blue-50 transition-colors flex items-center gap-3 group"
+                              >
+                                  <div className="p-1.5 bg-gray-50 rounded-lg group-hover:bg-white transition-colors">
+                                      {item.icon}
+                                  </div>
+                                  <div>
+                                      <p className="text-sm font-medium text-gray-800">{item.name}</p>
+                                      <p className="text-[10px] text-gray-500">{item.desc}</p>
+                                  </div>
+                              </button>
+                          ))}
+                      </div>
+                  )}
+              </div>
+            )}
           </div>
         </div>
 

@@ -28,6 +28,7 @@ SUB_REQ_FILE  = str(DATA_DIR / 'substitution_requests.json')
 ORIGINAL_FILE = str(DATA_DIR / 'original_schedule.json')
 VERSIONS_FILE = str(DATA_DIR / 'schedule_versions.json')
 PENDING_FILE  = str(DATA_DIR / 'pending_timetables.json')
+CANCELLATION_FILE = str(DATA_DIR / 'cancellations.json')
 
 def _get_scheduler():
     """Lazily initialize the CommitScheduler (only on HuggingFace Spaces)."""
@@ -243,3 +244,11 @@ def save_substitution_requests(requests: list):
 
 def clear_substitution_requests():
     if os.path.exists(SUB_REQ_FILE): os.remove(SUB_REQ_FILE)
+
+# ── Cancellation Requests ─────────────────────────────────────────────────
+
+def load_cancellations() -> list:
+    return _safe_read_json(CANCELLATION_FILE, default=[])
+
+def save_cancellations(requests: list):
+    _safe_write_json(CANCELLATION_FILE, requests)

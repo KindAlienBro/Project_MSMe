@@ -30,6 +30,7 @@ from .views import (
     AttendanceSubmitView,
     AttendanceStatusView,
     StudentMyAttendanceView,
+    FacultyAttendanceHistoryView,
     TimetableSyncView,
 )
 
@@ -67,4 +68,5 @@ urlpatterns = [
     path('attendance/submit/', AttendanceSubmitView.as_view(), name='attendance-submit'),
     path('attendance/status/', AttendanceStatusView.as_view(), name='attendance-status'),
     path('attendance/my/', StudentMyAttendanceView.as_view(), name='student-my-attendance'),
+    path('attendance/history/', FacultyAttendanceHistoryView.as_view(), name='faculty-attendance-history'),
 ]

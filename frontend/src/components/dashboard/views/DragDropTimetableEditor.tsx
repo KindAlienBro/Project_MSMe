@@ -150,6 +150,7 @@ export function DragDropTimetableEditor() {
     const [error, setError] = useState<string | null>(null);
     const [showAvailablePanel, setShowAvailablePanel] = useState(false);
     const [savedChanges, setSavedChanges] = useState<{ subject: string; faculty: string; fromDay: string; fromPeriod: number; toDay: string; toPeriod: number; savedAt: string }[]>([]);
+    const [highlightInfo, setHighlightInfo] = useState<{ day: string, period: number, subject: string } | null>(null);
 
     // ── Add Subject state ─────────────────────────────────────────────────
     const [subjectsList, setSubjectsList] = useState<SubjectData[]>([]);
@@ -191,7 +192,22 @@ export function DragDropTimetableEditor() {
                     if (data.lunch_after_index != null) setLunchAfter(data.lunch_after_index);
 
                     const sectionsList = Object.keys(data.grid).sort();
-                    if (sectionsList.length > 0) setActiveSection(sectionsList[0]);
+                    let targetSection = sectionsList.length > 0 ? sectionsList[0] : '';
+                    if (typeof window !== 'undefined') {
+                        const params = new URLSearchParams(window.location.search);
+                        const querySection = params.get('section');
+                        if (querySection && sectionsList.includes(querySection)) {
+                            targetSection = querySection;
+                        }
+                        
+                        const dayName = params.get('day');
+                        const periodStr = params.get('period');
+                        const subject = params.get('subject');
+                        if (dayName && periodStr && subject) {
+                            setHighlightInfo({ day: dayName, period: parseInt(periodStr, 10), subject });
+                        }
+                    }
+                    setActiveSection(targetSection);
                 } else {
                     setError("No active timetable found on the server.");
                 }
@@ -1265,6 +1281,11 @@ export function DragDropTimetableEditor() {
                                                         ) : (
                                                             cells.map((c, ci) => {
                                                                 const hue = subjectHue(c.subject);
+                                                                const isHighlighted = highlightInfo && 
+                                                                    highlightInfo.day === dayName && 
+                                                                    highlightInfo.period === currentPeriod && 
+                                                                    highlightInfo.subject === c.subject;
+
                                                                 return (
                                                                     <div
                                                                         key={ci}
@@ -1277,7 +1298,7 @@ export function DragDropTimetableEditor() {
                                                                             classData: c,
                                                                         })}
                                                                         onDragEnd={handleDragEnd}
-                                                                        className="relative rounded-lg px-2 py-1.5 mb-1 cursor-grab active:cursor-grabbing transition-all duration-150 hover:scale-[1.03] hover:shadow-md group/card border"
+                                                                        className={`relative rounded-lg px-2 py-1.5 mb-1 cursor-grab active:cursor-grabbing transition-all duration-150 hover:scale-[1.03] hover:shadow-md group/card border ${isHighlighted ? 'ring-4 ring-yellow-400 ring-offset-1 animate-pulse z-20' : ''}`}
                                                                         style={{
                                                                             backgroundColor: `hsl(${hue}, 85%, 96%)`,
                                                                             borderColor: `hsl(${hue}, 60%, 80%)`,

@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { RefreshCw, Send, AlertCircle, CheckCircle, Wand2, Eye, RotateCcw, Archive, ChevronDown, ChevronUp, X, MessageSquare, BookOpen } from 'lucide-react';
+import { RefreshCw, Send, AlertCircle, CheckCircle, Wand2, Eye, RotateCcw, Archive, ChevronDown, ChevronUp, X, MessageSquare, BookOpen, Download } from 'lucide-react';
 import axios from 'axios';
 import { endpoints } from '@/lib/api';
+import { ExportPreviewModal } from '../ExportPreviewModal';
 
 const HF_API = process.env.NEXT_PUBLIC_HF_API || 'https://kindalien-timetable-gen.hf.space';
 
@@ -145,6 +146,11 @@ export function TimetableGeneratorView() {
     const [showVersions, setShowVersions] = useState(false);
     const [isRestoringVersion, setIsRestoringVersion] = useState<string | null>(null);
     const [versionLabel, setVersionLabel] = useState('');
+    
+    // Export state
+    const [exportModalOpen, setExportModalOpen] = useState(false);
+    const [exportData, setExportData] = useState<any>(null);
+    const [isExportingVersion, setIsExportingVersion] = useState<string | null>(null);
 
     // Semester selection state
     const [availableSemesters, setAvailableSemesters] = useState<number[]>([]);
@@ -404,6 +410,22 @@ export function TimetableGeneratorView() {
         }
     };
 
+    // ── Version Export ───────────────────────────────────────────────────
+    const handleExportVersion = async (versionId: string) => {
+        setIsExportingVersion(versionId);
+        try {
+            const res = await axios.get(`${HF_API}/schedule/versions/${versionId}`);
+            if (res.data.status === 'SUCCESS') {
+                setExportData(res.data);
+                setExportModalOpen(true);
+            }
+        } catch (err: any) {
+            setError(err.response?.data?.detail || "Failed to fetch version data for export.");
+        } finally {
+            setIsExportingVersion(null);
+        }
+    };
+
     return (
         <div className="space-y-6 pb-12">
             <div className="flex items-start justify-between">
@@ -600,16 +622,28 @@ export function TimetableGeneratorView() {
                                                 {ts} · {v.history_count} change{v.history_count !== 1 ? 's' : ''} recorded
                                             </p>
                                         </div>
-                                        <button
-                                            onClick={() => handleRestoreVersion(v.id)}
-                                            disabled={isRestoringVersion === v.id}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold transition-colors border border-blue-200 disabled:opacity-50"
-                                        >
-                                            {isRestoringVersion === v.id
-                                                ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Restoring...</>
-                                                : <><RotateCcw className="w-3.5 h-3.5" /> Restore</>
-                                            }
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleExportVersion(v.id)}
+                                                disabled={isExportingVersion === v.id || isRestoringVersion === v.id}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded-lg text-xs font-semibold transition-colors border border-indigo-200 disabled:opacity-50"
+                                            >
+                                                {isExportingVersion === v.id
+                                                    ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Fetching...</>
+                                                    : <><Download className="w-3.5 h-3.5" /> Preview &amp; Export</>
+                                                }
+                                            </button>
+                                            <button
+                                                onClick={() => handleRestoreVersion(v.id)}
+                                                disabled={isRestoringVersion === v.id || isExportingVersion === v.id}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-semibold transition-colors border border-blue-200 disabled:opacity-50"
+                                            >
+                                                {isRestoringVersion === v.id
+                                                    ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Restoring...</>
+                                                    : <><RotateCcw className="w-3.5 h-3.5" /> Restore</>
+                                                }
+                                            </button>
+                                        </div>
                                     </div>
                                 );
                             })}
@@ -695,6 +729,22 @@ export function TimetableGeneratorView() {
                         </div>
                     </div>
                 </>
+            )}
+
+            {/* ═══ Export Preview Modal ═══ */}
+            {exportModalOpen && exportData && (
+                <ExportPreviewModal
+                    isOpen={exportModalOpen}
+                    onClose={() => setExportModalOpen(false)}
+                    matrix={{}}
+                    rawGrid={exportData.grid}
+                    headers={exportData.headers || Array.from({ length: 10 }, (_, i) => `P${i + 1}`)}
+                    weekDays={exportData.days || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']}
+                    breakAfterIndex={exportData.break_after_index ?? 2}
+                    lunchAfterIndex={exportData.lunch_after_index ?? 5}
+                    selectedSection={exportData.label || "Version"}
+                    selectedFaculty={""}
+                />
             )}
         </div>
     );

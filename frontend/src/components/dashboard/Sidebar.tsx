@@ -28,7 +28,7 @@ interface SidebarProps {
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, href: '/dashboard', roles: ['ADMIN', 'SUPER_TEACHER', 'TEACHER', 'STUDENT'] },
   { name: 'Timetable', icon: Calendar, href: '/dashboard/timetable', roles: ['ADMIN', 'SUPER_TEACHER', 'TEACHER', 'STUDENT'] },
-  { name: 'Attendance', icon: ClipboardList, href: '/dashboard/attendance', roles: ['STUDENT'] },
+  { name: 'Attendance', icon: ClipboardList, href: '/dashboard/attendance', roles: ['ADMIN', 'SUPER_TEACHER', 'TEACHER', 'STUDENT'] },
   { name: 'Timetable Generator', icon: Calendar, href: '/dashboard/generate-timetable', roles: ['ADMIN', 'SUPER_TEACHER'] },
   { name: 'Drag & Drop Editor', icon: GripVertical, href: '/dashboard/drag-drop-editor', roles: ['ADMIN', 'SUPER_TEACHER'] },
   { name: 'Compare Timetables', icon: GitCompare, href: '/dashboard/compare-timetable', roles: ['ADMIN', 'SUPER_TEACHER'] },

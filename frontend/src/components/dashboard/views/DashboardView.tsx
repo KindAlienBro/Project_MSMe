@@ -145,6 +145,7 @@ export function DashboardView() {
       subtitle: `${adminStats?.teachers_present || 0} present • ${adminStats?.teachers_on_leave || 0} absent`,
       icon: UserCog,
       color: 'blue' as const,
+      href: '/dashboard/manage-data',
     },
     {
       title: 'Total Students',
@@ -152,6 +153,7 @@ export function DashboardView() {
       subtitle: 'Enrolled in department',
       icon: GraduationCap,
       color: 'green' as const,
+      href: '/dashboard/manage-data',
     },
     {
       title: 'Total Classes',
@@ -159,6 +161,7 @@ export function DashboardView() {
       subtitle: 'Active sections',
       icon: Layers,
       color: 'pink' as const,
+      href: '/dashboard/manage-data',
     },
     {
       title: 'Pending Leave Requests',
@@ -166,6 +169,7 @@ export function DashboardView() {
       subtitle: pendingLeaves > 0 ? 'Awaiting approval' : 'All clear',
       icon: FileText,
       color: 'orange' as const,
+      href: '/dashboard/leave-requests',
     },
   ] : [
     {
@@ -176,6 +180,7 @@ export function DashboardView() {
         : 'No classes today',
       icon: BookOpen,
       color: 'blue' as const,
+      href: '/dashboard/timetable',
     },
     {
       title: 'Pending Leave Requests',
@@ -183,6 +188,7 @@ export function DashboardView() {
       subtitle: pendingLeaves > 0 ? 'Awaiting approval' : 'All clear',
       icon: FileText,
       color: 'orange' as const,
+      href: '/dashboard/leave-requests',
     },
     {
       title: 'Substitute Requests',
@@ -190,6 +196,7 @@ export function DashboardView() {
       subtitle: pendingSubRequests > 0 ? `${pendingSubRequests} pending action` : totalSubRequests > 0 ? 'All resolved' : 'None active',
       icon: UserCog,
       color: 'pink' as const,
+      href: '/dashboard/substitute-classes',
     },
     {
       title: 'Class Attendance',
@@ -197,6 +204,7 @@ export function DashboardView() {
       subtitle: `Average from ${adminStats?.total_attendance_sessions ?? 0} sessions`,
       icon: UserCheck,
       color: 'green' as const,
+      href: '/dashboard/attendance',
     },
   ];
 

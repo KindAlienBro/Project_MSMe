@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile, Body
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -24,7 +24,10 @@ from slm_inference import get_constraints_batch, smart_parse, get_constraint, ch
 from substitution_engine import (
     process_leave_approval, handle_acceptance, handle_decline, check_timeouts
 )
-from storage import load_leave_requests, save_leave_requests, load_substitution_requests
+from storage import (
+    load_leave_requests, save_leave_requests, load_substitution_requests,
+    save_substitution_requests, load_cancellations, save_cancellations
+)
 from models import LeaveRequest, LeaveStatus
 import uuid
 import constants as const
@@ -862,6 +865,22 @@ def get_versions():
         ]
     }
 
+@app.get("/schedule/versions/{version_id}")
+def get_version_details(version_id: str):
+    versions = load_versions()
+    target = next((v for v in versions if v["id"] == version_id), None)
+    if not target:
+        raise HTTPException(404, "Version not found.")
+    clean = _clean(target.get("schedule", {}))
+    return {
+        "status": "SUCCESS",
+        "version_id": version_id,
+        "label": target.get("label"),
+        "schedule": clean,
+        "grid": _build_grid(clean),
+        **_timetable_constants(),
+    }
+
 @app.post("/schedule/versions/restore/{version_id}")
 def restore_version_endpoint(version_id: str):
     # Auto-save current as a version before restoring
@@ -1425,6 +1444,56 @@ def get_unresolved_substitutions():
     # A true implementation would group by leave_id + slot
     
     return {"unresolved": unresolved_slots, "message": "Not fully implemented for MVP"}
+
+# ═════════════════════════════════════════════════════════════════════════════
+# CANCELLATION REQUESTS
+# ═════════════════════════════════════════════════════════════════════════════
+
+class CancellationRequestIn(BaseModel):
+    section_id: str
+    day: str
+    period: int
+    subject: str
+    reason: str
+    faculty_id: str
+
+@app.post("/cancellations/request", status_code=201)
+def create_cancellation_request(req: CancellationRequestIn):
+    cancellations = load_cancellations()
+    cancel_id = str(uuid.uuid4())
+    new_cancel = {
+        "id": cancel_id,
+        "section_id": req.section_id,
+        "day": req.day,
+        "period": req.period,
+        "subject": req.subject,
+        "reason": req.reason,
+        "faculty_id": req.faculty_id,
+        "status": "PENDING",
+        "created_at": datetime.now().isoformat()
+    }
+    cancellations.append(new_cancel)
+    save_cancellations(cancellations)
+    return {"message": "Cancellation request submitted", "cancellation": new_cancel}
+
+@app.get("/cancellations")
+def get_cancellations():
+    return {"cancellations": load_cancellations()}
+
+@app.post("/cancellations/{cancel_id}/status")
+def update_cancellation_status(cancel_id: str, payload: dict = Body(...)):
+    status = payload.get("status")
+    if not status:
+        raise HTTPException(400, "Missing status")
+        
+    cancellations = load_cancellations()
+    target = next((c for c in cancellations if c["id"] == cancel_id), None)
+    if not target:
+        raise HTTPException(404, "Cancellation not found")
+    
+    target["status"] = status
+    save_cancellations(cancellations)
+    return {"message": f"Cancellation marked as {status}", "cancellation": target}
 
 # ═════════════════════════════════════════════════════════════════════════════
 # CHANGE HISTORY

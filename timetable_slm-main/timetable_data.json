@@ -113,6 +113,12 @@
             "name": "OE Teacher 3 (Sem 7)",
             "designation": "Guest",
             "max_hours": 18
+        },
+        {
+            "id": "DUMMY_STAFF",
+            "name": "Dummy Staff",
+            "designation": "Filler",
+            "max_hours": 999
         }
     ],
     "subjects": [
@@ -371,6 +377,38 @@
             "credits": 6,
             "is_core": true,
             "is_heavy": true
+        },
+        {
+            "code": "LIB_HR",
+            "name": "Library Hour",
+            "type": "THEORY",
+            "credits": 1,
+            "is_core": false,
+            "is_heavy": false
+        },
+        {
+            "code": "STU_HR",
+            "name": "Student Hour",
+            "type": "THEORY",
+            "credits": 1,
+            "is_core": false,
+            "is_heavy": false
+        },
+        {
+            "code": "FAC_HR",
+            "name": "Faculty Hour",
+            "type": "THEORY",
+            "credits": 1,
+            "is_core": false,
+            "is_heavy": false
+        },
+        {
+            "code": "STDY_HR",
+            "name": "Study Hour",
+            "type": "THEORY",
+            "credits": 1,
+            "is_core": false,
+            "is_heavy": false
         }
     ],
     "sections": [
@@ -979,6 +1017,106 @@
             "subject_code": "major2",
             "section_id": "7a-B2",
             "elective_group": "sem7_proj_common"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STU_HR",
+            "section_id": "6a-E1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "FAC_HR",
+            "section_id": "6a-E1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STU_HR",
+            "section_id": "6a-E2"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "FAC_HR",
+            "section_id": "6a-E2"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STU_HR",
+            "section_id": "6b-E1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "FAC_HR",
+            "section_id": "6b-E1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STU_HR",
+            "section_id": "6b-E2"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "FAC_HR",
+            "section_id": "6b-E2"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "LIB_HR",
+            "section_id": "5a"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STDY_HR",
+            "section_id": "5a"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "LIB_HR",
+            "section_id": "5b"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STDY_HR",
+            "section_id": "5b"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "LIB_HR",
+            "section_id": "7b-B1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STDY_HR",
+            "section_id": "7b-B1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "LIB_HR",
+            "section_id": "7b-B2"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STDY_HR",
+            "section_id": "7b-B2"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "LIB_HR",
+            "section_id": "7a-B1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STDY_HR",
+            "section_id": "7a-B1"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "LIB_HR",
+            "section_id": "7a-B2"
+        },
+        {
+            "faculty_id": "DUMMY_STAFF",
+            "subject_code": "STDY_HR",
+            "section_id": "7a-B2"
         }
     ],
     "scheduling_rules": [

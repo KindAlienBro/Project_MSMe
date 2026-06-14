@@ -110,6 +110,7 @@ export const endpoints = {
         getStatus: (params: { subject_code: string; section: string; date: string; period_index: number }) =>
             api.get(`/dashboard/attendance/status/?subject_code=${encodeURIComponent(params.subject_code)}&section=${encodeURIComponent(params.section)}&date=${params.date}&period_index=${params.period_index}`),
         getMyAttendance: () => api.get('/dashboard/attendance/my/'),
+        getHistory: () => api.get('/dashboard/attendance/history/'),
     },
 };
 

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { AlertCircle, Plus, Trash2, RefreshCw, Users, BookOpen, Layers, DoorOpen, Link2 } from 'lucide-react';
+import { AlertCircle, Plus, Trash2, RefreshCw, Users, BookOpen, Layers, DoorOpen, Link2, X } from 'lucide-react';
 import axios from 'axios';
 
 const HF_API = process.env.NEXT_PUBLIC_TIMETABLE_API_URL || 'https://kindalien-timetable-gen.hf.space';
@@ -64,24 +64,38 @@ export function ManageDataView() {
     const [activeTab, setActiveTab] = useState<EntityKey>('faculties');
     const [items, setItems] = useState<any[]>([]);
     const [allSubjects, setAllSubjects] = useState<any[]>([]);
+    const [allFaculties, setAllFaculties] = useState<any[]>([]);
+    const [allSections, setAllSections] = useState<any[]>([]);
+    const [allAllocations, setAllAllocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState<Record<string, any>>({});
     const [editItem, setEditItem] = useState<any>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [uploadingExcel, setUploadingExcel] = useState(false);
+    
+    // Smart Search & Modal State
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedEntity, setSelectedEntity] = useState<{type: 'faculty' | 'subject' | 'section', id: string} | null>(null);
 
     const fetchData = async (entity: EntityKey) => {
         setLoading(true);
         try {
             // Also fetch subjects in parallel to populate dropdowns
-            const [mainRes, subRes] = await Promise.all([
+            const [mainRes, subRes, facRes, secRes, allocRes] = await Promise.all([
                 axios.get(`${HF_API}/${entity === 'scheduling_rules' ? 'scheduling-rules' : `data/${entity}`}`),
-                axios.get(`${HF_API}/data/subjects`)
+                axios.get(`${HF_API}/data/subjects`),
+                axios.get(`${HF_API}/data/faculties`),
+                axios.get(`${HF_API}/data/sections`),
+                axios.get(`${HF_API}/data/allocations`)
             ]);
             setItems(mainRes.data[entity === 'scheduling_rules' ? 'rules' : entity] || []);
             setEditItem(null);
             setEditIndex(null);
+            setSearchQuery('');
             setAllSubjects(subRes.data.subjects || []);
+            setAllFaculties(facRes.data.faculties || []);
+            setAllSections(secRes.data.sections || []);
+            setAllAllocations(allocRes.data.allocations || []);
         } catch (err) {
             console.error('Failed to load', err);
             setItems([]);
@@ -156,6 +170,29 @@ export function ManageDataView() {
         setFormData({});
     };
 
+    const calculateWorkload = (facultyId: string, customAllocations?: any[]) => {
+        let hours = 0;
+        const uniqueClasses = new Set<string>();
+        const allocsToUse = customAllocations || allAllocations;
+        
+        allocsToUse.forEach(alloc => {
+            if (alloc.faculty_id === facultyId) {
+                // Consider 6A-E1 and 6A-E2 as the same class "6a" for a given subject
+                const baseSection = alloc.section_id ? alloc.section_id.split('-')[0].toLowerCase().trim() : '';
+                const classKey = `${alloc.subject_code}-${baseSection}`;
+                
+                if (!uniqueClasses.has(classKey)) {
+                    uniqueClasses.add(classKey);
+                    const sub = allSubjects.find(s => s.code === alloc.subject_code);
+                    if (sub) {
+                        hours += sub.credits;
+                    }
+                }
+            }
+        });
+        return hours;
+    };
+
     const handleAdd = async () => {
         const fields = ENTITY_FIELDS[activeTab];
         const item: Record<string, any> = {};
@@ -187,6 +224,39 @@ export function ManageDataView() {
             if (item.rule_type !== 'FIXED_DAYS') delete item.days;
         }
 
+        // Instant Conflict Warning
+        if (activeTab === 'allocations') {
+            const faculty = allFaculties.find(f => f.id === item.faculty_id);
+            if (faculty) {
+                const newSub = allSubjects.find(s => s.code === item.subject_code);
+                
+                // Simulate new load
+                const simulatedAllocations = [...allAllocations];
+                if (editItem) {
+                    // Try to find and replace the old item
+                    const idx = simulatedAllocations.findIndex(a => 
+                        a.faculty_id === editItem.faculty_id && 
+                        a.subject_code === editItem.subject_code && 
+                        a.section_id === editItem.section_id
+                    );
+                    if (idx !== -1) {
+                        simulatedAllocations[idx] = item;
+                    } else {
+                        simulatedAllocations.push(item);
+                    }
+                } else {
+                    simulatedAllocations.push(item);
+                }
+
+                const newLoad = calculateWorkload(item.faculty_id, simulatedAllocations);
+
+                if (newLoad > faculty.max_hours) {
+                    if (!confirm(`Warning: Allocating ${newSub?.name || item.subject_code} to ${faculty.name} will exceed their max limit of ${faculty.max_hours} hours (New load: ${newLoad}). Proceed anyway?`)) {
+                        return;
+                    }
+                }
+            }
+        }
 
         try {
             if (editItem) {
@@ -252,6 +322,14 @@ export function ManageDataView() {
             console.error('Clear failed', err);
         }
     };
+
+    const filteredItems = items.filter(item => {
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
+        return Object.values(item).some(val => 
+            String(val).toLowerCase().includes(query)
+        );
+    });
 
     const fields = ENTITY_FIELDS[activeTab];
 
@@ -339,12 +417,31 @@ export function ManageDataView() {
                                         <span className="text-sm text-gray-700">{f.name}</span>
                                     </label>
                                 ) : (
-                                    <input type={f.type} value={formData[f.key] || ''}
-                                        onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })}
-                                        className={`w-full rounded-lg border border-gray-300 p-2 text-sm ${editItem && (f.key === 'id' || f.key === 'code' || (activeTab === 'allocations' && f.key === 'faculty_id')) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                                        placeholder={f.name} 
-                                        disabled={!!editItem && (f.key === 'id' || f.key === 'code' || (activeTab === 'allocations' && f.key === 'faculty_id'))} />
-
+                                    <>
+                                        <input type={f.type} value={formData[f.key] || ''}
+                                            list={`${f.key}-datalist`}
+                                            onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })}
+                                            className={`w-full rounded-lg border border-gray-300 p-2 text-sm ${editItem && (f.key === 'id' || f.key === 'code' || (activeTab === 'allocations' && f.key === 'faculty_id')) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                                            placeholder={f.name} 
+                                            disabled={!!editItem && (f.key === 'id' || f.key === 'code' || (activeTab === 'allocations' && f.key === 'faculty_id'))} />
+                                        
+                                        {/* Smart Autocomplete Datalists */}
+                                        {f.key === 'faculty_id' && (
+                                            <datalist id={`${f.key}-datalist`}>
+                                                {allFaculties.map(fac => <option key={fac.id} value={fac.id}>{fac.name} ({fac.designation})</option>)}
+                                            </datalist>
+                                        )}
+                                        {f.key === 'subject_code' && (
+                                            <datalist id={`${f.key}-datalist`}>
+                                                {allSubjects.map(sub => <option key={sub.code} value={sub.code}>{sub.name}</option>)}
+                                            </datalist>
+                                        )}
+                                        {f.key === 'section_id' && (
+                                            <datalist id={`${f.key}-datalist`}>
+                                                {allSections.map(sec => <option key={sec.id} value={sec.id}>Semester {sec.semester}</option>)}
+                                            </datalist>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         );
@@ -367,13 +464,27 @@ export function ManageDataView() {
 
             {/* Data Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                    <h3 className="text-sm font-semibold text-gray-700">
-                        {items.length} {activeTab} loaded
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-gray-100 gap-4">
+                    <h3 className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                        {filteredItems.length} {activeTab} loaded {searchQuery && '(filtered)'}
                     </h3>
+                    
+                    {/* Search Bar */}
+                    <div className="relative w-full sm:max-w-xs">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg className="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+                            placeholder={`Search ${activeTab}...`}
+                            className="w-full pl-9 pr-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors bg-gray-50/50"
+                        />
+                    </div>
+
                     {items.length > 0 && (
                         <button onClick={handleClearAll}
-                            className="text-xs text-red-600 hover:text-red-700 font-medium flex items-center gap-1">
+                            className="text-xs text-red-600 hover:text-red-700 font-medium flex items-center gap-1 shrink-0">
                             <Trash2 className="w-3.5 h-3.5" /> Clear All
                         </button>
                     )}
@@ -396,22 +507,57 @@ export function ManageDataView() {
                                             {f.name.split('(')[0].trim()}
                                         </th>
                                     ))}
+                                    {activeTab === 'faculties' && (
+                                        <th className="px-4 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase">Workload</th>
+                                    )}
                                     <th className="px-4 py-2.5 text-center text-xs font-semibold text-gray-500 uppercase">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {items.map((item, i) => (
+                                {filteredItems.map((item, i) => (
                                     <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
                                         <td className="px-4 py-2.5 text-gray-500">{i + 1}</td>
                                         {fields.map(f => (
                                             <td key={f.key} className="px-4 py-2.5 text-gray-800">
-                                                {f.type === 'checkbox' 
+                                                {/* Smart Click-to-View Links for Allocations */}
+                                                {activeTab === 'allocations' && ['faculty_id', 'subject_code', 'section_id'].includes(f.key) ? (
+                                                    <button onClick={() => setSelectedEntity({ type: f.key.split('_')[0] as any, id: String(item[f.key]) })} 
+                                                        className="text-blue-600 hover:text-blue-800 hover:underline font-medium focus:outline-none transition-colors">
+                                                        {String(item[f.key] ?? '')}
+                                                    </button>
+                                                ) : f.type === 'checkbox' 
                                                     ? (item[f.key] ? '✅' : '❌') 
                                                     : Array.isArray(item[f.key]) 
                                                         ? item[f.key].join(', ') 
                                                         : String(item[f.key] ?? '')}
                                             </td>
                                         ))}
+                                        {/* Workload Progress Bar for Faculties */}
+                                        {activeTab === 'faculties' && (
+                                            <td className="px-4 py-2.5">
+                                                {(() => {
+                                                    const load = calculateWorkload(item.id);
+                                                    const max = item.max_hours || 18;
+                                                    const percentage = Math.min(100, Math.round((load / max) * 100));
+                                                    const color = percentage >= 100 ? 'bg-red-500' : percentage >= 80 ? 'bg-yellow-500' : 'bg-green-500';
+                                                    return (
+                                                        <button 
+                                                            onClick={() => setSelectedEntity({ type: 'faculty', id: item.id })}
+                                                            className="w-32 text-left hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1 -ml-1"
+                                                            title="Click to view allocations"
+                                                        >
+                                                            <div className="flex justify-between text-[10px] mb-1">
+                                                                <span className={percentage >= 100 ? 'text-red-600 font-bold' : 'text-gray-500'}>{load} / {max} hrs</span>
+                                                                <span className="text-gray-400 font-medium">{percentage}%</span>
+                                                            </div>
+                                                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                                                <div className={`h-full ${color} transition-all duration-500`} style={{ width: `${percentage}%` }} />
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })()}
+                                            </td>
+                                        )}
                                         <td className="px-4 py-2.5 text-center flex items-center justify-center gap-2">
                                             <button onClick={() => handleEditClick(i, item)}
                                                 className="text-blue-500 hover:text-blue-700 transition-colors" title="Edit">
@@ -429,6 +575,107 @@ export function ManageDataView() {
                     </div>
                 )}
             </div>
+
+            {/* Quick View Modal */}
+            {selectedEntity && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSelectedEntity(null)} />
+                    <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <button onClick={() => setSelectedEntity(null)} className="absolute top-4 right-4 p-1.5 bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors">
+                            <X className="w-4 h-4" />
+                        </button>
+                        
+                        {(() => {
+                            if (selectedEntity.type === 'faculty') {
+                                const f = allFaculties.find(x => x.id === selectedEntity.id);
+                                if (!f) return <p className="text-gray-500">Faculty not found.</p>;
+                                const load = calculateWorkload(f.id);
+                                return (
+                                    <>
+                                        <div className="flex items-center gap-3 mb-4 border-b border-gray-100 pb-4">
+                                            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                                                <Users className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold text-gray-800">{f.name}</h3>
+                                                <p className="text-sm text-gray-500">{f.id} • {f.designation}</p>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Current Workload</p>
+                                                <p className="text-lg font-bold text-gray-800">{load} <span className="text-sm font-medium text-gray-500">/ {f.max_hours || 18} hrs</span></p>
+                                            </div>
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                <p className="text-xs text-gray-500 uppercase font-semibold mb-2">Allocated Subjects</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {allAllocations.filter(a => a.faculty_id === f.id).map((a, i) => (
+                                                        <span key={i} className="px-2 py-1 bg-white border border-gray-200 rounded shadow-sm text-xs font-medium text-gray-600">
+                                                            {a.subject_code} ({a.section_id})
+                                                        </span>
+                                                    ))}
+                                                    {allAllocations.filter(a => a.faculty_id === f.id).length === 0 && <span className="text-sm text-gray-400">No allocations yet</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                );
+                            }
+                            if (selectedEntity.type === 'subject') {
+                                const s = allSubjects.find(x => x.code === selectedEntity.id);
+                                if (!s) return <p className="text-gray-500">Subject not found.</p>;
+                                return (
+                                    <>
+                                        <div className="flex items-center gap-3 mb-4 border-b border-gray-100 pb-4">
+                                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                                                <BookOpen className="w-5 h-5 text-green-600" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold text-gray-800">{s.name}</h3>
+                                                <p className="text-sm text-gray-500">{s.code} • {s.type}</p>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3 mb-3">
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Credits</p>
+                                                <p className="text-lg font-bold text-gray-800">{s.credits}</p>
+                                            </div>
+                                            <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Tags</p>
+                                                <div className="flex gap-2 flex-wrap mt-1">
+                                                    {s.is_core ? <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-[10px] font-bold">CORE</span> : <span className="text-sm text-gray-400">-</span>}
+                                                    {s.is_heavy && <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded text-[10px] font-bold">HEAVY</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </>
+                                );
+                            }
+                            if (selectedEntity.type === 'section') {
+                                const sec = allSections.find(x => x.id === selectedEntity.id);
+                                if (!sec) return <p className="text-gray-500">Section not found.</p>;
+                                return (
+                                    <>
+                                        <div className="flex items-center gap-3 mb-4 border-b border-gray-100 pb-4">
+                                            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
+                                                <Layers className="w-5 h-5 text-purple-600" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold text-gray-800">Section {sec.id}</h3>
+                                                <p className="text-sm text-gray-500">Semester {sec.semester}</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                            <p className="text-xs text-gray-500 uppercase font-semibold mb-1">Strength</p>
+                                            <p className="text-lg font-bold text-gray-800">{sec.strength} <span className="text-sm font-medium text-gray-500">Students</span></p>
+                                        </div>
+                                    </>
+                                );
+                            }
+                        })()}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

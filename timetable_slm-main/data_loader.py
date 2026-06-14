@@ -22,6 +22,7 @@ from typing import List, Optional
 
 # Import the core data models
 from models import Faculty, Subject, Section, Task, SubjectType
+from constants import TOTAL_TEACHING_SLOTS_PER_WEEK
 
 @dataclass(frozen=True)
 class Allocation:
@@ -60,6 +61,7 @@ def prepare_scheduling_tasks(
     sections_by_id = {s.section_id: s for s in sections}
 
     all_tasks: List[Task] = []
+    section_duration_sums = {s.section_id: 0 for s in sections}
 
     for alloc in allocations:
         # Retrieve the full objects using the IDs from the allocation
@@ -98,6 +100,7 @@ def prepare_scheduling_tasks(
                     elective_group_id=group_id
                 )
                 all_tasks.append(task)
+                section_duration_sums[section.section_id] += task.duration
         
         elif subject.subject_type in [SubjectType.LAB, SubjectType.SOFTSKILL, SubjectType.FORUM]:
             # For labs and other block sessions, create exactly ONE 2-hour task.
@@ -111,8 +114,40 @@ def prepare_scheduling_tasks(
                 elective_group_id=alloc.elective_group_id
             )
             all_tasks.append(task)
+                section_duration_sums[section.section_id] += task.duration
+    # --- Gap Filler Logic ---
+    try:
+        if "DUMMY_STAFF" in faculties_by_id and "LIB_HR" in subjects_by_code:
+            dummy_fac = faculties_by_id["DUMMY_STAFF"]
+            dummy_subjects_pool = [
+                subjects_by_code["LIB_HR"],
+                subjects_by_code["STU_HR"],
+                subjects_by_code["FAC_HR"],
+                subjects_by_code["STDY_HR"]
+            ]
+            
+            for section in sections:
+                current_duration = section_duration_sums.get(section.section_id, 0)
+                gaps = TOTAL_TEACHING_SLOTS_PER_WEEK - current_duration
+                
+                if gaps > 0:
+                    for i in range(gaps):
+                        subj = dummy_subjects_pool[i % len(dummy_subjects_pool)]
+                        task = Task(
+                            task_id=f"FILLER-{subj.subject_code}-{section.section_id}-{i}",
+                            faculty=dummy_fac,
+                            subject=subj,
+                            section=section,
+                            duration=1,
+                            elective_group_id=None
+                        )
+                        all_tasks.append(task)
+                        # No need to update duration_sums since we are done
+    except KeyError as e:
+        print(f"Skipping gap filling, missing dummy setup: {e}")
 
     return all_tasks
+
 
 # --- Example Usage ---
 if __name__ == '__main__':

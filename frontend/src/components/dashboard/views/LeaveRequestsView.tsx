@@ -16,10 +16,12 @@ interface LeaveRequest {
 
 export function LeaveRequestsView() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_TEACHER';
 
   const [showForm, setShowForm] = useState(false);
+  const [activeTab, setActiveTab] = useState<'leaves' | 'cancellations'>('leaves');
   const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>([]);
+  const [cancellations, setCancellations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     start_date: '',
@@ -66,7 +68,18 @@ export function LeaveRequestsView() {
             (lastName && facId.includes(lastName));
         });
       }
-      setLeaveRequests(allLeaves);
+      // Fetch Cancellations
+      try {
+        const cRes = await axios.get(`${HF_API}/cancellations`);
+        let allCancels = cRes.data.cancellations || [];
+        if (!isAdmin) {
+          allCancels = allCancels.filter((c: any) => 
+            c.faculty_id === user?.id || c.faculty_id === user?.username || c.faculty_id === 'teacher'
+          );
+        }
+        setCancellations(allCancels);
+      } catch (err) { console.error("Failed to fetch cancellations", err); }
+      
     } catch (error) {
       console.error("Failed to fetch leave requests", error);
     } finally {
@@ -132,6 +145,28 @@ export function LeaveRequestsView() {
     }
   };
 
+  const handleCancelStatus = async (id: string, status: string) => {
+    try {
+      await axios.post(`${HF_API}/cancellations/${id}/status`, { status });
+      fetchLeaveRequests();
+      if (status === 'APPROVED') {
+        alert("Cancellation approved. You can now use the Drag & Drop editor to reschedule.");
+      }
+    } catch (e: any) {
+      alert('Error updating cancellation: ' + e.message);
+    }
+  };
+
+  const handleReschedule = (c: any) => {
+    const params = new URLSearchParams({
+       section: c.section_id,
+       day: c.day,
+       period: c.period.toString(),
+       subject: c.subject
+    });
+    window.location.href = `/dashboard/drag-drop-editor?${params.toString()}`;
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
@@ -143,7 +178,7 @@ export function LeaveRequestsView() {
           <p className="text-sm text-gray-500 mt-1">{isAdmin ? 'Manage faculty leave requests and automate substitutions' : 'Apply for leave and track your applications'}</p>
         </div>
 
-        {!isAdmin && (
+        {!isAdmin && activeTab === 'leaves' && (
           <button
             onClick={() => setShowForm(!showForm)}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors self-start sm:self-auto"
@@ -152,6 +187,22 @@ export function LeaveRequestsView() {
             {showForm ? 'Cancel' : 'Apply for Leave'}
           </button>
         )}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-4 border-b border-gray-200 mb-6">
+        <button 
+          onClick={() => setActiveTab('leaves')}
+          className={`pb-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'leaves' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Leave Applications
+        </button>
+        <button 
+          onClick={() => setActiveTab('cancellations')}
+          className={`pb-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'cancellations' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+        >
+          Class Cancellations
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -192,13 +243,13 @@ export function LeaveRequestsView() {
               <XCircle className="w-5 h-5 text-red-600" />
             </div>
           </div>
-          <p className="text-2xl font-semibold text-gray-900">{rejectedCount}</p>
+          <p className="text-2xl font-semibold text-gray-900">{activeTab === 'leaves' ? rejectedCount : cancellations.filter(c => c.status === 'REJECTED').length}</p>
           <p className="text-sm text-gray-600 mt-1">Rejected</p>
         </div>
       </div>
 
       {/* Leave Application Form */}
-      {showForm && !isAdmin && (
+      {showForm && !isAdmin && activeTab === 'leaves' && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">Apply for Leave</h2>
 
@@ -292,6 +343,7 @@ export function LeaveRequestsView() {
       )}
 
       {/* Leave Requests List */}
+      {activeTab === 'leaves' && (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-6">{isAdmin ? 'Action Required' : 'My Leave History'}</h2>
 
@@ -356,6 +408,92 @@ export function LeaveRequestsView() {
           </div>
         )}
       </div>
+      )}
+
+      {/* Class Cancellations List */}
+      {activeTab === 'cancellations' && (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-fade-in">
+        <h2 className="text-lg font-semibold text-gray-900 mb-6">{isAdmin ? 'Pending Cancellations' : 'My Class Cancellations'}</h2>
+
+        {cancellations.length === 0 ? (
+          <div className="text-center py-12">
+            <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500">No class cancellation requests found</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {cancellations.map((c) => (
+              <div
+                key={c.id}
+                className="p-5 rounded-xl border border-gray-200 hover:border-red-200 hover:shadow-sm transition-all duration-200"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-3">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                      <h3 className="font-semibold text-gray-900 flex items-center gap-1.5">
+                        <AlertCircle className="w-4 h-4 text-red-500" />
+                        {c.subject} <span className="font-normal text-gray-500">({c.section_id})</span>
+                      </h3>
+                      <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                        {c.day} • Period {c.period + 1}
+                      </span>
+                      <span
+                        className={`text-xs font-bold px-2 py-0.5 rounded uppercase tracking-wider ${c.status === 'PENDING'
+                          ? 'bg-orange-100 text-orange-700'
+                          : c.status === 'APPROVED'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-gray-100 text-gray-700'
+                          }`}
+                      >
+                        {c.status}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-1">
+                      <span className="font-medium text-gray-500">Requested by:</span> {c.faculty_id}
+                    </p>
+                    <p className="text-sm text-gray-600 bg-slate-50 p-2 rounded border border-slate-100 mt-2">
+                      <span className="font-medium text-gray-700">Reason:</span> {c.reason}
+                    </p>
+                  </div>
+
+                  {isAdmin && c.status === 'PENDING' && (
+                    <div className="flex w-full sm:w-auto gap-2">
+                      <button
+                        onClick={() => handleCancelStatus(c.id, 'APPROVED')}
+                        className="flex-1 sm:flex-none bg-red-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-red-700 transition-colors">Approve Cancel</button>
+                      <button
+                        onClick={() => handleCancelStatus(c.id, 'REJECTED')}
+                        className="flex-1 sm:flex-none bg-gray-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-gray-700 transition-colors">Reject</button>
+                    </div>
+                  )}
+
+                  {isAdmin && c.status === 'APPROVED' && (
+                    <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                      <button
+                        onClick={() => handleReschedule(c)}
+                        className="bg-indigo-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+                      >
+                        Reschedule (Drag & Drop)
+                      </button>
+                    </div>
+                  )}
+                  
+                  {!isAdmin && c.status === 'PENDING' && (
+                    <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                      <button
+                        className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg w-full sm:w-auto text-sm font-medium cursor-default"
+                      >
+                        Pending Approval
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      )}
     </div>
   );
 }

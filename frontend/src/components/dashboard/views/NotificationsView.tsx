@@ -30,10 +30,11 @@ export function NotificationsView() {
 
   const fetchNotifications = async () => {
     try {
-      const [leaveRes, subRes, djangoRes] = await Promise.all([
+      const [leaveRes, subRes, djangoRes, cRes] = await Promise.all([
         axios.get(`${HF_API}/leave`).catch((e) => ({ error: e.message, data: { leaves: [] } })),
         axios.get(`${HF_API}/substitution/pending`).catch((e) => ({ error: e.message, data: { substitutions: [] } })),
-        endpoints.notifications.list().catch((e: any) => ({ error: e.message, data: [] }))
+        endpoints.notifications.list().catch((e: any) => ({ error: e.message, data: [] })),
+        axios.get(`${HF_API}/cancellations`).catch((e) => ({ error: e.message, data: { cancellations: [] } }))
       ]);
 
       const items: Notification[] = [];
@@ -86,6 +87,22 @@ export function NotificationsView() {
           message: `${sub.affected_slot?.subject_code?.toUpperCase()} (${sub.affected_slot?.section_id?.toUpperCase()}) — ${sub.affected_slot?.day} P${(sub.affected_slot?.period || 0) + 1}`,
           created_at: sub.sent_at || new Date().toISOString(),
           notification_type: 'Substitution',
+          is_read: readIds.has(id),
+        });
+      });
+
+      // Cancellation Notifications
+      (cRes.data?.cancellations || []).forEach((c: any) => {
+        if (user?.role === 'STUDENT') return;
+        if (user?.role === 'TEACHER' && c.faculty_id !== getDisplayName() && c.faculty_id !== user?.username && c.faculty_id !== user?.id) return;
+
+        const id = `cancel-${c.id}`;
+        items.push({
+          id,
+          title: c.status === 'APPROVED' ? 'Cancellation Approved' : c.status === 'REJECTED' ? 'Cancellation Rejected' : 'Cancellation Request',
+          message: `${c.subject} (${c.section_id}) — ${c.day} P${(c.period || 0) + 1}`,
+          created_at: c.created_at || new Date().toISOString(),
+          notification_type: 'Cancellation',
           is_read: readIds.has(id),
         });
       });

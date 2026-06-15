@@ -122,13 +122,15 @@ export function SubstituteClassesView() {
       fetchRequests();
       
       // Notify students of the change!
-      try {
-        await endpoints.timetableChange.notify({
-            message: "A substitute teacher has been assigned to one of your classes. Please check your schedule.",
-            notification_type: "SUBSTITUTION_UPDATE"
-        });
-      } catch (e) {
-        console.error("Failed to broadcast substitution notification", e);
+      if (user?.role === 'ADMIN' || user?.role === 'SUPER_TEACHER') {
+        try {
+          await endpoints.timetableChange.notify({
+              message: "A substitute teacher has been assigned to one of your classes. Please check your schedule.",
+              notification_type: "SUBSTITUTION_UPDATE"
+          });
+        } catch (e) {
+          console.error("Failed to broadcast substitution notification", e);
+        }
       }
 
       alert("Substitution Accepted! Timetable updated. Go to Timetable to see the change.");

@@ -656,10 +656,10 @@ export function ExportPreviewModal({
       {/* Modal */}
       <div className="relative w-[95vw] max-w-7xl h-[90vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/80 flex-shrink-0">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Export Timetable</h2>
-            <p className="text-sm text-gray-500 mt-0.5">Choose a template, add your logo, and preview before downloading</p>
+        <div className="flex items-start sm:items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/80 flex-shrink-0">
+          <div className="pr-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900">Export Timetable</h2>
+            <p className="text-xs sm:text-sm text-gray-500 mt-0.5">Choose a template, add your logo, and preview before downloading</p>
           </div>
           <button
             onClick={onClose}
@@ -670,9 +670,9 @@ export function ExportPreviewModal({
         </div>
 
         {/* Body */}
-        <div className="flex flex-1 min-h-0 overflow-hidden">
+        <div className="flex flex-col md:flex-row flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
           {/* Left Panel — Settings */}
-          <div className="w-80 flex-shrink-0 border-r border-gray-100 overflow-y-auto p-5 space-y-6 bg-white">
+          <div className="w-full md:w-80 flex-shrink-0 border-b md:border-b-0 md:border-r border-gray-100 md:overflow-y-auto p-4 sm:p-5 space-y-6 bg-white">
             
             {/* Filtering (Only if rawGrid is provided, i.e., Generator View) */}
             {rawGrid && (
@@ -872,8 +872,8 @@ export function ExportPreviewModal({
           </div>
 
           {/* Right Panel — Preview */}
-          <div className="flex-1 flex flex-col min-h-0 bg-gray-100/60">
-            <div className="px-5 py-3 border-b border-gray-200/80 flex items-center justify-between flex-shrink-0">
+          <div className="flex-1 flex flex-col min-h-[400px] md:min-h-0 bg-gray-100/60">
+            <div className="px-4 sm:px-5 py-3 border-b border-gray-200/80 flex items-center justify-between flex-shrink-0">
               <span className="text-sm font-semibold text-gray-700">Live Preview</span>
               {generating && (
                 <span className="text-xs text-indigo-500 animate-pulse flex items-center gap-1.5">
@@ -902,20 +902,20 @@ export function ExportPreviewModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/80 flex-shrink-0">
-          <p className="text-xs text-gray-400">
+        <div className="flex flex-col sm:flex-row items-center justify-between px-4 sm:px-6 py-4 border-t border-gray-100 bg-gray-50/80 flex-shrink-0 gap-4 sm:gap-0">
+          <p className="text-xs text-gray-400 text-center sm:text-left">
             {selectedSection ? `Section ${selectedSection}` : selectedFaculty || 'All sections'} · Landscape A4
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex w-full sm:w-auto items-center gap-3">
             <button
               onClick={onClose}
-              className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
+              className="flex-1 sm:flex-none px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleDownload}
-              className="px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-sm"
+              className="flex-1 sm:flex-none justify-center px-5 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-sm"
             >
               <Download className="w-4 h-4" />
               Download PDF

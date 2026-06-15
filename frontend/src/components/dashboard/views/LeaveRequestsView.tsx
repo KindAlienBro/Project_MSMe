@@ -17,6 +17,7 @@ interface LeaveRequest {
 export function LeaveRequestsView() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_TEACHER';
+  const isStrictAdmin = user?.role === 'ADMIN';
 
   const [showForm, setShowForm] = useState(false);
   const [activeTab, setActiveTab] = useState<'leaves' | 'cancellations'>('leaves');
@@ -68,6 +69,7 @@ export function LeaveRequestsView() {
             (lastName && facId.includes(lastName));
         });
       }
+      setLeaveRequests(allLeaves);
       // Fetch Cancellations
       try {
         const cRes = await axios.get(`${HF_API}/cancellations`);
@@ -386,7 +388,7 @@ export function LeaveRequestsView() {
                     <p className="text-sm text-gray-600">{request.reason}</p>
                   </div>
 
-                  {isAdmin && request.status === 'PENDING' && (
+                  {isStrictAdmin && request.status === 'PENDING' && (
                     <div className="flex w-full sm:w-auto gap-2">
                       <button
                         onClick={() => handleApprove(request.leave_id)}
@@ -397,7 +399,7 @@ export function LeaveRequestsView() {
                     </div>
                   )}
 
-                  {!isAdmin && request.status === 'PENDING' && (
+                  {!isStrictAdmin && request.status === 'PENDING' && (
                     <div className="w-full sm:w-auto mt-2 sm:mt-0">
                       <button
                         className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg w-full sm:w-auto text-sm font-medium cursor-default"
@@ -460,24 +462,33 @@ export function LeaveRequestsView() {
                     </p>
                   </div>
 
-                  {isAdmin && c.status === 'PENDING' && (
+                  {isStrictAdmin && c.status === 'PENDING' && (
                     <div className="flex w-full sm:w-auto gap-2">
                       <button
                         onClick={() => handleCancelStatus(c.id, 'APPROVED')}
-                        className="flex-1 sm:flex-none bg-red-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-red-700 transition-colors">Approve Cancel</button>
+                        className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-green-700 transition-colors">Approve</button>
                       <button
                         onClick={() => handleCancelStatus(c.id, 'REJECTED')}
-                        className="flex-1 sm:flex-none bg-gray-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-gray-700 transition-colors">Reject</button>
+                        className="flex-1 sm:flex-none bg-red-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-red-700 transition-colors">Reject</button>
                     </div>
                   )}
 
-                  {isAdmin && c.status === 'APPROVED' && (
+                  {!isStrictAdmin && c.status === 'PENDING' && (
                     <div className="w-full sm:w-auto mt-2 sm:mt-0">
                       <button
-                        onClick={() => handleReschedule(c)}
-                        className="bg-indigo-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
+                        className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg w-full sm:w-auto text-sm font-medium cursor-default"
                       >
-                        Reschedule (Drag & Drop)
+                        Pending Approval
+                      </button>
+                    </div>
+                  )}
+
+                  {isStrictAdmin && c.status === 'APPROVED' && (
+                    <div className="flex w-full sm:w-auto gap-2">
+                      <button
+                        onClick={() => handleReschedule(c)}
+                        className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 sm:px-3 sm:py-1.5 rounded-lg sm:rounded text-sm font-medium hover:bg-blue-700 transition-colors">
+                          Reschedule Class
                       </button>
                     </div>
                   )}

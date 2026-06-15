@@ -132,11 +132,58 @@ export function DashboardView() {
     return facultySet.size;
   }, [timetable]);
 
-  const pendingLeaves = leaves.filter(l => l.status === 'PENDING').length;
-  const approvedLeaves = leaves.filter(l => l.status === 'APPROVED').length;
-  const pendingSubRequests = subRequests.filter(s => s.status === 'PENDING').length;
-  const totalSubRequests = subRequests.length;
   const isAdminOrSuper = user?.role === 'ADMIN' || user?.role === 'SUPER_TEACHER';
+
+  const fuzzyMatch = (a: string, b: string) => {
+    if (!a || !b) return false;
+    const aAlpha = a.toLowerCase().replace(/[^a-z]/gi, '');
+    const bAlpha = b.toLowerCase().replace(/[^a-z]/gi, '');
+    if (aAlpha.includes(bAlpha) || bAlpha.includes(aAlpha)) return true;
+    if (aAlpha.length >= 5 && bAlpha.length >= 5 && (aAlpha.includes(bAlpha.substring(0, 5)) || bAlpha.includes(aAlpha.substring(0, 5)))) return true;
+    return false;
+  };
+
+  const getDisplayName = () => `${user?.first_name || ''} ${user?.last_name || ''}`.trim();
+  const firstName = (user?.first_name || '').toLowerCase();
+  const lastName = (user?.last_name || '').toLowerCase();
+  const fullName = getDisplayName().toLowerCase();
+
+  const filteredLeaves = useMemo(() => {
+    if (isAdminOrSuper) return leaves;
+    return leaves.filter((l: any) => l.faculty_id === getDisplayName());
+  }, [leaves, isAdminOrSuper, user]);
+
+  const filteredSubRequests = useMemo(() => {
+    if (isAdminOrSuper) return subRequests;
+    return subRequests.filter((r: any) => {
+      const candidateId = (r.candidate_faculty_id || '').toLowerCase();
+      const originalId = (r.original_faculty_id || '').toLowerCase();
+
+      // Exclude requests where this teacher is the original faculty (the one who took leave)
+      if ((firstName && originalId.includes(firstName)) ||
+          (originalId && firstName.includes(originalId)) ||
+          originalId === fullName ||
+          (lastName && originalId.includes(lastName)) ||
+          (originalId && lastName.includes(originalId)) ||
+          fuzzyMatch(firstName, originalId) ||
+          fuzzyMatch(fullName, originalId)) {
+        return false;
+      }
+
+      // Include requests where this teacher is the candidate faculty
+      return (firstName && candidateId.includes(firstName)) ||
+          (candidateId && firstName.includes(candidateId)) ||
+          candidateId === fullName ||
+          (lastName && candidateId.includes(lastName)) ||
+          (candidateId && lastName.includes(candidateId)) ||
+          fuzzyMatch(firstName, candidateId) ||
+          fuzzyMatch(fullName, candidateId);
+    });
+  }, [subRequests, isAdminOrSuper, user]);
+
+  const pendingLeaves = filteredLeaves.filter(l => l.status === 'PENDING').length;
+  const pendingSubRequests = filteredSubRequests.filter(s => s.status === 'PENDING').length;
+  const totalSubRequests = filteredSubRequests.length;
 
   const cardData = user?.role === 'ADMIN' ? [
     {
@@ -273,8 +320,8 @@ export function DashboardView() {
       <TodaysTimetable classes={todayClasses} loading={loading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentNotifications leaves={leaves} subRequests={subRequests} />
-        <SubstituteRequests requests={subRequests} isAdmin={isAdminOrSuper} />
+        <RecentNotifications leaves={filteredLeaves} subRequests={filteredSubRequests} />
+        <SubstituteRequests requests={filteredSubRequests} isAdmin={isAdminOrSuper} />
       </div>
     </div>
   );

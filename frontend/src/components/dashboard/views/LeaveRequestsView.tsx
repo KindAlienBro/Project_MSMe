@@ -462,7 +462,7 @@ export function LeaveRequestsView() {
                     </p>
                   </div>
 
-                  {isStrictAdmin && c.status === 'PENDING' && (
+                  {isAdmin && c.status === 'PENDING' && (
                     <div className="flex w-full sm:w-auto gap-2">
                       <button
                         onClick={() => handleCancelStatus(c.id, 'APPROVED')}
@@ -473,17 +473,8 @@ export function LeaveRequestsView() {
                     </div>
                   )}
 
-                  {!isStrictAdmin && c.status === 'PENDING' && (
-                    <div className="w-full sm:w-auto mt-2 sm:mt-0">
-                      <button
-                        className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg w-full sm:w-auto text-sm font-medium cursor-default"
-                      >
-                        Pending Approval
-                      </button>
-                    </div>
-                  )}
 
-                  {isStrictAdmin && c.status === 'APPROVED' && (
+                  {isAdmin && c.status === 'APPROVED' && (
                     <div className="flex w-full sm:w-auto gap-2">
                       <button
                         onClick={() => handleReschedule(c)}

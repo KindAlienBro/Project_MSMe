@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { AlertCircle, Plus, Trash2, RefreshCw, Users, BookOpen, Layers, DoorOpen, Link2, X } from 'lucide-react';
+import { AlertCircle, Plus, Trash2, RefreshCw, Users, BookOpen, Layers, DoorOpen, Link2, X, Download } from 'lucide-react';
 import axios from 'axios';
 
 const HF_API = process.env.NEXT_PUBLIC_TIMETABLE_API_URL || 'https://kindalien-timetable-gen.hf.space';
@@ -123,6 +123,10 @@ export function ManageDataView() {
 
     const handleDownloadTemplate = () => {
         window.open(`${HF_API}/data/template/excel`, '_blank');
+    };
+
+    const handleDownloadData = () => {
+        window.open(`${HF_API}/data/export/excel`, '_blank');
     };
 
     const handleUploadExcel = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -344,19 +348,31 @@ export function ManageDataView() {
 
             
             {/* Excel Import/Export */}
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                    <h3 className="text-sm font-semibold text-blue-900">Bulk Import Data</h3>
-                    <p className="text-xs text-blue-700 mt-1">Download the Excel template, fill it out, and upload it to replace existing data.</p>
+            <div className="space-y-3">
+                <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 className="text-sm font-semibold text-blue-900">Bulk Import Data</h3>
+                        <p className="text-xs text-blue-700 mt-1">Download the Excel template, fill it out, and upload it to replace existing data.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button onClick={handleDownloadTemplate} className="text-xs px-3 py-1.5 bg-white text-blue-600 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors shadow-sm">
+                            Download Template
+                        </button>
+                        <label className={`cursor-pointer text-xs px-3 py-1.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm ${uploadingExcel ? 'opacity-50 pointer-events-none' : ''}`}>
+                            {uploadingExcel ? 'Uploading...' : 'Upload Excel'}
+                            <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadExcel} disabled={uploadingExcel} />
+                        </label>
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <button onClick={handleDownloadTemplate} className="text-xs px-3 py-1.5 bg-white text-blue-600 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors shadow-sm">
-                        Download Template
+                <div className="bg-green-50 border border-green-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h3 className="text-sm font-semibold text-green-900">Export Existing Data</h3>
+                        <p className="text-xs text-green-700 mt-1">Download all current data (faculties, subjects, sections, rooms, allocations, and scheduling rules) as an Excel file.</p>
+                    </div>
+                    <button onClick={handleDownloadData} className="flex items-center gap-2 text-xs px-3 py-1.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors shadow-sm shrink-0">
+                        <Download className="w-3.5 h-3.5" />
+                        Download Data
                     </button>
-                    <label className={`cursor-pointer text-xs px-3 py-1.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm ${uploadingExcel ? 'opacity-50 pointer-events-none' : ''}`}>
-                        {uploadingExcel ? 'Uploading...' : 'Upload Excel'}
-                        <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleUploadExcel} disabled={uploadingExcel} />
-                    </label>
                 </div>
             </div>
 

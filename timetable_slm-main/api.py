@@ -313,11 +313,14 @@ import io
 
 @app.get("/data/template/excel")
 def get_excel_template():
+    from openpyxl.worksheet.datavalidation import DataValidation
+
     df_faculties = pd.DataFrame(columns=["id", "name", "designation", "max_hours"])
     df_subjects = pd.DataFrame(columns=["code", "name", "type", "credits", "is_core", "is_heavy"])
     df_sections = pd.DataFrame(columns=["id", "semester", "strength"])
     df_rooms = pd.DataFrame(columns=["id", "capacity", "is_lab", "building"])
     df_allocations = pd.DataFrame(columns=["faculty_id", "subject_code", "section_id", "elective_group"])
+    df_scheduling_rules = pd.DataFrame(columns=["rule_type", "subject_codes", "subject_types", "period", "max_period", "days"])
     
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -326,12 +329,195 @@ def get_excel_template():
         df_sections.to_excel(writer, sheet_name='Sections', index=False)
         df_rooms.to_excel(writer, sheet_name='Rooms', index=False)
         df_allocations.to_excel(writer, sheet_name='Allocations', index=False)
+        df_scheduling_rules.to_excel(writer, sheet_name='Scheduling Rules', index=False)
+        
+        # Add dropdown validations to Scheduling Rules sheet
+        ws = writer.sheets['Scheduling Rules']
+        
+        # Rule Type dropdown (column A, rows 2-100)
+        dv_rule_type = DataValidation(type="list", formula1='"FIXED_PERIOD,BEFORE_TIME,FIXED_DAYS"', allow_blank=True)
+        dv_rule_type.prompt = "Select a rule type"
+        dv_rule_type.promptTitle = "Rule Type"
+        ws.add_data_validation(dv_rule_type)
+        dv_rule_type.add(f'A2:A100')
+        
+        # Subject Types dropdown (column C, rows 2-100)
+        dv_subject_types = DataValidation(type="list", formula1='"THEORY,LAB,SOFTSKILL,FORUM"', allow_blank=True)
+        dv_subject_types.prompt = "Select subject type(s) - comma-separate for multiple"
+        dv_subject_types.promptTitle = "Subject Types"
+        ws.add_data_validation(dv_subject_types)
+        dv_subject_types.add(f'C2:C100')
+        
+        # Period dropdown (column D, rows 2-100)
+        dv_period = DataValidation(type="list", formula1='"Period 1,Period 2,Period 3,Period 4,Period 5,Period 6,Period 7,Period 8"', allow_blank=True)
+        dv_period.prompt = "Select period (for FIXED_PERIOD rules)"
+        dv_period.promptTitle = "Period"
+        ws.add_data_validation(dv_period)
+        dv_period.add(f'D2:D100')
+        
+        # Max Period dropdown (column E, rows 2-100)
+        dv_max_period = DataValidation(type="list", formula1='"Period 1,Period 2,Period 3,Period 4,Period 5,Period 6,Period 7,Period 8"', allow_blank=True)
+        dv_max_period.prompt = "Select max period (for BEFORE_TIME rules)"
+        dv_max_period.promptTitle = "Max Period"
+        ws.add_data_validation(dv_max_period)
+        dv_max_period.add(f'E2:E100')
+        
+        # Days dropdown (column F, rows 2-100)
+        dv_days = DataValidation(type="list", formula1='"MON,TUE,WED,THU,FRI,SAT"', allow_blank=True)
+        dv_days.prompt = "Select day(s) - comma-separate for multiple (for FIXED_DAYS rules)"
+        dv_days.promptTitle = "Days"
+        ws.add_data_validation(dv_days)
+        dv_days.add(f'F2:F100')
+        
+        # Designation dropdown for Faculties sheet (column C, rows 2-100)
+        ws_fac = writer.sheets['Faculties']
+        dv_designation = DataValidation(type="list", formula1='"Professor,Assoc. Prof,Asst. Prof,Guest"', allow_blank=True)
+        dv_designation.prompt = "Select designation"
+        dv_designation.promptTitle = "Designation"
+        ws_fac.add_data_validation(dv_designation)
+        dv_designation.add(f'C2:C100')
+        
+        # Subject Type dropdown for Subjects sheet (column C, rows 2-100)
+        ws_sub = writer.sheets['Subjects']
+        dv_sub_type = DataValidation(type="list", formula1='"THEORY,LAB,SOFTSKILL,FORUM"', allow_blank=True)
+        dv_sub_type.prompt = "Select subject type"
+        dv_sub_type.promptTitle = "Type"
+        ws_sub.add_data_validation(dv_sub_type)
+        dv_sub_type.add(f'C2:C100')
+        
+        # Boolean dropdowns for Subjects (is_core col E, is_heavy col F)
+        dv_bool = DataValidation(type="list", formula1='"TRUE,FALSE"', allow_blank=True)
+        ws_sub.add_data_validation(dv_bool)
+        dv_bool.add(f'E2:F100')
+        
+        # Boolean dropdown for Rooms is_lab (column C, rows 2-100)
+        ws_rooms = writer.sheets['Rooms']
+        dv_lab = DataValidation(type="list", formula1='"TRUE,FALSE"', allow_blank=True)
+        ws_rooms.add_data_validation(dv_lab)
+        dv_lab.add(f'C2:C100')
     
     output.seek(0)
     return StreamingResponse(
         output, 
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
         headers={"Content-Disposition": "attachment; filename=timetable_template.xlsx"}
+    )
+
+
+@app.get("/data/export/excel")
+def export_data_as_excel():
+    """Export all current data as an Excel file matching the template format."""
+    data = load_data()
+    
+    # Build DataFrames from existing data
+    df_faculties = pd.DataFrame(data.get("faculties", []))
+    df_subjects = pd.DataFrame(data.get("subjects", []))
+    df_sections = pd.DataFrame(data.get("sections", []))
+    df_rooms = pd.DataFrame(data.get("rooms", []))
+    df_allocations = pd.DataFrame(data.get("allocations", []))
+    
+    # Build scheduling rules DataFrame with human-readable columns
+    rules = data.get("scheduling_rules", [])
+    rules_rows = []
+    for rule in rules:
+        row = {
+            "rule_type": rule.get("rule_type", ""),
+            "subject_codes": ", ".join(rule.get("subject_codes", [])) if isinstance(rule.get("subject_codes"), list) else str(rule.get("subject_codes", "")),
+            "subject_types": ", ".join(rule.get("subject_types", [])) if isinstance(rule.get("subject_types"), list) else str(rule.get("subject_types", "")),
+            "period": f"Period {rule['period_index'] + 1}" if rule.get("period_index") is not None else "",
+            "max_period": f"Period {rule['max_period_index'] + 1}" if rule.get("max_period_index") is not None else "",
+            "days": ", ".join(rule.get("days", [])) if isinstance(rule.get("days"), list) else str(rule.get("days", "")),
+        }
+        rules_rows.append(row)
+    df_scheduling_rules = pd.DataFrame(rules_rows) if rules_rows else pd.DataFrame(columns=["rule_type", "subject_codes", "subject_types", "period", "max_period", "days"])
+    
+    # Ensure column order matches the template
+    fac_cols = ["id", "name", "designation", "max_hours"]
+    sub_cols = ["code", "name", "type", "credits", "is_core", "is_heavy"]
+    sec_cols = ["id", "semester", "strength"]
+    room_cols = ["id", "capacity", "is_lab", "building"]
+    alloc_cols = ["faculty_id", "subject_code", "section_id", "elective_group"]
+    rule_cols = ["rule_type", "subject_codes", "subject_types", "period", "max_period", "days"]
+    
+    for col in fac_cols:
+        if col not in df_faculties.columns:
+            df_faculties[col] = ""
+    for col in sub_cols:
+        if col not in df_subjects.columns:
+            df_subjects[col] = ""
+    for col in sec_cols:
+        if col not in df_sections.columns:
+            df_sections[col] = ""
+    for col in room_cols:
+        if col not in df_rooms.columns:
+            df_rooms[col] = ""
+    for col in alloc_cols:
+        if col not in df_allocations.columns:
+            df_allocations[col] = ""
+    
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df_faculties[fac_cols].to_excel(writer, sheet_name='Faculties', index=False)
+        df_subjects[sub_cols].to_excel(writer, sheet_name='Subjects', index=False)
+        df_sections[sec_cols].to_excel(writer, sheet_name='Sections', index=False)
+        df_rooms[room_cols].to_excel(writer, sheet_name='Rooms', index=False)
+        df_allocations[alloc_cols].to_excel(writer, sheet_name='Allocations', index=False)
+        df_scheduling_rules[rule_cols].to_excel(writer, sheet_name='Scheduling Rules', index=False)
+        
+        # Add dropdown validations (same as template)
+        from openpyxl.worksheet.datavalidation import DataValidation
+        
+        # Faculties - designation dropdown
+        ws_fac = writer.sheets['Faculties']
+        dv_desig = DataValidation(type="list", formula1='"Professor,Assoc. Prof,Asst. Prof,Guest"', allow_blank=True)
+        ws_fac.add_data_validation(dv_desig)
+        dv_desig.add('C2:C1000')
+        
+        # Subjects - type dropdown
+        ws_sub = writer.sheets['Subjects']
+        dv_stype = DataValidation(type="list", formula1='"THEORY,LAB,SOFTSKILL,FORUM"', allow_blank=True)
+        ws_sub.add_data_validation(dv_stype)
+        dv_stype.add('C2:C1000')
+        
+        # Subjects - is_core & is_heavy boolean dropdowns
+        dv_bool_sub = DataValidation(type="list", formula1='"TRUE,FALSE"', allow_blank=True)
+        ws_sub.add_data_validation(dv_bool_sub)
+        dv_bool_sub.add('E2:F1000')
+        
+        # Rooms - is_lab boolean dropdown
+        ws_rooms = writer.sheets['Rooms']
+        dv_lab = DataValidation(type="list", formula1='"TRUE,FALSE"', allow_blank=True)
+        ws_rooms.add_data_validation(dv_lab)
+        dv_lab.add('C2:C1000')
+        
+        # Scheduling Rules - all dropdowns
+        ws_rules = writer.sheets['Scheduling Rules']
+        
+        dv_rt = DataValidation(type="list", formula1='"FIXED_PERIOD,BEFORE_TIME,FIXED_DAYS"', allow_blank=True)
+        ws_rules.add_data_validation(dv_rt)
+        dv_rt.add('A2:A1000')
+        
+        dv_st = DataValidation(type="list", formula1='"THEORY,LAB,SOFTSKILL,FORUM"', allow_blank=True)
+        ws_rules.add_data_validation(dv_st)
+        dv_st.add('C2:C1000')
+        
+        dv_p = DataValidation(type="list", formula1='"Period 1,Period 2,Period 3,Period 4,Period 5,Period 6,Period 7,Period 8"', allow_blank=True)
+        ws_rules.add_data_validation(dv_p)
+        dv_p.add('D2:D1000')
+        
+        dv_mp = DataValidation(type="list", formula1='"Period 1,Period 2,Period 3,Period 4,Period 5,Period 6,Period 7,Period 8"', allow_blank=True)
+        ws_rules.add_data_validation(dv_mp)
+        dv_mp.add('E2:E1000')
+        
+        dv_d = DataValidation(type="list", formula1='"MON,TUE,WED,THU,FRI,SAT"', allow_blank=True)
+        ws_rules.add_data_validation(dv_d)
+        dv_d.add('F2:F1000')
+    
+    output.seek(0)
+    return StreamingResponse(
+        output,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": "attachment; filename=timetable_data_export.xlsx"}
     )
 
 @app.post("/data/import/excel")
@@ -405,9 +591,50 @@ async def import_excel(file: UploadFile = File(...)):
                         "elective_group": str(eg) if eg else None
                     })
         
-        # Merge with existing scheduling_rules to preserve them
-        existing_data = load_data()
-        data["scheduling_rules"] = existing_data.get("scheduling_rules", [])
+        # Parse Scheduling Rules sheet if present, otherwise preserve existing rules
+        if 'Scheduling Rules' in xls.sheet_names:
+            import uuid as _uuid
+            df = pd.read_excel(xls, 'Scheduling Rules').fillna('')
+            for _, row in df.iterrows():
+                rule_type = str(row.get('rule_type', '')).strip()
+                if not rule_type:
+                    continue
+                rule = {"id": str(_uuid.uuid4()), "rule_type": rule_type}
+                
+                # Parse subject_codes (comma-separated)
+                sc = str(row.get('subject_codes', '')).strip()
+                rule["subject_codes"] = [s.strip() for s in sc.split(',') if s.strip()] if sc else []
+                
+                # Parse subject_types (comma-separated)
+                st = str(row.get('subject_types', '')).strip()
+                rule["subject_types"] = [s.strip() for s in st.split(',') if s.strip()] if st else []
+                
+                # Parse period (e.g. "Period 3" -> 2)
+                period_str = str(row.get('period', '')).strip()
+                if period_str and 'Period' in period_str:
+                    try:
+                        rule["period_index"] = int(period_str.replace('Period ', '')) - 1
+                    except ValueError:
+                        pass
+                
+                # Parse max_period
+                max_period_str = str(row.get('max_period', '')).strip()
+                if max_period_str and 'Period' in max_period_str:
+                    try:
+                        rule["max_period_index"] = int(max_period_str.replace('Period ', '')) - 1
+                    except ValueError:
+                        pass
+                
+                # Parse days (comma-separated)
+                days_str = str(row.get('days', '')).strip()
+                if days_str:
+                    rule["days"] = [d.strip() for d in days_str.split(',') if d.strip()]
+                
+                data["scheduling_rules"].append(rule)
+        else:
+            # Preserve existing scheduling_rules if no sheet in upload
+            existing_data = load_data()
+            data["scheduling_rules"] = existing_data.get("scheduling_rules", [])
         
         save_data(data)
         return {"message": "Data imported successfully", "imported": {k: len(v) for k, v in data.items()}}

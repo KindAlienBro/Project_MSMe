@@ -730,7 +730,7 @@ export function DragDropTimetableEditor() {
              });
         } else {
              // If there are multiple classes in this cell (e.g. batch labs), collect all of them so they move together
-             const slotClasses = grid[initialPayload.section]?.slots?.[String(initialPayload.dayIdx)]?.[String(initialPayload.periodIdx)] || [];
+             const slotClasses = grid?.[initialPayload.section]?.slots?.[String(initialPayload.dayIdx)]?.[String(initialPayload.periodIdx)] || [];
              if (slotClasses.length > 1) {
                  isGroupMove = true;
                  slotClasses.forEach((c: any, cIdx: number) => {

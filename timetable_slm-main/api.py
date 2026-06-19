@@ -534,6 +534,15 @@ async def import_excel(file: UploadFile = File(...)):
             "scheduling_rules": []
         }
         
+        import re
+        def parse_int(val, default):
+            if pd.isna(val) or val == '': return default
+            try:
+                return int(val)
+            except (ValueError, TypeError):
+                m = re.search(r'\d+', str(val))
+                return int(m.group()) if m else default
+
         if 'Faculties' in xls.sheet_names:
             df = pd.read_excel(xls, 'Faculties').fillna('')
             for _, row in df.iterrows():
@@ -542,7 +551,7 @@ async def import_excel(file: UploadFile = File(...)):
                         "id": str(row.get('id')),
                         "name": str(row.get('name', '')),
                         "designation": str(row.get('designation', 'Asst. Prof')),
-                        "max_hours": int(row.get('max_hours', 18) or 18)
+                        "max_hours": parse_int(row.get('max_hours', 18), 18)
                     })
                     
         if 'Subjects' in xls.sheet_names:
@@ -553,7 +562,7 @@ async def import_excel(file: UploadFile = File(...)):
                         "code": str(row.get('code')),
                         "name": str(row.get('name', '')),
                         "type": str(row.get('type', 'THEORY')),
-                        "credits": int(row.get('credits', 3) or 3),
+                        "credits": parse_int(row.get('credits', 3), 3),
                         "is_core": bool(row.get('is_core', True)),
                         "is_heavy": bool(row.get('is_heavy', False))
                     })
@@ -564,8 +573,8 @@ async def import_excel(file: UploadFile = File(...)):
                 if row.get('id'):
                     data["sections"].append({
                         "id": str(row.get('id')),
-                        "semester": int(row.get('semester', 1) or 1),
-                        "strength": int(row.get('strength', 60) or 60)
+                        "semester": parse_int(row.get('semester', 1), 1),
+                        "strength": parse_int(row.get('strength', 60), 60)
                     })
                     
         if 'Rooms' in xls.sheet_names:
@@ -574,7 +583,7 @@ async def import_excel(file: UploadFile = File(...)):
                 if row.get('id'):
                     data["rooms"].append({
                         "id": str(row.get('id')),
-                        "capacity": int(row.get('capacity', 60) or 60),
+                        "capacity": parse_int(row.get('capacity', 60), 60),
                         "is_lab": bool(row.get('is_lab', False)),
                         "building": str(row.get('building', 'Main'))
                     })

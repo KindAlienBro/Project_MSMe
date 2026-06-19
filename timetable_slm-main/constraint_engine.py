@@ -75,7 +75,7 @@ class ConstraintEngine:
                 continue
             self.model.AddNoOverlap(intervals_by_faculty[faculty_id])
 
-        # 2. Section Clash Prevention (MODIFIED FOR ELECTIVES)
+        # 2. Section Clash Prevention (MODIFIED FOR ELECTIVES AND BATCHES)
         intervals_by_section = defaultdict(list)
         processed_groups_per_section = defaultdict(set)
 
@@ -93,6 +93,19 @@ class ConstraintEngine:
 
         for section_id in intervals_by_section:
             self.model.AddNoOverlap(intervals_by_section[section_id])
+
+        # Enforce NoOverlap between Parent and Batch
+        parent_batches = defaultdict(list)
+        for sid in intervals_by_section.keys():
+            if '-' in sid:
+                parent = sid.split('-')[0]
+                parent_batches[parent].append(sid)
+        
+        for parent, batches in parent_batches.items():
+            if parent in intervals_by_section:
+                for batch in batches:
+                    combined = intervals_by_section[parent] + intervals_by_section[batch]
+                    self.model.AddNoOverlap(combined)
 
         # 3. Room Clash Prevention
         for i, room in enumerate(self.rooms):

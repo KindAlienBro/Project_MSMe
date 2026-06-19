@@ -114,7 +114,7 @@ def prepare_scheduling_tasks(
                 elective_group_id=alloc.elective_group_id
             )
             all_tasks.append(task)
-                section_duration_sums[section.section_id] += task.duration
+            section_duration_sums[section.section_id] += task.duration
     # --- Gap Filler Logic ---
     try:
         if "DUMMY_STAFF" in faculties_by_id and "LIB_HR" in subjects_by_code:

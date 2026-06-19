@@ -145,7 +145,8 @@ export function DragDropTimetableEditor() {
     const [activeSection, setActiveSection] = useState<string>('');
     const [editHistory, setEditHistory] = useState<EditRecord[]>([]);
     const [dragPayload, setDragPayload] = useState<DragPayload | null>(null);
-    const [highlightedCells, setHighlightedCells] = useState<Record<string, 'free' | 'conflict'>>({});
+    const [highlightedCells, setHighlightedCells] = useState<Record<string, { status: 'free' | 'conflict'; reason?: string }>>({});
+    const [hoveredConflictCell, setHoveredConflictCell] = useState<{ key: string; reason: string; x: number; y: number } | null>(null);
     const [savingState, setSavingState] = useState<'idle' | 'saving' | 'saved'>('idle');
     const [error, setError] = useState<string | null>(null);
     const [showAvailablePanel, setShowAvailablePanel] = useState(false);
@@ -470,7 +471,7 @@ export function DragDropTimetableEditor() {
         payload: DragPayload | null,
         targetDay: number,
         targetPeriod: number,
-    ): { conflict: boolean; conflictReason: string } => {
+    ): { conflict: boolean; conflictReason: string; conflictDetails?: { subject: string; faculty: string; section: string } } => {
         if (!grid || !payload) return { conflict: false, conflictReason: '' };
 
         // For each entry in the group, calculate its relative target
@@ -538,7 +539,22 @@ export function DragDropTimetableEditor() {
             });
 
             if (hasUnrelatedClass) {
-                return { conflict: true, conflictReason: `${tgtSectionId} is occupied` };
+                const blockingClass = classesInTarget.find(cls =>
+                    !payload.groupEntries.some(ge =>
+                        ge.section === tgtSectionId &&
+                        ge.dayIdx === entryTargetDay &&
+                        ge.periodIdx === entryTargetPeriod &&
+                        normalizeSubject(ge.classData.subject) === normalizeSubject(cls.subject) &&
+                        ge.classData.faculty === cls.faculty
+                    )
+                );
+                return { 
+                    conflict: true, 
+                    conflictReason: blockingClass 
+                        ? `${tgtSectionId}: ${blockingClass.subject} (${blockingClass.faculty}) already scheduled here`
+                        : `${tgtSectionId} is occupied`,
+                    conflictDetails: blockingClass ? { subject: blockingClass.subject, faculty: blockingClass.faculty, section: tgtSectionId } : undefined
+                };
             }
 
             // 3. Faculty conflict check across all sections
@@ -550,15 +566,21 @@ export function DragDropTimetableEditor() {
                 for (const cls of classesInSlot) {
                     if (cls.faculty === entry.classData.faculty) {
                         // Skip if this class is one of the ones we are moving
+                        // We check if ANY group entry has its SOURCE at (sec, entryTargetDay, entryTargetPeriod)
+                        // with matching subject/faculty — meaning the class at the target IS part of our drag group
                         const isMovingEntry = payload.groupEntries.some(ge => 
                              ge.section === sec && 
-                             ge.dayIdx === entry.dayIdx && 
-                             ge.periodIdx === entry.periodIdx && 
+                             ge.dayIdx === entryTargetDay && 
+                             ge.periodIdx === entryTargetPeriod && 
                              ge.classData.faculty === cls.faculty &&
                              normalizeSubject(ge.classData.subject) === normalizeSubject(cls.subject)
                         );
                         if (!isMovingEntry) {
-                            return { conflict: true, conflictReason: `Faculty ${cls.faculty} is busy in ${sec}` };
+                            return { 
+                                conflict: true, 
+                                conflictReason: `${cls.faculty} is teaching ${cls.subject} in Section ${sec} at this time`,
+                                conflictDetails: { subject: cls.subject, faculty: cls.faculty, section: sec }
+                            };
                         }
                     }
                 }
@@ -566,14 +588,14 @@ export function DragDropTimetableEditor() {
         }
         
         return { conflict: false, conflictReason: '' };
-    }, [grid, days.length, headers.length, breakHeaderIdx, lunchHeaderIdx]);
+    }, [grid, activeSection, days.length, headers.length, breakHeaderIdx, lunchHeaderIdx]);
 
     // ── Find all available slots for a group ────────────────────────────
     const findAvailableSlots = useCallback((
         payload: DragPayload | null
-    ): { day: number; period: number; dayName: string; headerLabel: string; status: 'free' | 'conflict' }[] => {
+    ): { day: number; period: number; dayName: string; headerLabel: string; status: 'free' | 'conflict'; reason?: string }[] => {
         if (!grid || !activeSection || !payload) return [];
-        const results: { day: number; period: number; dayName: string; headerLabel: string; status: 'free' | 'conflict' }[] = [];
+        const results: { day: number; period: number; dayName: string; headerLabel: string; status: 'free' | 'conflict'; reason?: string }[] = [];
 
         const sectionData = grid[activeSection];
         if (!sectionData) return results;
@@ -592,7 +614,7 @@ export function DragDropTimetableEditor() {
                 if (dayIdx === payload.dayIdx && pIdx === payload.periodIdx) continue;
 
                 // Check group conflict at target day/period
-                const { conflict } = checkGroupConflict(payload, dayIdx, pIdx);
+                const { conflict, conflictReason } = checkGroupConflict(payload, dayIdx, pIdx);
 
                 if (!conflict) {
                     // Build header label
@@ -625,6 +647,7 @@ export function DragDropTimetableEditor() {
                         dayName: days[dayIdx] || `Day ${dayIdx}`,
                         headerLabel: headers[headerIdx] || `P${pIdx + 1}`,
                         status: 'conflict',
+                        reason: conflictReason,
                     });
                 }
             }
@@ -636,7 +659,7 @@ export function DragDropTimetableEditor() {
     // ── Highlight cells during drag ───────────────────────────────────────
     const computeHighlights = useCallback((payload: DragPayload) => {
         if (!grid || !activeSection) return;
-        const highlights: Record<string, 'free' | 'conflict'> = {};
+        const highlights: Record<string, { status: 'free' | 'conflict'; reason?: string }> = {};
         const sectionData = grid[activeSection];
         if (!sectionData) return;
 
@@ -652,12 +675,12 @@ export function DragDropTimetableEditor() {
 
                 const key = `${dayIdx}-${pIdx}`;
 
-                const { conflict } = checkGroupConflict(payload, dayIdx, pIdx);
+                const { conflict, conflictReason } = checkGroupConflict(payload, dayIdx, pIdx);
 
                 if (conflict) {
-                    highlights[key] = 'conflict';
+                    highlights[key] = { status: 'conflict', reason: conflictReason };
                 } else {
-                    highlights[key] = 'free';
+                    highlights[key] = { status: 'free' };
                 }
             }
         }
@@ -706,7 +729,16 @@ export function DragDropTimetableEditor() {
                  });
              });
         } else {
-             collectedClasses.push({ section: initialPayload.section, dayIdx: initialPayload.dayIdx, periodIdx: initialPayload.periodIdx, cardIndex: initialPayload.cardIndex, classData: initialPayload.classData });
+             // If there are multiple classes in this cell (e.g. batch labs), collect all of them so they move together
+             const slotClasses = grid[initialPayload.section]?.slots?.[String(initialPayload.dayIdx)]?.[String(initialPayload.periodIdx)] || [];
+             if (slotClasses.length > 1) {
+                 isGroupMove = true;
+                 slotClasses.forEach((c: any, cIdx: number) => {
+                     collectedClasses.push({ section: initialPayload.section, dayIdx: initialPayload.dayIdx, periodIdx: initialPayload.periodIdx, cardIndex: cIdx, classData: c });
+                 });
+             } else {
+                 collectedClasses.push({ section: initialPayload.section, dayIdx: initialPayload.dayIdx, periodIdx: initialPayload.periodIdx, cardIndex: initialPayload.cardIndex, classData: initialPayload.classData });
+             }
         }
 
         // Step 2: Vertical collection (Duration logic for each collected class)
@@ -766,13 +798,16 @@ export function DragDropTimetableEditor() {
         const key = `${dayIdx}-${periodIdx}`;
         const highlight = highlightedCells[key];
 
-        if (highlight === 'free') {
+        if (highlight?.status === 'free') {
             e.dataTransfer.dropEffect = 'move';
-        } else if (highlight === 'conflict') {
+            setHoveredConflictCell(null);
+        } else if (highlight?.status === 'conflict') {
             e.dataTransfer.dropEffect = 'none';
+            setHoveredConflictCell({ key, reason: highlight.reason || 'Conflict', x: e.clientX, y: e.clientY });
         } else {
             // Cell occupied but no conflict — allow swap
             e.dataTransfer.dropEffect = 'move';
+            setHoveredConflictCell(null);
         }
     };
 
@@ -781,7 +816,7 @@ export function DragDropTimetableEditor() {
         if (!dragPayload || !grid) return;
 
         const key = `${targetDay}-${targetPeriod}`;
-        if (highlightedCells[key] === 'conflict') return;
+        if (highlightedCells[key]?.status === 'conflict') return;
 
         // Same cell — no-op
         if (
@@ -877,6 +912,7 @@ export function DragDropTimetableEditor() {
         setDragPayload(null);
         setHighlightedCells({});
         setShowAvailablePanel(false);
+        setHoveredConflictCell(null);
     };
 
     // ── Quick-drop from available panel ───────────────────────────────────
@@ -1229,7 +1265,8 @@ export function DragDropTimetableEditor() {
                                                 periodCounter++;
                                                 const cells: ClassEntry[] = daySlots[String(currentPeriod)] || [];
                                                 const cellKey = `${dayIdx}-${currentPeriod}`;
-                                                const highlight = dragPayload ? highlightedCells[cellKey] : undefined;
+                                                const highlightData = dragPayload ? highlightedCells[cellKey] : undefined;
+                                                const highlight = highlightData?.status;
                                                 const isSource = dragPayload &&
                                                     dragPayload.section === activeSection &&
                                                     dragPayload.dayIdx === dayIdx &&
@@ -1243,7 +1280,7 @@ export function DragDropTimetableEditor() {
                                                             : highlight === 'free'
                                                                 ? 'bg-emerald-50/80 ring-2 ring-emerald-400/60 ring-inset shadow-inner'
                                                                 : highlight === 'conflict'
-                                                                    ? 'bg-red-50/80 ring-2 ring-red-400/60 ring-inset'
+                                                                    ? 'bg-red-50/80 ring-2 ring-red-400/60 ring-inset cursor-not-allowed'
                                                                     : 'hover:bg-gray-50/50'
                                                             }`}
                                                         onDragOver={(e) => handleDragOver(e, dayIdx, currentPeriod)}
@@ -1258,7 +1295,8 @@ export function DragDropTimetableEditor() {
                                                             </div>
                                                         )}
 
-                                                        {/* Conflict indicator during drag */}
+
+                                                        {/* Conflict X icon during drag */}
                                                         {highlight === 'conflict' && (
                                                             <div className="absolute top-0.5 right-0.5 pointer-events-none">
                                                                 <X className="w-3 h-3 text-red-500" />
@@ -1378,6 +1416,34 @@ export function DragDropTimetableEditor() {
                     </div>
                 </div>
 
+                {/* ── Floating Conflict Tooltip (rendered outside table to avoid overflow clipping) ── */}
+                {hoveredConflictCell && dragPayload && (
+                    <div
+                        className="fixed z-[200] pointer-events-none"
+                        style={{
+                            top: hoveredConflictCell.y - 16,
+                            left: hoveredConflictCell.x,
+                            transform: 'translate(-50%, -100%)',
+                        }}
+                    >
+                        <div className="bg-gray-900/95 backdrop-blur-sm text-white text-[11px] leading-snug rounded-xl px-3.5 py-2.5 shadow-2xl max-w-[300px] border border-white/10 animate-fade-in">
+                            <div className="flex items-start gap-2">
+                                <div className="w-4 h-4 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    <AlertCircle className="w-3 h-3 text-red-400" />
+                                </div>
+                                <div>
+                                    <div className="font-semibold text-red-300 text-[10px] uppercase tracking-wider mb-0.5">Conflict</div>
+                                    <div className="text-white/90">{hoveredConflictCell.reason}</div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Arrow pointing down */}
+                        <div className="flex justify-center">
+                            <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-gray-900/95" />
+                        </div>
+                    </div>
+                )}
+
                 {/* ── Available Slots Panel ──────────────────────────────────── */}
                 <div
                     className={`w-72 flex-shrink-0 transition-all duration-300 ${showAvailablePanel && dragPayload
@@ -1435,12 +1501,20 @@ export function DragDropTimetableEditor() {
                                                     {conflicts.map((slot, i) => (
                                                         <div
                                                             key={i}
-                                                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50/50 border border-red-100 mb-1 opacity-50"
+                                                            className="flex flex-col gap-1 px-3 py-2 rounded-lg bg-red-50/50 border border-red-100 mb-1"
+                                                            title={slot.reason || 'Conflict'}
                                                         >
-                                                            <X className="w-3 h-3 text-red-400 flex-shrink-0" />
-                                                            <div className="text-[10px] text-red-600 line-through">
-                                                                {slot.dayName.slice(0, 3)} — {slot.headerLabel}
+                                                            <div className="flex items-center gap-2">
+                                                                <X className="w-3 h-3 text-red-400 flex-shrink-0" />
+                                                                <div className="text-[10px] text-red-700 font-semibold">
+                                                                    {slot.dayName.slice(0, 3)} — {slot.headerLabel}
+                                                                </div>
                                                             </div>
+                                                            {slot.reason && (
+                                                                <div className="text-[9px] text-red-500 ml-5 leading-snug">
+                                                                    {slot.reason}
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     ))}
                                                 </div>

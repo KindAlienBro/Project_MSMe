@@ -753,9 +753,9 @@ export function TimetableView() {
                                             <span>{cls.subject}</span>
                                             {cls.batch && <span className="px-1.5 py-0.5 bg-white/60 border border-current/20 rounded-full text-[9px] font-bold tracking-wide shrink-0">{cls.batch}</span>}
                                           </div>
-                                          <div className={`flex flex-wrap items-center justify-between gap-2 text-[10px] font-semibold ${colors.textSecondary} mt-0.5`}>
-                                            <span className="flex items-center gap-1 truncate"><UserIcon className="w-3 h-3 shrink-0" /> {cls.faculty}</span>
-                                            {cls.room && <span className="flex items-center gap-1 shrink-0"><MapPin className="w-3 h-3 shrink-0" /> {cls.room}</span>}
+                                          <div className={`flex flex-col gap-1 text-[10px] font-semibold ${colors.textSecondary} mt-0.5`}>
+                                            <span className="flex items-center gap-1 min-w-0"><UserIcon className="w-3 h-3 shrink-0" /> <span className="truncate">{cls.faculty}</span></span>
+                                            {cls.room && <span className="flex items-center gap-1 min-w-0"><MapPin className="w-3 h-3 shrink-0" /> <span className="truncate">{cls.room}</span></span>}
                                           </div>
                                           {isTeacherOrAdmin && (
                                             <div className="mt-1.5 pt-1.5 border-t border-black/5 flex justify-between items-center relative z-20" onClick={e => e.stopPropagation()}>

@@ -1349,7 +1349,7 @@ export function DragDropTimetableEditor() {
                                                                             {c.subject}
                                                                         </div>
                                                                         <div
-                                                                            className="text-[10px] leading-tight truncate mt-0.5"
+                                                                            className="text-[10px] leading-tight truncate mt-0.5 pr-4"
                                                                             style={{ color: `hsl(${hue}, 40%, 50%)` }}
                                                                         >
                                                                             {c.faculty}
@@ -1359,11 +1359,11 @@ export function DragDropTimetableEditor() {
                                                                             const room = roomLookup[roomKey];
                                                                             return room ? (
                                                                                 <div
-                                                                                    className="text-[9px] leading-tight truncate mt-0.5 flex items-center gap-0.5 opacity-70"
+                                                                                    className="text-[9px] leading-tight mt-0.5 flex items-center gap-0.5 opacity-70 min-w-0 pr-4"
                                                                                     style={{ color: `hsl(${hue}, 40%, 50%)` }}
                                                                                 >
-                                                                                    <MapPin className="w-2.5 h-2.5 inline shrink-0" />
-                                                                                    {room}
+                                                                                    <MapPin className="w-2.5 h-2.5 shrink-0" />
+                                                                                    <span className="truncate min-w-0">{room}</span>
                                                                                 </div>
                                                                             ) : null;
                                                                         })()}

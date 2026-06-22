@@ -842,13 +842,13 @@
             "faculty_id": "vijayashekar",
             "subject_code": "dlrllab",
             "section_id": "7b-B1",
-            "elective_group": null
+            "elective_group": "lab_pair_7b_2"
         },
         {
             "faculty_id": "kavitha",
             "subject_code": "dlrllab",
             "section_id": "7b-B2",
-            "elective_group": null
+            "elective_group": "lab_pair_7b_1"
         },
         {
             "faculty_id": "anu",
@@ -866,13 +866,13 @@
             "faculty_id": "anu",
             "subject_code": "ml2lab",
             "section_id": "7b-B1",
-            "elective_group": null
+            "elective_group": "lab_pair_7b_1"
         },
         {
             "faculty_id": "anu",
             "subject_code": "ml2lab",
             "section_id": "7b-B2",
-            "elective_group": null
+            "elective_group": "lab_pair_7b_2"
         },
         {
             "faculty_id": "jovin",
@@ -938,13 +938,13 @@
             "faculty_id": "kavitha",
             "subject_code": "dlrllab",
             "section_id": "7a-B1",
-            "elective_group": null
+            "elective_group": "lab_pair_7a_2"
         },
         {
             "faculty_id": "vijayashekar",
             "subject_code": "dlrllab",
             "section_id": "7a-B2",
-            "elective_group": null
+            "elective_group": "lab_pair_7a_1"
         },
         {
             "faculty_id": "vikas",
@@ -962,13 +962,13 @@
             "faculty_id": "vikas",
             "subject_code": "ml2lab",
             "section_id": "7a-B1",
-            "elective_group": null
+            "elective_group": "lab_pair_7a_1"
         },
         {
             "faculty_id": "vikas",
             "subject_code": "ml2lab",
             "section_id": "7a-B2",
-            "elective_group": null
+            "elective_group": "lab_pair_7a_2"
         },
         {
             "faculty_id": "jovin",

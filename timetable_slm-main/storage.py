@@ -46,7 +46,20 @@ def _get_scheduler():
             return None  # Running locally, no scheduler needed
         
         try:
-            from huggingface_hub import CommitScheduler
+            from huggingface_hub import CommitScheduler, HfApi
+
+            # Workaround: CommitScheduler internally calls create_repo()
+            # which requires space_sdk for Spaces, but CommitScheduler
+            # doesn't accept/forward that parameter. Temporarily patch
+            # create_repo to inject space_sdk='docker' as a default.
+            _orig_create = HfApi.create_repo
+
+            def _patched_create(self, *args, **kwargs):
+                kwargs.setdefault("space_sdk", "docker")
+                return _orig_create(self, *args, **kwargs)
+
+            HfApi.create_repo = _patched_create
+
             _scheduler = CommitScheduler(
                 repo_id=space_id,
                 repo_type="space",
@@ -58,6 +71,10 @@ def _get_scheduler():
                 ],
                 squash_history=True,  # Keep repo history clean
             )
+
+            # Restore original create_repo
+            HfApi.create_repo = _orig_create
+
             print(f"[storage] CommitScheduler initialized for {space_id}")
         except Exception as e:
             print(f"[storage] CommitScheduler failed to initialize: {e}")

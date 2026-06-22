@@ -437,9 +437,9 @@ export function ManageDataView() {
                                         <input type={f.type} value={formData[f.key] || ''}
                                             list={`${f.key}-datalist`}
                                             onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })}
-                                            className={`w-full rounded-lg border border-gray-300 p-2 text-sm ${editItem && (f.key === 'id' || f.key === 'code' || (activeTab === 'allocations' && f.key === 'faculty_id')) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                                            className={`w-full rounded-lg border border-gray-300 p-2 text-sm ${editItem && (f.key === 'id' || f.key === 'code') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                             placeholder={f.name} 
-                                            disabled={!!editItem && (f.key === 'id' || f.key === 'code' || (activeTab === 'allocations' && f.key === 'faculty_id'))} />
+                                            disabled={!!editItem && (f.key === 'id' || f.key === 'code')} />
                                         
                                         {/* Smart Autocomplete Datalists */}
                                         {f.key === 'faculty_id' && (
@@ -575,11 +575,11 @@ export function ManageDataView() {
                                             </td>
                                         )}
                                         <td className="px-4 py-2.5 text-center flex items-center justify-center gap-2">
-                                            <button onClick={() => handleEditClick(i, item)}
+                                            <button onClick={() => handleEditClick(items.indexOf(item), item)}
                                                 className="text-blue-500 hover:text-blue-700 transition-colors" title="Edit">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                             </button>
-                                            <button onClick={() => handleDelete(i, item)}
+                                            <button onClick={() => handleDelete(items.indexOf(item), item)}
                                                 className="text-red-500 hover:text-red-700 transition-colors" title="Delete">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>

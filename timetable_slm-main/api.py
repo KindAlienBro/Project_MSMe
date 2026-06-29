@@ -991,14 +991,18 @@ def generate(req: GenerateRequest):
             raise HTTPException(400, "No schedulable tasks found. Check your allocations.")
 
         solver = TimetableSolver(tasks, facs, secs, rooms)
-        status, solution = solver.solve(
-            time_limit_seconds=req.time_limit_seconds,
-            enable_soft_constraints=True,
-            scheduling_rules=data.get("scheduling_rules", []),
-        )
+        try:
+            status, solution = solver.solve(
+                time_limit_seconds=req.time_limit_seconds,
+                enable_soft_constraints=True,
+                scheduling_rules=data.get("scheduling_rules", []),
+            )
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
 
         if status not in ("OPTIMAL", "FEASIBLE"):
-            raise HTTPException(400, f"Solver returned: {status}.")
+            diagnosis = solver.diagnose_infeasibility()
+            raise HTTPException(400, f"Timetable generation failed. {diagnosis}")
 
         # Auto-save current schedule as a version before overwriting
         if schedule_exists():

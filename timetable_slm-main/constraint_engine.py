@@ -57,18 +57,21 @@ class ConstraintEngine:
         intervals_by_faculty = defaultdict(list)
         processed_groups_per_faculty = defaultdict(set)
 
+        faculty_ids_set = {f.id for f in self.faculties}
         for task in self.tasks:
-            fid = task.faculty.id
+            parts = task.faculty.id.split('_')
+            fids = parts if len(parts) > 1 and all(p in faculty_ids_set for p in parts) else [task.faculty.id]
             gid = task.elective_group_id
             interval = self.task_vars[task.task_id][2]
 
-            if gid:
-                # If this faculty is teaching a group, only add the interval ONCE for that group
-                if gid not in processed_groups_per_faculty[fid]:
+            for fid in fids:
+                if gid:
+                    # If this faculty is teaching a group, only add the interval ONCE for that group
+                    if gid not in processed_groups_per_faculty[fid]:
+                        intervals_by_faculty[fid].append(interval)
+                        processed_groups_per_faculty[fid].add(gid)
+                else:
                     intervals_by_faculty[fid].append(interval)
-                    processed_groups_per_faculty[fid].add(gid)
-            else:
-                intervals_by_faculty[fid].append(interval)
         
         for faculty_id in intervals_by_faculty:
             if faculty_id == "DUMMY_STAFF":
@@ -95,17 +98,17 @@ class ConstraintEngine:
             self.model.AddNoOverlap(intervals_by_section[section_id])
 
         # Enforce NoOverlap between Parent and Batch
-        parent_batches = defaultdict(list)
-        for sid in intervals_by_section.keys():
-            if '-' in sid:
-                parent = sid.split('-')[0]
-                parent_batches[parent].append(sid)
-        
-        for parent, batches in parent_batches.items():
-            if parent in intervals_by_section:
-                for batch in batches:
-                    combined = intervals_by_section[parent] + intervals_by_section[batch]
-                    self.model.AddNoOverlap(combined)
+        for section in self.sections:
+            if '-' in section.section_id: continue
+            
+            parent_intervals = intervals_by_section[section.section_id]
+            
+            # A parent section cannot have a parent class and a batch class simultaneously.
+            # But B1 and B2 CAN run simultaneously.
+            for batch_suffix in ['-B1', '-B2', '-B3']:
+                batch_id = f"{section.section_id}{batch_suffix}"
+                if batch_id in intervals_by_section:
+                    self.model.AddNoOverlap(parent_intervals + intervals_by_section[batch_id])
 
         # 3. Room Clash Prevention
         for i, room in enumerate(self.rooms):
@@ -127,7 +130,8 @@ class ConstraintEngine:
         tasks_by_entity = defaultdict(list)
         for task in self.tasks:
             if task.faculty.id != "DUMMY_STAFF":
-                tasks_by_entity[f"fac_{task.faculty.id}"].append(task)
+                for fid in task.faculty.id.split('_'):  # Handle composite co-teaching faculties
+                    tasks_by_entity[f"fac_{fid}"].append(task)
             tasks_by_entity[f"sec_{task.section.section_id}"].append(task)
         for name, tasks in tasks_by_entity.items():
             self._add_stretch_constraint_for_entity(tasks, name)
@@ -248,7 +252,9 @@ class ConstraintEngine:
             type_match = (task.subject.subject_type == SubjectType.LAB) == room.is_lab
             cap_match = room.capacity >= task.section.student_strength
             if type_match and cap_match: allowed.append(i)
-        if not allowed: raise ValueError(f"No room for {task.task_id}")
+        if not allowed:
+            req_type = 'Computer Lab' if task.subject.subject_type == SubjectType.LAB else 'Standard Classroom'
+            raise ValueError(f"Shortage of suitable class rooms! Could not find any {req_type} with a minimum capacity of {task.section.student_strength} students for the subject '{task.subject.name}' (Section {task.section.section_id}). Please add a larger room to the template.")
         return allowed
 
     def _add_stretch_constraint_for_entity(self, tasks: List[Task], entity_name: str):

@@ -126,7 +126,7 @@ function TimetableGrid({
 // ── Main Component ─────────────────────────────────────────────────────────
 export function TimetableGeneratorView() {
     const { user } = useAuth();
-    const [timeLimit, setTimeLimit] = useState(30);
+    const [timeLimit, setTimeLimit] = useState(120);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [timetable, setTimetable] = useState<any>(null);
@@ -512,11 +512,11 @@ export function TimetableGeneratorView() {
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 ⏱ Solver Time Limit: <span className="text-blue-600">{timeLimit}s</span>
                             </label>
-                            <input type="range" min={10} max={120} value={timeLimit}
+                            <input type="range" min={10} max={240} value={timeLimit}
                                 onChange={e => setTimeLimit(parseInt(e.target.value))}
                                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                             />
-                            <div className="flex justify-between text-xs text-gray-400 mt-1"><span>10s</span><span>120s</span></div>
+                            <div className="flex justify-between text-xs text-gray-400 mt-1"><span>10s</span><span>240s</span></div>
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">

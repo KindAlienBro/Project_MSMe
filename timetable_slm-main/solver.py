@@ -103,3 +103,41 @@ class TimetableSolver:
                 "duration":     task.duration
             }
         return schedule
+
+    def diagnose_infeasibility(self) -> str:
+        """Heuristic checks to explain common reasons for INFEASIBLE models."""
+        import constants as const
+        # 1. Check Faculty Overload
+        fac_hours = {}
+        for t in self.tasks:
+            if 'DUMMY' in t.faculty.id: continue
+            for fid in t.faculty.id.split('_'):
+                fac_hours[fid] = fac_hours.get(fid, 0) + t.duration
+        
+        for fid, hrs in fac_hours.items():
+            if hrs > const.TOTAL_TEACHING_SLOTS_PER_WEEK:
+                fac = next((f.name for f in self.faculties if f.id == fid), fid)
+                return f"Faculty overload: {fac} ({fid}) is assigned {hrs} hours of classes, but there are only {const.TOTAL_TEACHING_SLOTS_PER_WEEK} total slots available in the week."
+        
+        # 2. Check Section Overload
+        sec_parent_hours = {}
+        sec_batch_hours = {}
+        for t in self.tasks:
+            sec = t.section.section_id
+            if '-' in sec:
+                parent = sec.split('-')[0]
+                if parent not in sec_batch_hours:
+                    sec_batch_hours[parent] = {}
+                sec_batch_hours[parent][sec] = sec_batch_hours[parent].get(sec, 0) + t.duration
+            else:
+                sec_parent_hours[sec] = sec_parent_hours.get(sec, 0) + t.duration
+                
+        for sid, hrs in sec_parent_hours.items():
+            max_batch = 0
+            if sid in sec_batch_hours:
+                max_batch = max(sec_batch_hours[sid].values())
+            total = hrs + max_batch
+            if total > const.TOTAL_TEACHING_SLOTS_PER_WEEK:
+                return f"Section overload: Section {sid} (including its batches) requires {total} hours of classes, but there are only {const.TOTAL_TEACHING_SLOTS_PER_WEEK} slots available in the week."
+
+        return "The constraint engine could not find a solution due to conflicting constraints. This typically happens if multiple subjects are forced to occur at the same time, or if teachers/rooms are double-booked by rigid scheduling rules."

@@ -195,7 +195,7 @@ if page == "🗓️ Generate Timetable":
         st.info("Generate the timetable once — it will be fixed for the semester. "
                 "Use 'Update Timetable' to make changes later via prompts.")
 
-        time_limit = st.slider("Solver time limit (seconds)", 10, 120, 30)
+        time_limit = st.slider("Solver time limit (seconds)", 10, 240, 120)
 
         st.markdown("### 📝 Add Constraints Before Generating (Optional)")
         st.caption("These rules will be baked into the timetable from the start.")

@@ -63,15 +63,31 @@ def prepare_scheduling_tasks(
     all_tasks: List[Task] = []
     section_duration_sums = {s.section_id: 0 for s in sections}
 
+    # Group allocations for co-teaching support
+    from collections import defaultdict
+    grouped_allocs = defaultdict(list)
     for alloc in allocations:
-        # Retrieve the full objects using the IDs from the allocation
+        key = (alloc.subject_code, alloc.section_id, alloc.elective_group_id)
+        grouped_allocs[key].append(alloc)
+
+    for key, alloc_group in grouped_allocs.items():
+        subject_code, section_id, alloc_elective_group_id = key
+        
         try:
-            faculty = faculties_by_id[alloc.faculty_id]
-            subject = subjects_by_code[alloc.subject_code]
-            section = sections_by_id[alloc.section_id]
+            subject = subjects_by_code[subject_code]
+            section = sections_by_id[section_id]
+            facs = [faculties_by_id[a.faculty_id] for a in alloc_group]
         except KeyError as e:
-            print(f"Error: Invalid ID in allocation {alloc}. Missing key: {e}")
+            print(f"Error: Invalid ID in allocation group {key}. Missing key: {e}")
             continue
+            
+        if len(facs) == 1:
+            faculty = facs[0]
+        else:
+            # Create composite faculty to avoid generating duplicate tasks
+            comp_id = "_".join(f.id for f in facs)
+            comp_name = " / ".join(f.name.replace("Prof. ", "").replace("Dr. ", "").replace("Mr. ", "").replace("Ms. ", "").strip() for f in facs)
+            faculty = Faculty(id=comp_id, name=comp_name, designation="Co-Teaching", max_hours_per_week=99)
 
         # --- Task Generation Logic ---
 
@@ -83,8 +99,8 @@ def prepare_scheduling_tasks(
                 # to pair the correct hours across different sections.
                 
                 group_id = None
-                if alloc.elective_group_id:
-                    group_id = f"{alloc.elective_group_id}_{i}"
+                if alloc_elective_group_id:
+                    group_id = f"{alloc_elective_group_id}_{i}"
                 elif subject.is_core:
                     # Treat Core Theory as a "Joint Class" for all batches in the section (e.g. 6a-E1 + 6a-E2)
                     # We generate a synthetic group ID: CORE_CS101_6A_0
@@ -111,7 +127,7 @@ def prepare_scheduling_tasks(
                 subject=subject,
                 section=section,
                 duration=2,
-                elective_group_id=alloc.elective_group_id
+                elective_group_id=alloc_elective_group_id
             )
             all_tasks.append(task)
             section_duration_sums[section.section_id] += task.duration
@@ -127,8 +143,25 @@ def prepare_scheduling_tasks(
             ]
             
             for section in sections:
-                current_duration = section_duration_sums.get(section.section_id, 0)
-                gaps = TOTAL_TEACHING_SLOTS_PER_WEEK - current_duration
+                if '-' in section.section_id or section.section_id == 'OE_AI':
+                    continue
+                batch_durations = [
+                    section_duration_sums.get(b.section_id, 0)
+                    for b in sections if b.section_id.startswith(f"{section.section_id}-")
+                ]
+                max_batch_duration = max(batch_durations) if batch_durations else 0
+                current_duration = section_duration_sums.get(section.section_id, 0) + max_batch_duration
+                
+                # Dynamically adjust filler buffer based on problem size (massive math = lower fillers)
+                num_allocations = len(allocations)
+                if num_allocations > 100:
+                    buffer = 8  # Massive math: keep 8 hours free to reduce dummy tasks
+                elif num_allocations > 50:
+                    buffer = 4  # Moderate math: keep 4 hours free
+                else:
+                    buffer = 2  # Normal math: keep 2 hours free
+                    
+                gaps = max(0, TOTAL_TEACHING_SLOTS_PER_WEEK - current_duration - buffer)
                 
                 if gaps > 0:
                     for i in range(gaps):

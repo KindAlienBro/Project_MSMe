@@ -181,8 +181,13 @@ class ObjectiveEngine:
 
         # Group tasks by faculty
         tasks_by_faculty = {f.id: [] for f in self.faculties}
+        faculty_ids_set = {f.id for f in self.faculties}
         for task in self.tasks:
-            tasks_by_faculty[task.faculty.id].append(task)
+            parts = task.faculty.id.split('_')
+            fids = parts if len(parts) > 1 and all(p in faculty_ids_set for p in parts) else [task.faculty.id]
+            for fid in fids:
+                if fid in tasks_by_faculty:
+                    tasks_by_faculty[fid].append(task)
 
         for faculty_id, f_tasks in tasks_by_faculty.items():
             if not f_tasks:

@@ -139,18 +139,21 @@ def _build_grid(solution: dict, allocations: list = None) -> dict:
     days_seen = {ps: set() for ps in parent_sections}
 
     for task_id, info in solution.items():
-        sec_id = info.get("section_id", "")
-        ps = sec_id.split("-")[0].upper()
+        sec_id = info.get("section_id") or ""
+        ps = sec_id.split("-")[0].upper() if sec_id else ""
         day = info.get("day_index", 0)
         period = info.get("period_index", 0)
         dur = info.get("duration", 1)
-        subject = info.get("subject_code", "?").upper()
-        faculty = info.get("faculty_name", "")
+        
+        subject_raw = info.get("subject_code") or "?"
+        subject = subject_raw.upper()
+        
+        faculty = info.get("faculty_name") or ""
         short_fac = (faculty.replace("Prof. ", "").replace("Dr. ", "")
                             .replace("Mr. ", "").replace("Ms. ", ""))
 
         # Look up elective_group from allocations
-        eg = alloc_by_sec_sub.get((sec_id.lower(), info.get("subject_code", "").lower()))
+        eg = alloc_by_sec_sub.get((sec_id.lower(), subject_raw.lower()))
         is_oe = bool(eg and "oe" in eg.lower())
 
         days_seen[ps].add(day)
@@ -167,7 +170,7 @@ def _build_grid(solution: dict, allocations: list = None) -> dict:
             # Propagate substitution metadata so frontend can highlight
             if info.get("is_substituted"):
                 entry["is_substituted"] = True
-                orig = info.get("original_faculty_name", "")
+                orig = info.get("original_faculty_name") or ""
                 entry["original_faculty"] = (orig.replace("Prof. ", "").replace("Dr. ", "")
                                               .replace("Mr. ", "").replace("Ms. ", ""))
             slot = merged[ps][day][period + i]

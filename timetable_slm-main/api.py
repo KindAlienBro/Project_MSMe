@@ -323,7 +323,7 @@ def get_excel_template():
     df_sections = pd.DataFrame(columns=["id", "semester", "strength"])
     df_rooms = pd.DataFrame(columns=["id", "capacity", "is_lab", "building"])
     df_allocations = pd.DataFrame(columns=["faculty_id", "subject_code", "section_id", "elective_group"])
-    df_scheduling_rules = pd.DataFrame(columns=["rule_type", "subject_codes", "subject_types", "period", "max_period", "days"])
+    df_scheduling_rules = pd.DataFrame(columns=["rule_type", "faculty_id", "subject_codes", "subject_types", "period", "max_period", "days"])
     
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -338,39 +338,39 @@ def get_excel_template():
         ws = writer.sheets['Scheduling Rules']
         
         # Rule Type dropdown (column A, rows 2-100)
-        dv_rule_type = DataValidation(type="list", formula1='"FIXED_PERIOD,BEFORE_TIME,FIXED_DAYS"', allow_blank=True)
+        dv_rule_type = DataValidation(type="list", formula1='"FIXED_PERIOD,BEFORE_TIME,FIXED_DAYS,FACULTY_UNAVAILABLE"', allow_blank=True)
         dv_rule_type.prompt = "Select a rule type"
         dv_rule_type.promptTitle = "Rule Type"
         ws.add_data_validation(dv_rule_type)
         dv_rule_type.add(f'A2:A100')
         
-        # Subject Types dropdown (column C, rows 2-100)
+        # Subject Types dropdown (column D, rows 2-100)
         dv_subject_types = DataValidation(type="list", formula1='"THEORY,LAB,SOFTSKILL,FORUM"', allow_blank=True)
         dv_subject_types.prompt = "Select subject type(s) - comma-separate for multiple"
         dv_subject_types.promptTitle = "Subject Types"
         ws.add_data_validation(dv_subject_types)
-        dv_subject_types.add(f'C2:C100')
+        dv_subject_types.add(f'D2:D100')
         
-        # Period dropdown (column D, rows 2-100)
+        # Period dropdown (column E, rows 2-100)
         dv_period = DataValidation(type="list", formula1='"Period 1,Period 2,Period 3,Period 4,Period 5,Period 6,Period 7,Period 8"', allow_blank=True)
         dv_period.prompt = "Select period (for FIXED_PERIOD rules)"
         dv_period.promptTitle = "Period"
         ws.add_data_validation(dv_period)
-        dv_period.add(f'D2:D100')
+        dv_period.add(f'E2:E100')
         
-        # Max Period dropdown (column E, rows 2-100)
+        # Max Period dropdown (column F, rows 2-100)
         dv_max_period = DataValidation(type="list", formula1='"Period 1,Period 2,Period 3,Period 4,Period 5,Period 6,Period 7,Period 8"', allow_blank=True)
         dv_max_period.prompt = "Select max period (for BEFORE_TIME rules)"
         dv_max_period.promptTitle = "Max Period"
         ws.add_data_validation(dv_max_period)
-        dv_max_period.add(f'E2:E100')
+        dv_max_period.add(f'F2:F100')
         
-        # Days dropdown (column F, rows 2-100)
+        # Days dropdown (column G, rows 2-100)
         dv_days = DataValidation(type="list", formula1='"MON,TUE,WED,THU,FRI,SAT"', allow_blank=True)
         dv_days.prompt = "Select day(s) - comma-separate for multiple (for FIXED_DAYS rules)"
         dv_days.promptTitle = "Days"
         ws.add_data_validation(dv_days)
-        dv_days.add(f'F2:F100')
+        dv_days.add(f'G2:G100')
         
         # Designation dropdown for Faculties sheet (column C, rows 2-100)
         ws_fac = writer.sheets['Faculties']
@@ -425,6 +425,7 @@ def export_data_as_excel():
     for rule in rules:
         row = {
             "rule_type": rule.get("rule_type", ""),
+            "faculty_id": rule.get("faculty_id", ""),
             "subject_codes": ", ".join(rule.get("subject_codes", [])) if isinstance(rule.get("subject_codes"), list) else str(rule.get("subject_codes", "")),
             "subject_types": ", ".join(rule.get("subject_types", [])) if isinstance(rule.get("subject_types"), list) else str(rule.get("subject_types", "")),
             "period": f"Period {rule['period_index'] + 1}" if rule.get("period_index") is not None else "",
@@ -440,7 +441,7 @@ def export_data_as_excel():
     sec_cols = ["id", "semester", "strength"]
     room_cols = ["id", "capacity", "is_lab", "building"]
     alloc_cols = ["faculty_id", "subject_code", "section_id", "elective_group"]
-    rule_cols = ["rule_type", "subject_codes", "subject_types", "period", "max_period", "days"]
+    rule_cols = ["rule_type", "faculty_id", "subject_codes", "subject_types", "period", "max_period", "days"]
     
     for col in fac_cols:
         if col not in df_faculties.columns:
@@ -612,6 +613,11 @@ async def import_excel(file: UploadFile = File(...)):
                 if not rule_type:
                     continue
                 rule = {"id": str(_uuid.uuid4()), "rule_type": rule_type}
+                
+                # Parse faculty_id
+                fid = str(row.get('faculty_id', '')).strip()
+                if fid:
+                    rule["faculty_id"] = fid
                 
                 # Parse subject_codes (comma-separated)
                 sc = str(row.get('subject_codes', '')).strip()

@@ -100,12 +100,19 @@ function TimetableGrid({
                                                             {cells.length === 0 ? (
                                                                 <span className="text-gray-200 flex justify-center items-center h-10">—</span>
                                                             ) : (
-                                                                cells.map((c: any, ci: number) => (
-                                                                    <div key={ci} className={`rounded px-1.5 py-1 mb-0.5 border ${color}`}>
-                                                                        <div className="font-bold leading-tight text-[11px]">{c.subject}</div>
-                                                                        <div className="opacity-70 text-[10px] leading-tight">{c.faculty}</div>
-                                                                    </div>
-                                                                ))
+                                                                <div className={`rounded px-1 py-1 border flex flex-col justify-center min-h-[40px] ${color}`}>
+                                                                    {cells.map((c: any, ci: number) => (
+                                                                        <React.Fragment key={ci}>
+                                                                            <div className="text-center w-full">
+                                                                                <div className="font-bold leading-tight text-[11px]">{c.subject}</div>
+                                                                                <div className="opacity-70 text-[10px] leading-tight">{c.faculty}</div>
+                                                                            </div>
+                                                                            {ci < cells.length - 1 && (
+                                                                                <div className="w-full my-1 border-t border-dashed border-current opacity-30"></div>
+                                                                            )}
+                                                                        </React.Fragment>
+                                                                    ))}
+                                                                </div>
                                                             )}
                                                         </td>
                                                     );

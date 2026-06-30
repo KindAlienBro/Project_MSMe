@@ -50,7 +50,8 @@ const ENTITY_FIELDS: Record<EntityKey, { name: string; key: string; type: string
         { name: 'Elective Group (Optional)', key: 'elective_group', type: 'text' },
     ],
     scheduling_rules: [
-        { name: 'Rule Type', key: 'rule_type', type: 'select', options: ['FIXED_PERIOD', 'BEFORE_TIME', 'FIXED_DAYS'] },
+        { name: 'Rule Type', key: 'rule_type', type: 'select', options: ['FIXED_PERIOD', 'BEFORE_TIME', 'FIXED_DAYS', 'FACULTY_UNAVAILABLE'] },
+        { name: 'Faculty ID', key: 'faculty_id', type: 'text' },
         { name: 'Subject Codes', key: 'subject_codes', type: 'multiselect' }, // dynamically populated
         { name: 'Subject Types', key: 'subject_types', type: 'multiselect', options: ['THEORY', 'LAB', 'SOFTSKILL', 'FORUM'] },
         { name: 'Period', key: 'period_index', type: 'select', options: ['Period 1', 'Period 2', 'Period 3', 'Period 4', 'Period 5', 'Period 6', 'Period 7', 'Period 8'] },
@@ -72,10 +73,10 @@ export function ManageDataView() {
     const [editItem, setEditItem] = useState<any>(null);
     const [editIndex, setEditIndex] = useState<number | null>(null);
     const [uploadingExcel, setUploadingExcel] = useState(false);
-    
+
     // Smart Search & Modal State
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedEntity, setSelectedEntity] = useState<{type: 'faculty' | 'subject' | 'section', id: string} | null>(null);
+    const [selectedEntity, setSelectedEntity] = useState<{ type: 'faculty' | 'subject' | 'section', id: string } | null>(null);
 
     const fetchData = async (entity: EntityKey) => {
         setLoading(true);
@@ -155,7 +156,7 @@ export function ManageDataView() {
     const handleEditClick = (index: number, item: any) => {
         setEditItem(item);
         setEditIndex(index);
-        
+
         // Populate formData based on activeTab
         const newFormData: Record<string, any> = { ...item };
         if (activeTab === 'scheduling_rules' && item.period_index !== undefined) {
@@ -178,13 +179,13 @@ export function ManageDataView() {
         let hours = 0;
         const uniqueClasses = new Set<string>();
         const allocsToUse = customAllocations || allAllocations;
-        
+
         allocsToUse.forEach(alloc => {
             if (alloc.faculty_id === facultyId) {
                 // Consider 6A-E1 and 6A-E2 as the same class "6a" for a given subject
                 const baseSection = alloc.section_id ? alloc.section_id.split('-')[0].toLowerCase().trim() : '';
                 const classKey = `${alloc.subject_code}-${baseSection}`;
-                
+
                 if (!uniqueClasses.has(classKey)) {
                     uniqueClasses.add(classKey);
                     const sub = allSubjects.find(s => s.code === alloc.subject_code);
@@ -223,9 +224,18 @@ export function ManageDataView() {
         // For scheduling rules, arrays are already properly typed via multiselect
         if (activeTab === 'scheduling_rules') {
             // Cleanup unused fields based on type to keep JSON clean
-            if (item.rule_type !== 'FIXED_PERIOD') delete item.period_index;
-            if (item.rule_type !== 'BEFORE_TIME') delete item.max_period_index;
-            if (item.rule_type !== 'FIXED_DAYS') delete item.days;
+            if (item.rule_type !== 'FACULTY_UNAVAILABLE') delete item.faculty_id;
+            
+            if (item.rule_type === 'FACULTY_UNAVAILABLE') {
+                delete item.subject_codes;
+                delete item.subject_types;
+                delete item.max_period_index;
+                // period_index and days are used
+            } else {
+                if (item.rule_type !== 'FIXED_PERIOD') delete item.period_index;
+                if (item.rule_type !== 'BEFORE_TIME') delete item.max_period_index;
+                if (item.rule_type !== 'FIXED_DAYS') delete item.days;
+            }
         }
 
         // Instant Conflict Warning
@@ -233,14 +243,14 @@ export function ManageDataView() {
             const faculty = allFaculties.find(f => f.id === item.faculty_id);
             if (faculty) {
                 const newSub = allSubjects.find(s => s.code === item.subject_code);
-                
+
                 // Simulate new load
                 const simulatedAllocations = [...allAllocations];
                 if (editItem) {
                     // Try to find and replace the old item
-                    const idx = simulatedAllocations.findIndex(a => 
-                        a.faculty_id === editItem.faculty_id && 
-                        a.subject_code === editItem.subject_code && 
+                    const idx = simulatedAllocations.findIndex(a =>
+                        a.faculty_id === editItem.faculty_id &&
+                        a.subject_code === editItem.subject_code &&
                         a.section_id === editItem.section_id
                     );
                     if (idx !== -1) {
@@ -330,7 +340,7 @@ export function ManageDataView() {
     const filteredItems = items.filter(item => {
         if (!searchQuery) return true;
         const query = searchQuery.toLowerCase();
-        return Object.values(item).some(val => 
+        return Object.values(item).some(val =>
             String(val).toLowerCase().includes(query)
         );
     });
@@ -346,7 +356,7 @@ export function ManageDataView() {
                 </p>
             </div>
 
-            
+
             {/* Excel Import/Export */}
             <div className="space-y-3">
                 <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -397,9 +407,12 @@ export function ManageDataView() {
                         // Dynamically hide/show fields for scheduling rules
                         if (activeTab === 'scheduling_rules') {
                             const rtype = formData.rule_type || 'FIXED_PERIOD';
-                            if (f.key === 'period_index' && rtype !== 'FIXED_PERIOD') return null;
+                            if (f.key === 'faculty_id' && rtype !== 'FACULTY_UNAVAILABLE') return null;
+                            if (f.key === 'subject_codes' && rtype === 'FACULTY_UNAVAILABLE') return null;
+                            if (f.key === 'subject_types' && rtype === 'FACULTY_UNAVAILABLE') return null;
+                            if (f.key === 'period_index' && rtype !== 'FIXED_PERIOD' && rtype !== 'FACULTY_UNAVAILABLE') return null;
                             if (f.key === 'max_period_index' && rtype !== 'BEFORE_TIME') return null;
-                            if (f.key === 'days' && rtype !== 'FIXED_DAYS') return null;
+                            if (f.key === 'days' && rtype !== 'FIXED_DAYS' && rtype !== 'FACULTY_UNAVAILABLE') return null;
                         }
 
                         let options = f.options || [];
@@ -438,9 +451,9 @@ export function ManageDataView() {
                                             list={`${f.key}-datalist`}
                                             onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })}
                                             className={`w-full rounded-lg border border-gray-300 p-2 text-sm ${editItem && (f.key === 'id' || f.key === 'code') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                                            placeholder={f.name} 
+                                            placeholder={f.name}
                                             disabled={!!editItem && (f.key === 'id' || f.key === 'code')} />
-                                        
+
                                         {/* Smart Autocomplete Datalists */}
                                         {f.key === 'faculty_id' && (
                                             <datalist id={`${f.key}-datalist`}>
@@ -484,12 +497,12 @@ export function ManageDataView() {
                     <h3 className="text-sm font-semibold text-gray-700 whitespace-nowrap">
                         {filteredItems.length} {activeTab} loaded {searchQuery && '(filtered)'}
                     </h3>
-                    
+
                     {/* Search Bar */}
                     <div className="relative w-full sm:max-w-xs">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg className="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
                             </svg>
                         </div>
                         <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
@@ -537,14 +550,14 @@ export function ManageDataView() {
                                             <td key={f.key} className="px-4 py-2.5 text-gray-800">
                                                 {/* Smart Click-to-View Links for Allocations */}
                                                 {activeTab === 'allocations' && ['faculty_id', 'subject_code', 'section_id'].includes(f.key) ? (
-                                                    <button onClick={() => setSelectedEntity({ type: f.key.split('_')[0] as any, id: String(item[f.key]) })} 
+                                                    <button onClick={() => setSelectedEntity({ type: f.key.split('_')[0] as any, id: String(item[f.key]) })}
                                                         className="text-blue-600 hover:text-blue-800 hover:underline font-medium focus:outline-none transition-colors">
                                                         {String(item[f.key] ?? '')}
                                                     </button>
-                                                ) : f.type === 'checkbox' 
-                                                    ? (item[f.key] ? '✅' : '❌') 
-                                                    : Array.isArray(item[f.key]) 
-                                                        ? item[f.key].join(', ') 
+                                                ) : f.type === 'checkbox'
+                                                    ? (item[f.key] ? '✅' : '❌')
+                                                    : Array.isArray(item[f.key])
+                                                        ? item[f.key].join(', ')
                                                         : String(item[f.key] ?? '')}
                                             </td>
                                         ))}
@@ -557,7 +570,7 @@ export function ManageDataView() {
                                                     const percentage = Math.min(100, Math.round((load / max) * 100));
                                                     const color = percentage >= 100 ? 'bg-red-500' : percentage >= 80 ? 'bg-yellow-500' : 'bg-green-500';
                                                     return (
-                                                        <button 
+                                                        <button
                                                             onClick={() => setSelectedEntity({ type: 'faculty', id: item.id })}
                                                             className="w-32 text-left hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-blue-500 rounded p-1 -ml-1"
                                                             title="Click to view allocations"
@@ -600,7 +613,7 @@ export function ManageDataView() {
                         <button onClick={() => setSelectedEntity(null)} className="absolute top-4 right-4 p-1.5 bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-colors">
                             <X className="w-4 h-4" />
                         </button>
-                        
+
                         {(() => {
                             if (selectedEntity.type === 'faculty') {
                                 const f = allFaculties.find(x => x.id === selectedEntity.id);

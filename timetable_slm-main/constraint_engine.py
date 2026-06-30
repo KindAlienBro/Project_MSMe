@@ -81,6 +81,9 @@ class ConstraintEngine:
         # 2. Section Clash Prevention (MODIFIED FOR ELECTIVES AND BATCHES)
         intervals_by_section = defaultdict(list)
         processed_groups_per_section = defaultdict(set)
+        
+        # We also need to keep track of parent sections dynamically in case they are missing from self.sections
+        parent_sections_dynamic = set()
 
         for task in self.tasks:
             sid = task.section.section_id
@@ -93,22 +96,37 @@ class ConstraintEngine:
                     processed_groups_per_section[sid].add(gid)
             else:
                 intervals_by_section[sid].append(interval)
+                
+            # Add to parent_sections_dynamic if it's a parent section
+            if '-' not in sid:
+                parent_sections_dynamic.add(sid)
+            else:
+                parent_sections_dynamic.add(sid.split('-')[0])
 
         for section_id in intervals_by_section:
             self.model.AddNoOverlap(intervals_by_section[section_id])
 
-        # Enforce NoOverlap between Parent and Batch
-        for section in self.sections:
-            if '-' in section.section_id: continue
-            
-            parent_intervals = intervals_by_section[section.section_id]
-            
-            # A parent section cannot have a parent class and a batch class simultaneously.
-            # But B1 and B2 CAN run simultaneously.
+        # Enforce NoOverlap between Parent and ALL its Batches (including between batches)
+        for parent_sid in parent_sections_dynamic:
+            parent_intervals = list(intervals_by_section.get(parent_sid, []))
+
+            # Parent can't overlap with any batch task (grouped or not)
             for batch_suffix in ['-B1', '-B2', '-B3']:
-                batch_id = f"{section.section_id}{batch_suffix}"
+                batch_id = f"{parent_sid}{batch_suffix}"
                 if batch_id in intervals_by_section:
                     self.model.AddNoOverlap(parent_intervals + intervals_by_section[batch_id])
+
+            # Non-grouped batch tasks across different batches can't overlap.
+            # (Grouped tasks are allowed to overlap — the grouping constraint
+            #  forces them to the same start time intentionally.)
+            non_grouped_cross_batch = []
+            for task in self.tasks:
+                sid = task.section.section_id
+                if '-' in sid and sid.split('-')[0] == parent_sid and not task.elective_group_id:
+                    non_grouped_cross_batch.append(self.task_vars[task.task_id][2])
+
+            if len(non_grouped_cross_batch) > 1:
+                self.model.AddNoOverlap(non_grouped_cross_batch)
 
         # 3. Room Clash Prevention
         for i, room in enumerate(self.rooms):
@@ -178,6 +196,27 @@ class ConstraintEngine:
         # ── Configurable scheduling rules (data-driven) ─────────────────
         DAY_MAP = {'MON':0,'TUE':1,'WED':2,'THU':3,'FRI':4,'SAT':5}
         for rule in self.scheduling_rules:
+            rtype = rule.get('rule_type', '').upper()
+            
+            if rtype == 'FACULTY_UNAVAILABLE':
+                rule_fid = rule.get('faculty_id')
+                if rule_fid and rule_fid != task.faculty.id:
+                    continue
+                
+                days = [DAY_MAP[d.upper()] for d in (rule.get('days') or []) if d.upper() in DAY_MAP]
+                period_idx = rule.get('period_index')
+                
+                for day in days:
+                    off = day * const.NUM_TEACHING_SLOTS_PER_DAY
+                    if period_idx is not None:
+                        for o in range(task.duration):
+                            full_range.discard(off + period_idx - o)
+                    else:
+                        for p in range(const.NUM_TEACHING_SLOTS_PER_DAY):
+                            for o in range(task.duration):
+                                full_range.discard(off + p - o)
+                continue
+
             rule_subjects = [s.lower() for s in (rule.get('subject_codes') or [])]
             rule_types = [t.upper() for t in (rule.get('subject_types') or [])]
             # Check if this rule applies to the current task
@@ -185,8 +224,6 @@ class ConstraintEngine:
             matches_type = task.subject.subject_type.name in rule_types if rule_types else False
             if not matches_subject and not matches_type:
                 continue
-
-            rtype = rule.get('rule_type', '').upper()
 
             if rtype == 'FIXED_PERIOD':
                 # Force tasks to a specific period index

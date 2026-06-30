@@ -1,1172 +1,1570 @@
 {
-    "faculties": [
-        {
-            "id": "anu",
-            "name": "Dr. Anu Pallavi S",
-            "designation": "Assoc. Prof",
-            "max_hours": 14
-        },
-        {
-            "id": "kavitha",
-            "name": "Dr. Kavitha Nair R",
-            "designation": "Assoc. Prof",
-            "max_hours": 14
-        },
-        {
-            "id": "nanda",
-            "name": "Prof. Nanda",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "tahir",
-            "name": "Prof. Tahir",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "jovin",
-            "name": "Mr. Jovin Deglus",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "praveen",
-            "name": "Prof. Praveen",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "surbhi",
-            "name": "Ms. Surbhi",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "soft",
-            "name": "Soft Skills Trainer",
-            "designation": "Trainer",
-            "max_hours": 18
-        },
-        {
-            "id": "oe_fac_1",
-            "name": "OE Teacher 1",
-            "designation": "Guest",
-            "max_hours": 18
-        },
-        {
-            "id": "oe_fac_2",
-            "name": "OE Teacher 2",
-            "designation": "Guest",
-            "max_hours": 18
-        },
-        {
-            "id": "adarsha",
-            "name": "Mr. Adarsha S P",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "syed",
-            "name": "Prof. Syed",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "sanjay",
-            "name": "Mr. Sanjay P",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "vikas",
-            "name": "Mr. Vikas Kumar",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "rahul",
-            "name": "Mr. Rahul Bharath",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "abhijith",
-            "name": "Mr. Abhijith",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "krithika",
-            "name": "Ms. Krithika",
-            "designation": "Asst. Prof",
-            "max_hours": 18
-        },
-        {
-            "id": "vijayashekar",
-            "name": "Dr. Vijayashekar S S",
-            "designation": "Assoc. Prof",
-            "max_hours": 14
-        },
-        {
-            "id": "oe_fac_3",
-            "name": "OE Teacher 3 (Sem 7)",
-            "designation": "Guest",
-            "max_hours": 18
-        },
-        {
-            "id": "DUMMY_STAFF",
-            "name": "Dummy Staff",
-            "designation": "Filler",
-            "max_hours": 999
-        }
-    ],
-    "subjects": [
-        {
-            "code": "nlp",
-            "name": "NLP",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "nlplab",
-            "name": "NLP Lab",
-            "type": "LAB",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "ml",
-            "name": "ML",
-            "type": "THEORY",
-            "credits": 4,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "mllab",
-            "name": "ML Lab",
-            "type": "LAB",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "hcai",
-            "name": "HCI",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "cc",
-            "name": "Cloud",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "oe",
-            "name": "OE",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "major",
-            "name": "Project",
-            "type": "LAB",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "iks",
-            "name": "IKS",
-            "type": "THEORY",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "softskill",
-            "name": "Soft Skills",
-            "type": "SOFTSKILL",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "forum",
-            "name": "Forum",
-            "type": "FORUM",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "devops",
-            "name": "DevOps",
-            "type": "LAB",
-            "credits": 2,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "genai",
-            "name": "GenAI",
-            "type": "LAB",
-            "credits": 2,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "sepm",
-            "name": "SEPM (Soft. Engg)",
-            "type": "THEORY",
-            "credits": 4,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "cn",
-            "name": "Comp. Networks",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "cnlab",
-            "name": "CN Lab",
-            "type": "LAB",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "toc",
-            "name": "Theory of Comp.",
-            "type": "THEORY",
-            "credits": 4,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "dvlab",
-            "name": "Data Vis Lab",
-            "type": "LAB",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "nosql",
-            "name": "NoSQL DB",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "miniproj",
-            "name": "Mini Project",
-            "type": "LAB",
-            "credits": 1,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "rmipr",
-            "name": "RM & IPR",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "evs",
-            "name": "Env. Studies",
-            "type": "THEORY",
-            "credits": 1,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "nss",
-            "name": "NSS",
-            "type": "LAB",
-            "credits": 1,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "dlrl",
-            "name": "Deep Learning & RL",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "dlrllab",
-            "name": "DL&RL Lab",
-            "type": "LAB",
-            "credits": 2,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "ml2",
-            "name": "Machine Learning-II",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "ml2lab",
-            "name": "ML-II Lab",
-            "type": "LAB",
-            "credits": 2,
-            "is_core": true,
-            "is_heavy": false
-        },
-        {
-            "code": "dsp",
-            "name": "Data Security & Privacy",
-            "type": "THEORY",
-            "credits": 4,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "ba",
-            "name": "Business Analytics",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "bda",
-            "name": "Big Data Analytics",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "oe7",
-            "name": "Open Elective (Sem 7)",
-            "type": "THEORY",
-            "credits": 3,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "major2",
-            "name": "Major Project Phase-II",
-            "type": "LAB",
-            "credits": 6,
-            "is_core": true,
-            "is_heavy": true
-        },
-        {
-            "code": "LIB_HR",
-            "name": "Library Hour",
-            "type": "THEORY",
-            "credits": 1,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "STU_HR",
-            "name": "Student Hour",
-            "type": "THEORY",
-            "credits": 1,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "FAC_HR",
-            "name": "Faculty Hour",
-            "type": "THEORY",
-            "credits": 1,
-            "is_core": false,
-            "is_heavy": false
-        },
-        {
-            "code": "STDY_HR",
-            "name": "Study Hour",
-            "type": "THEORY",
-            "credits": 1,
-            "is_core": false,
-            "is_heavy": false
-        }
-    ],
-    "sections": [
-        {
-            "id": "6a-E1",
-            "semester": 6,
-            "strength": 40
-        },
-        {
-            "id": "6a-E2",
-            "semester": 6,
-            "strength": 40
-        },
-        {
-            "id": "6b-E1",
-            "semester": 6,
-            "strength": 30
-        },
-        {
-            "id": "6b-E2",
-            "semester": 6,
-            "strength": 30
-        },
-        {
-            "id": "5a",
-            "semester": 5,
-            "strength": 60
-        },
-        {
-            "id": "5b",
-            "semester": 5,
-            "strength": 60
-        },
-        {
-            "id": "7b-B1",
-            "semester": 7,
-            "strength": 30
-        },
-        {
-            "id": "7b-B2",
-            "semester": 7,
-            "strength": 30
-        },
-        {
-            "id": "7a-B1",
-            "semester": 7,
-            "strength": 30
-        },
-        {
-            "id": "7a-B2",
-            "semester": 7,
-            "strength": 30
-        }
-    ],
-    "rooms": [
-        {
-            "id": "r1",
-            "capacity": 80,
-            "is_lab": false,
-            "building": "Main"
-        },
-        {
-            "id": "r2",
-            "capacity": 80,
-            "is_lab": false,
-            "building": "Main"
-        },
-        {
-            "id": "r3",
-            "capacity": 80,
-            "is_lab": false,
-            "building": "Main"
-        },
-        {
-            "id": "r4",
-            "capacity": 80,
-            "is_lab": false,
-            "building": "Main"
-        },
-        {
-            "id": "l1",
-            "capacity": 80,
-            "is_lab": true,
-            "building": "Lab"
-        },
-        {
-            "id": "l2",
-            "capacity": 80,
-            "is_lab": true,
-            "building": "Lab"
-        },
-        {
-            "id": "l3",
-            "capacity": 80,
-            "is_lab": true,
-            "building": "Lab"
-        },
-        {
-            "id": "l4",
-            "capacity": 80,
-            "is_lab": true,
-            "building": "Lab"
-        }
-    ],
-    "allocations": [
-        {
-            "faculty_id": "anu",
-            "subject_code": "nlp",
-            "section_id": "6a-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "nlp",
-            "section_id": "6a-E2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "nlp",
-            "section_id": "6b-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "nlp",
-            "section_id": "6b-E2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "nlplab",
-            "section_id": "6a-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "nlplab",
-            "section_id": "6b-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "ml",
-            "section_id": "6a-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "ml",
-            "section_id": "6a-E2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "ml",
-            "section_id": "6b-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "ml",
-            "section_id": "6b-E2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "mllab",
-            "section_id": "6a-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "praveen",
-            "subject_code": "mllab",
-            "section_id": "6b-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "jovin",
-            "subject_code": "major",
-            "section_id": "6a-E1",
-            "elective_group": "sem6_proj_common"
-        },
-        {
-            "faculty_id": "jovin",
-            "subject_code": "major",
-            "section_id": "6b-E1",
-            "elective_group": "sem6_proj_common"
-        },
-        {
-            "faculty_id": "nanda",
-            "subject_code": "hcai",
-            "section_id": "6a-E1",
-            "elective_group": "elec_common"
-        },
-        {
-            "faculty_id": "tahir",
-            "subject_code": "cc",
-            "section_id": "6a-E2",
-            "elective_group": "elec_common"
-        },
-        {
-            "faculty_id": "nanda",
-            "subject_code": "hcai",
-            "section_id": "6b-E1",
-            "elective_group": "elec_common"
-        },
-        {
-            "faculty_id": "tahir",
-            "subject_code": "cc",
-            "section_id": "6b-E2",
-            "elective_group": "elec_common"
-        },
-        {
-            "faculty_id": "oe_fac_1",
-            "subject_code": "oe",
-            "section_id": "6a-E1",
-            "elective_group": "oe_common"
-        },
-        {
-            "faculty_id": "oe_fac_1",
-            "subject_code": "oe",
-            "section_id": "6a-E2",
-            "elective_group": "oe_common"
-        },
-        {
-            "faculty_id": "oe_fac_2",
-            "subject_code": "oe",
-            "section_id": "6b-E1",
-            "elective_group": "oe_common"
-        },
-        {
-            "faculty_id": "oe_fac_2",
-            "subject_code": "oe",
-            "section_id": "6b-E2",
-            "elective_group": "oe_common"
-        },
-        {
-            "faculty_id": "praveen",
-            "subject_code": "iks",
-            "section_id": "6a-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "praveen",
-            "subject_code": "iks",
-            "section_id": "6b-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "soft",
-            "subject_code": "softskill",
-            "section_id": "6a-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "soft",
-            "subject_code": "softskill",
-            "section_id": "6b-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "surbhi",
-            "subject_code": "forum",
-            "section_id": "6a-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "forum",
-            "section_id": "6b-E1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "syed",
-            "subject_code": "devops",
-            "section_id": "6a-E1",
-            "elective_group": "tech_elec_common"
-        },
-        {
-            "faculty_id": "sanjay",
-            "subject_code": "genai",
-            "section_id": "6a-E2",
-            "elective_group": "tech_elec_common"
-        },
-        {
-            "faculty_id": "syed",
-            "subject_code": "devops",
-            "section_id": "6b-E1",
-            "elective_group": "tech_elec_common"
-        },
-        {
-            "faculty_id": "sanjay",
-            "subject_code": "genai",
-            "section_id": "6b-E2",
-            "elective_group": "tech_elec_common"
-        },
-        {
-            "faculty_id": "vikas",
-            "subject_code": "sepm",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "vikas",
-            "subject_code": "sepm",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "cn",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "cn",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "cnlab",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "cnlab",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "rahul",
-            "subject_code": "toc",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "rahul",
-            "subject_code": "toc",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "abhijith",
-            "subject_code": "dvlab",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "jovin",
-            "subject_code": "dvlab",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "praveen",
-            "subject_code": "nosql",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "praveen",
-            "subject_code": "nosql",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "sanjay",
-            "subject_code": "miniproj",
-            "section_id": "5a",
-            "elective_group": "sem5_proj_common"
-        },
-        {
-            "faculty_id": "sanjay",
-            "subject_code": "miniproj",
-            "section_id": "5b",
-            "elective_group": "sem5_proj_common"
-        },
-        {
-            "faculty_id": "syed",
-            "subject_code": "rmipr",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "syed",
-            "subject_code": "rmipr",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "krithika",
-            "subject_code": "evs",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "krithika",
-            "subject_code": "evs",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "nanda",
-            "subject_code": "nss",
-            "section_id": "5a",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "nanda",
-            "subject_code": "nss",
-            "section_id": "5b",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "vijayashekar",
-            "subject_code": "dlrl",
-            "section_id": "7b-B1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "vijayashekar",
-            "subject_code": "dlrl",
-            "section_id": "7b-B2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "vijayashekar",
-            "subject_code": "dlrllab",
-            "section_id": "7b-B1",
-            "elective_group": "lab_pair_7b_2"
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "dlrllab",
-            "section_id": "7b-B2",
-            "elective_group": "lab_pair_7b_1"
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "ml2",
-            "section_id": "7b-B1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "ml2",
-            "section_id": "7b-B2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "ml2lab",
-            "section_id": "7b-B1",
-            "elective_group": "lab_pair_7b_1"
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "ml2lab",
-            "section_id": "7b-B2",
-            "elective_group": "lab_pair_7b_2"
-        },
-        {
-            "faculty_id": "jovin",
-            "subject_code": "dsp",
-            "section_id": "7b-B1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "jovin",
-            "subject_code": "dsp",
-            "section_id": "7b-B2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "surbhi",
-            "subject_code": "ba",
-            "section_id": "7b-B1",
-            "elective_group": "sem7_elec_common"
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "bda",
-            "section_id": "7b-B2",
-            "elective_group": "sem7_elec_common"
-        },
-        {
-            "faculty_id": "oe_fac_3",
-            "subject_code": "oe7",
-            "section_id": "7b-B1",
-            "elective_group": "oe7_common"
-        },
-        {
-            "faculty_id": "oe_fac_3",
-            "subject_code": "oe7",
-            "section_id": "7b-B2",
-            "elective_group": "oe7_common"
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "major2",
-            "section_id": "7b-B1",
-            "elective_group": "sem7_proj_common"
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "major2",
-            "section_id": "7b-B2",
-            "elective_group": "sem7_proj_common"
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "dlrl",
-            "section_id": "7a-B1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "dlrl",
-            "section_id": "7a-B2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "kavitha",
-            "subject_code": "dlrllab",
-            "section_id": "7a-B1",
-            "elective_group": "lab_pair_7a_2"
-        },
-        {
-            "faculty_id": "vijayashekar",
-            "subject_code": "dlrllab",
-            "section_id": "7a-B2",
-            "elective_group": "lab_pair_7a_1"
-        },
-        {
-            "faculty_id": "vikas",
-            "subject_code": "ml2",
-            "section_id": "7a-B1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "vikas",
-            "subject_code": "ml2",
-            "section_id": "7a-B2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "vikas",
-            "subject_code": "ml2lab",
-            "section_id": "7a-B1",
-            "elective_group": "lab_pair_7a_1"
-        },
-        {
-            "faculty_id": "vikas",
-            "subject_code": "ml2lab",
-            "section_id": "7a-B2",
-            "elective_group": "lab_pair_7a_2"
-        },
-        {
-            "faculty_id": "jovin",
-            "subject_code": "dsp",
-            "section_id": "7a-B1",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "jovin",
-            "subject_code": "dsp",
-            "section_id": "7a-B2",
-            "elective_group": null
-        },
-        {
-            "faculty_id": "surbhi",
-            "subject_code": "ba",
-            "section_id": "7a-B1",
-            "elective_group": "sem7_elec_common"
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "bda",
-            "section_id": "7a-B2",
-            "elective_group": "sem7_elec_common"
-        },
-        {
-            "faculty_id": "oe_fac_3",
-            "subject_code": "oe7",
-            "section_id": "7a-B1",
-            "elective_group": "oe7_common"
-        },
-        {
-            "faculty_id": "oe_fac_3",
-            "subject_code": "oe7",
-            "section_id": "7a-B2",
-            "elective_group": "oe7_common"
-        },
-        {
-            "faculty_id": "adarsha",
-            "subject_code": "major2",
-            "section_id": "7a-B1",
-            "elective_group": "sem7_proj_common"
-        },
-        {
-            "faculty_id": "anu",
-            "subject_code": "major2",
-            "section_id": "7a-B2",
-            "elective_group": "sem7_proj_common"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STU_HR",
-            "section_id": "6a-E1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "FAC_HR",
-            "section_id": "6a-E1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STU_HR",
-            "section_id": "6a-E2"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "FAC_HR",
-            "section_id": "6a-E2"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STU_HR",
-            "section_id": "6b-E1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "FAC_HR",
-            "section_id": "6b-E1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STU_HR",
-            "section_id": "6b-E2"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "FAC_HR",
-            "section_id": "6b-E2"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "LIB_HR",
-            "section_id": "5a"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STDY_HR",
-            "section_id": "5a"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "LIB_HR",
-            "section_id": "5b"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STDY_HR",
-            "section_id": "5b"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "LIB_HR",
-            "section_id": "7b-B1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STDY_HR",
-            "section_id": "7b-B1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "LIB_HR",
-            "section_id": "7b-B2"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STDY_HR",
-            "section_id": "7b-B2"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "LIB_HR",
-            "section_id": "7a-B1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STDY_HR",
-            "section_id": "7a-B1"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "LIB_HR",
-            "section_id": "7a-B2"
-        },
-        {
-            "faculty_id": "DUMMY_STAFF",
-            "subject_code": "STDY_HR",
-            "section_id": "7a-B2"
-        }
-    ],
-    "scheduling_rules": [
-        {
-            "id": "39f48b77-c0a1-4817-a212-018c69ec1aad",
-            "rule_type": "BEFORE_TIME",
-            "subject_types": [
-                "SOFTSKILL"
-            ],
-            "max_period_index": 4
-        },
-        {
-            "id": "2efa2c48-3e8a-4de4-81fd-0446d3ea9c81",
-            "rule_type": "FIXED_PERIOD",
-            "subject_codes": [
-                "OE"
-            ],
-            "period_index": 2
-        },
-        {
-            "id": "7620deac-8f84-494f-9b54-b0124d61e7e4",
-            "rule_type": "FIXED_DAYS",
-            "subject_codes": [
-                "OE"
-            ],
-            "days": [
-                "MON",
-                "TUE",
-                "WED"
-            ]
-        },
-        {
-            "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-            "rule_type": "FIXED_PERIOD",
-            "subject_codes": [
-                "oe7"
-            ],
-            "period_index": 2
-        },
-        {
-            "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-            "rule_type": "FIXED_DAYS",
-            "subject_codes": [
-                "oe7"
-            ],
-            "days": [
-                "MON",
-                "TUE",
-                "WED"
-            ]
-        }
-    ]
+  "faculties": [
+    {
+      "id": "AI00355",
+      "name": "Dr. Vijayashekar S S",
+      "designation": "Professor",
+      "max_hours": 6
+    },
+    {
+      "id": "AI00378",
+      "name": "Dr. Kavitha Nair R",
+      "designation": "Assoc. Prof",
+      "max_hours": 24
+    },
+    {
+      "id": "AI00755",
+      "name": "Dr. S Anu Pallavi",
+      "designation": "Assoc. Prof",
+      "max_hours": 22
+    },
+    {
+      "id": "AI00425",
+      "name": "Mr. Jovin Deglus",
+      "designation": "Asst. Prof",
+      "max_hours": 24
+    },
+    {
+      "id": "AI00604",
+      "name": "Mr. Syed Musadiq Illahi",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "AI00893",
+      "name": "Mr. Nanda Kumar N",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "AI00822",
+      "name": "Ms. Surbhi",
+      "designation": "Asst. Prof",
+      "max_hours": 22
+    },
+    {
+      "id": "AI01146",
+      "name": "Ms. Vinutha M",
+      "designation": "Asst. Prof",
+      "max_hours": 24
+    },
+    {
+      "id": "AI00825",
+      "name": "Mr. Mhd Tahir Mirji",
+      "designation": "Asst. Prof",
+      "max_hours": 20
+    },
+    {
+      "id": "AI00917",
+      "name": "Mr. Sanjay P",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "AI01204",
+      "name": "Mr. Abhijith S",
+      "designation": "Asst. Prof",
+      "max_hours": 17
+    },
+    {
+      "id": "AI01093",
+      "name": "Mr. Praveen Arokia Raj",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "NTA1",
+      "name": "Nandita Tarikeri",
+      "designation": "TA",
+      "max_hours": 50
+    },
+    {
+      "id": "NF1",
+      "name": "Ranjan Kumar",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "NF2",
+      "name": "Chalasani Jayanth",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "NF3",
+      "name": "NF3",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "BASAV",
+      "name": "Basavaraj",
+      "designation": "Instructor",
+      "max_hours": 50
+    },
+    {
+      "id": "soft",
+      "name": "Soft Skills Trainer",
+      "designation": "Trainer",
+      "max_hours": 50
+    },
+    {
+      "id": "MBA1",
+      "name": "Mr. Yogesh Dixith",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "CIVIL",
+      "name": "CIVIL_1",
+      "designation": "Asst. Prof",
+      "max_hours": 18
+    },
+    {
+      "id": "MATHS",
+      "name": "Maths Department",
+      "designation": "External",
+      "max_hours": 50
+    },
+    {
+      "id": "oe_fac_1",
+      "name": "OE Teacher 1",
+      "designation": "Guest",
+      "max_hours": 18
+    },
+    {
+      "id": "oe_fac_2",
+      "name": "OE Teacher 2",
+      "designation": "Guest",
+      "max_hours": 18
+    },
+    {
+      "id": "oe_fac_3",
+      "name": "OE Teacher 3 (Sem 7)",
+      "designation": "Guest",
+      "max_hours": 18
+    }
+  ],
+  "subjects": [
+    {
+      "code": "DL&RL",
+      "name": "Deep Learning & RL",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "DL&RL Lab",
+      "name": "DL&RL Lab",
+      "type": "LAB",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "ML II",
+      "name": "Machine Learning-II",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "ML II Lab",
+      "name": "ML-II Lab",
+      "type": "LAB",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "DS&P",
+      "name": "Data Security & Privacy",
+      "type": "THEORY",
+      "credits": 4,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "BA",
+      "name": "Business Analytics",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "BDA",
+      "name": "Big Data Analytics",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "OE (Sem 7)",
+      "name": "Open Elective (Sem 7)",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "MP Phase-II (BAI)",
+      "name": "Major Project Phase-II",
+      "type": "FORUM",
+      "credits": 6,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "Intro DBMS",
+      "name": "Introduction to DBMS",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "PP",
+      "name": "Parallel Programming",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "PP Lab",
+      "name": "PP Lab",
+      "type": "LAB",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "SML for DS",
+      "name": "Statistical ML for DS",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "SML for DS Lab",
+      "name": "Statistical ML for DS Lab",
+      "type": "LAB",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "CNS",
+      "name": "Cryptography and Network Security",
+      "type": "THEORY",
+      "credits": 4,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "DL",
+      "name": "Deep Learning",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "MP Phase-II (BCD)",
+      "name": "Major Project Phase-II",
+      "type": "FORUM",
+      "credits": 6,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "SEPM",
+      "name": "Software Engg & Project Management",
+      "type": "THEORY",
+      "credits": 4,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "CN",
+      "name": "Computer Networks",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "CN Lab",
+      "name": "CN Lab",
+      "type": "LAB",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "TOC",
+      "name": "Theory of Computation",
+      "type": "THEORY",
+      "credits": 5,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "DV Lab",
+      "name": "Data Visualization Lab",
+      "type": "LAB",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "Mini Project (BAI)",
+      "name": "Mini Project",
+      "type": "FORUM",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "Mini Project (BCD)",
+      "name": "Mini Project (DS)",
+      "type": "FORUM",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "RM&IPR",
+      "name": "Research Methodology & IPR",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "EVS",
+      "name": "Environmental Studies",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "CV",
+      "name": "Computer Vision",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "EDA",
+      "name": "Exploratory Data Analysis",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "NoSQL DB",
+      "name": "NoSQL Databases",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "DW",
+      "name": "Data Warehousing",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "Maths (Prob & Stats)",
+      "name": "Probability, Distributions and Statistics",
+      "type": "THEORY",
+      "credits": 4,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "DDCO",
+      "name": "Digital Design & Computer Organization",
+      "type": "THEORY",
+      "credits": 5,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "OS",
+      "name": "Operating Systems",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "DSA",
+      "name": "Data Structures and Applications",
+      "type": "THEORY",
+      "credits": 3,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "DSA Lab",
+      "name": "DSA Lab",
+      "type": "LAB",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": true
+    },
+    {
+      "code": "OOP with Java",
+      "name": "OOP with JAVA",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "EDA Lab",
+      "name": "Exploratory Data Analysis Lab",
+      "type": "FORUM",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "PM with Git",
+      "name": "Project Management with GIT",
+      "type": "FORUM",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "PBL",
+      "name": "Project Based Learning",
+      "type": "FORUM",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "Maths LE",
+      "name": "Mathematics for Lateral Entry Students",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "LIB_HR",
+      "name": "Library Hour",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "STU_HR",
+      "name": "Student Hour",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "FAC_HR",
+      "name": "Faculty Hour",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "STDY_HR",
+      "name": "Study Hour",
+      "type": "THEORY",
+      "credits": 1,
+      "is_core": false,
+      "is_heavy": false
+    },
+    {
+      "code": "Soft Skills",
+      "name": "Soft Skills",
+      "type": "SOFTSKILL",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    },
+    {
+      "code": "Forum",
+      "name": "Forum",
+      "type": "FORUM",
+      "credits": 1,
+      "is_core": true,
+      "is_heavy": false
+    }
+  ],
+  "sections": [
+    {
+      "id": "7A",
+      "semester": 7,
+      "strength": 70
+    },
+    {
+      "id": "7B",
+      "semester": 7,
+      "strength": 70
+    },
+    {
+      "id": "5A",
+      "semester": 5,
+      "strength": 70
+    },
+    {
+      "id": "5B",
+      "semester": 5,
+      "strength": 70
+    },
+    {
+      "id": "3A",
+      "semester": 3,
+      "strength": 70
+    },
+    {
+      "id": "3B",
+      "semester": 3,
+      "strength": 70
+    },
+    {
+      "id": "7DS",
+      "semester": 7,
+      "strength": 70
+    },
+    {
+      "id": "5DS",
+      "semester": 5,
+      "strength": 70
+    },
+    {
+      "id": "3DS",
+      "semester": 3,
+      "strength": 70
+    },
+    {
+      "id": "OE_AI",
+      "semester": 1,
+      "strength": 70
+    },
+    {
+      "id": "7A-B1",
+      "semester": 7,
+      "strength": 35
+    },
+    {
+      "id": "7A-B2",
+      "semester": 7,
+      "strength": 35
+    },
+    {
+      "id": "7B-B1",
+      "semester": 7,
+      "strength": 35
+    },
+    {
+      "id": "7B-B2",
+      "semester": 7,
+      "strength": 35
+    },
+    {
+      "id": "7DS-B1",
+      "semester": 7,
+      "strength": 35
+    },
+    {
+      "id": "7DS-B2",
+      "semester": 7,
+      "strength": 35
+    },
+    {
+      "id": "5A-B1",
+      "semester": 5,
+      "strength": 35
+    },
+    {
+      "id": "5A-B2",
+      "semester": 5,
+      "strength": 35
+    },
+    {
+      "id": "5B-B1",
+      "semester": 5,
+      "strength": 35
+    },
+    {
+      "id": "5B-B2",
+      "semester": 5,
+      "strength": 35
+    },
+    {
+      "id": "5DS-B1",
+      "semester": 5,
+      "strength": 35
+    },
+    {
+      "id": "5DS-B2",
+      "semester": 5,
+      "strength": 35
+    },
+    {
+      "id": "3A-B1",
+      "semester": 3,
+      "strength": 35
+    },
+    {
+      "id": "3A-B2",
+      "semester": 3,
+      "strength": 35
+    },
+    {
+      "id": "3B-B1",
+      "semester": 3,
+      "strength": 35
+    },
+    {
+      "id": "3B-B2",
+      "semester": 3,
+      "strength": 35
+    },
+    {
+      "id": "3DS-B1",
+      "semester": 3,
+      "strength": 35
+    },
+    {
+      "id": "3DS-B2",
+      "semester": 3,
+      "strength": 35
+    }
+  ],
+  "rooms": [
+    {
+      "id": "AI09 3F 01",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 3F 03",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 3F 08",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 2F 12",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 2F 13",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 2F 14",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 2F 08",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 1F 25",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI09 1F26",
+      "capacity": 75,
+      "is_lab": false,
+      "building": "ECE BLOCK"
+    },
+    {
+      "id": "AI03 2F 01",
+      "capacity": 40,
+      "is_lab": true,
+      "building": "ASD BLOCK"
+    },
+    {
+      "id": "AI03 2F 02",
+      "capacity": 40,
+      "is_lab": true,
+      "building": "ASD BLOCK"
+    }
+  ],
+  "allocations": [
+    {
+      "faculty_id": "AI00355",
+      "subject_code": "DL&RL",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00355",
+      "subject_code": "DL&RL",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "DL&RL Lab",
+      "section_id": "7A-B1",
+      "elective_group": "lab_pair_7A_2"
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "DL&RL Lab",
+      "section_id": "7A-B2",
+      "elective_group": "lab_pair_7A_1"
+    },
+    {
+      "faculty_id": "AI01093",
+      "subject_code": "DL&RL Lab",
+      "section_id": "7B-B1",
+      "elective_group": "lab_pair_7B_2"
+    },
+    {
+      "faculty_id": "AI01093",
+      "subject_code": "DL&RL Lab",
+      "section_id": "7B-B2",
+      "elective_group": "lab_pair_7B_1"
+    },
+    {
+      "faculty_id": "AI00604",
+      "subject_code": "ML II",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI01204",
+      "subject_code": "ML II",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00604",
+      "subject_code": "ML II Lab",
+      "section_id": "7A-B1",
+      "elective_group": "lab_pair_7A_1"
+    },
+    {
+      "faculty_id": "AI00604",
+      "subject_code": "ML II Lab",
+      "section_id": "7A-B2",
+      "elective_group": "lab_pair_7A_2"
+    },
+    {
+      "faculty_id": "AI01204",
+      "subject_code": "ML II Lab",
+      "section_id": "7B-B1",
+      "elective_group": "lab_pair_7B_1"
+    },
+    {
+      "faculty_id": "AI01204",
+      "subject_code": "ML II Lab",
+      "section_id": "7B-B2",
+      "elective_group": "lab_pair_7B_2"
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "DS&P",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "DS&P",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "MBA1",
+      "subject_code": "BA",
+      "section_id": "7A",
+      "elective_group": "ELEC_7"
+    },
+    {
+      "faculty_id": "MBA1",
+      "subject_code": "BA",
+      "section_id": "7B",
+      "elective_group": "ELEC_7"
+    },
+    {
+      "faculty_id": "MBA1",
+      "subject_code": "BA",
+      "section_id": "7DS",
+      "elective_group": "ELEC_7"
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "BDA",
+      "section_id": "7A",
+      "elective_group": "ELEC_7"
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "BDA",
+      "section_id": "7B",
+      "elective_group": "ELEC_7"
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "DL",
+      "section_id": "7DS",
+      "elective_group": "ELEC_7"
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "Intro DBMS",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "Intro DBMS",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "MP Phase-II (BAI)",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "MP Phase-II (BAI)",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "oe_fac_1",
+      "subject_code": "OE (Sem 7)",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "oe_fac_2",
+      "subject_code": "OE (Sem 7)",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "oe_fac_3",
+      "subject_code": "OE (Sem 7)",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF2",
+      "subject_code": "PP",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF2",
+      "subject_code": "PP Lab",
+      "section_id": "7DS-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF2",
+      "subject_code": "PP Lab",
+      "section_id": "7DS-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "SML for DS",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "SML for DS Lab",
+      "section_id": "7DS-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "SML for DS Lab",
+      "section_id": "7DS-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "CNS",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "MP Phase-II (BCD)",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF3",
+      "subject_code": "SEPM",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF3",
+      "subject_code": "SEPM",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "CN",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "CN",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "CN Lab",
+      "section_id": "5A-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "CN Lab",
+      "section_id": "5A-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "CN Lab",
+      "section_id": "5B-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "CN Lab",
+      "section_id": "5B-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI01146",
+      "subject_code": "TOC",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI01146",
+      "subject_code": "TOC",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "DV Lab",
+      "section_id": "5A-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI01204",
+      "subject_code": "DV Lab",
+      "section_id": "5A-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "DV Lab",
+      "section_id": "5B-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "DV Lab",
+      "section_id": "5B-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00604",
+      "subject_code": "CV",
+      "section_id": "5A",
+      "elective_group": "ELEC_5_AIML"
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "EDA",
+      "section_id": "5A",
+      "elective_group": "ELEC_5_AIML"
+    },
+    {
+      "faculty_id": "AI00604",
+      "subject_code": "CV",
+      "section_id": "5B",
+      "elective_group": "ELEC_5_AIML"
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "EDA",
+      "section_id": "5B",
+      "elective_group": "ELEC_5_AIML"
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "Mini Project (BAI)",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "Mini Project (BAI)",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "BASAV",
+      "subject_code": "RM&IPR",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "BASAV",
+      "subject_code": "RM&IPR",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "CIVIL",
+      "subject_code": "EVS",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "CIVIL",
+      "subject_code": "EVS",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF1",
+      "subject_code": "SEPM",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "CN",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "CN Lab",
+      "section_id": "5DS-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "CN Lab",
+      "section_id": "5DS-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI01146",
+      "subject_code": "TOC",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00604",
+      "subject_code": "DV Lab",
+      "section_id": "5DS-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI01093",
+      "subject_code": "DV Lab",
+      "section_id": "5DS-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "NoSQL DB",
+      "section_id": "5DS",
+      "elective_group": "ELEC_5_DS"
+    },
+    {
+      "faculty_id": "AI01204",
+      "subject_code": "DW",
+      "section_id": "5DS",
+      "elective_group": "ELEC_5_DS"
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "Mini Project (BCD)",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "BASAV",
+      "subject_code": "RM&IPR",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "CIVIL",
+      "subject_code": "EVS",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "MATHS",
+      "subject_code": "Maths (Prob & Stats)",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "MATHS",
+      "subject_code": "Maths (Prob & Stats)",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF1",
+      "subject_code": "DDCO",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF1",
+      "subject_code": "DDCO",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00917",
+      "subject_code": "OS",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI01146",
+      "subject_code": "OS",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "DSA",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "DSA",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "DSA Lab",
+      "section_id": "3A-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "DSA Lab",
+      "section_id": "3A-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "DSA Lab",
+      "section_id": "3B-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "DSA Lab",
+      "section_id": "3B-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NTA1",
+      "subject_code": "OOP with Java",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NTA1",
+      "subject_code": "OOP with Java",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "EDA Lab",
+      "section_id": "3A",
+      "elective_group": "ELEC_3_LAB"
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "EDA Lab",
+      "section_id": "3B",
+      "elective_group": "ELEC_3_LAB"
+    },
+    {
+      "faculty_id": "AI00917",
+      "subject_code": "PM with Git",
+      "section_id": "3A",
+      "elective_group": "ELEC_3_LAB"
+    },
+    {
+      "faculty_id": "AI00917",
+      "subject_code": "PM with Git",
+      "section_id": "3B",
+      "elective_group": "ELEC_3_LAB"
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "PBL",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "PBL",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "MATHS",
+      "subject_code": "Maths LE",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "MATHS",
+      "subject_code": "Maths LE",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "MATHS",
+      "subject_code": "Maths (Prob & Stats)",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NF2",
+      "subject_code": "DDCO",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00917",
+      "subject_code": "OS",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "DSA",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "DSA Lab",
+      "section_id": "3DS-B1",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00917",
+      "subject_code": "DSA Lab",
+      "section_id": "3DS-B2",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NTA1",
+      "subject_code": "OOP with Java",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "EDA Lab",
+      "section_id": "3DS",
+      "elective_group": "ELEC_3_LAB"
+    },
+    {
+      "faculty_id": "NF3",
+      "subject_code": "PM with Git",
+      "section_id": "3DS",
+      "elective_group": "ELEC_3_LAB"
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "PBL",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "MATHS",
+      "subject_code": "Maths LE",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "soft",
+      "subject_code": "Soft Skills",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00822",
+      "subject_code": "Forum",
+      "section_id": "7A",
+      "elective_group": "forum_7"
+    },
+    {
+      "faculty_id": "NF3",
+      "subject_code": "Forum",
+      "section_id": "7B",
+      "elective_group": "forum_7"
+    },
+    {
+      "faculty_id": "AI00917",
+      "subject_code": "Forum",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00893",
+      "subject_code": "Forum",
+      "section_id": "5A",
+      "elective_group": "forum_5"
+    },
+    {
+      "faculty_id": "AI01204",
+      "subject_code": "Forum",
+      "section_id": "5B",
+      "elective_group": "forum_5"
+    },
+    {
+      "faculty_id": "AI01093",
+      "subject_code": "Forum",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "Forum",
+      "section_id": "3A",
+      "elective_group": "forum_3"
+    },
+    {
+      "faculty_id": "AI01146",
+      "subject_code": "Forum",
+      "section_id": "3B",
+      "elective_group": "forum_3"
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "Forum",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "Mini Project (BCD)",
+      "section_id": "5DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "PBL",
+      "section_id": "3A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "PBL",
+      "section_id": "3B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00378",
+      "subject_code": "PBL",
+      "section_id": "3DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "Mini Project (BAI)",
+      "section_id": "5A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "Mini Project (BAI)",
+      "section_id": "5B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00755",
+      "subject_code": "MP Phase-II (BAI)",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00425",
+      "subject_code": "MP Phase-II (BAI)",
+      "section_id": "7B",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "AI00825",
+      "subject_code": "MP Phase-II (BCD)",
+      "section_id": "7DS",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NTA1",
+      "subject_code": "DL&RL",
+      "section_id": "7A",
+      "elective_group": null
+    },
+    {
+      "faculty_id": "NTA1",
+      "subject_code": "DL&RL",
+      "section_id": "7B",
+      "elective_group": null
+    }
+  ],
+  "scheduling_rules": [
+    {
+      "id": "222c1c51-3c69-4ba2-bbbb-80e92bd3be98",
+      "rule_type": "BEFORE_TIME",
+      "subject_codes": [],
+      "subject_types": [
+        "SOFTSKILL"
+      ],
+      "max_period_index": 4
+    },
+    {
+      "id": "4370c524-628f-4674-b1f8-431a03add439",
+      "rule_type": "FIXED_PERIOD",
+      "subject_codes": [
+        "OE (Sem 7)"
+      ],
+      "subject_types": [],
+      "period_index": 2
+    },
+    {
+      "id": "1df09f16-bdee-48a5-87f6-600b46b80b40",
+      "rule_type": "FIXED_DAYS",
+      "subject_codes": [
+        "OE (Sem 7)"
+      ],
+      "subject_types": [],
+      "days": [
+        "MON",
+        "TUE",
+        "WED"
+      ]
+    },
+    {
+      "id": "8125a5e9-6685-45cd-ab70-1fe4ea88d6ff",
+      "rule_type": "BEFORE_TIME",
+      "subject_codes": [],
+      "subject_types": [
+        "FORUM"
+      ],
+      "max_period_index": 4
+    }
+  ]
 }

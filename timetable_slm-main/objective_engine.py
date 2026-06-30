@@ -68,9 +68,14 @@ class ObjectiveEngine:
         self._minimize_subject_repetition()
         self._prioritize_morning_core_subjects()
         self._avoid_late_heavy_subjects()
-        self._minimize_faculty_gaps()
-        self._minimize_campus_movement()
-        self._penalize_first_hour_free()
+        
+        # Disable highly expensive constraints for massive math (large datasets)
+        if len(self.tasks) <= 100:
+            self._minimize_faculty_gaps()
+            self._minimize_campus_movement()
+            self._penalize_first_hour_free()
+        else:
+            print(f"Skipping expensive soft constraints due to massive math (Tasks: {len(self.tasks)})")
 
         # Summation of all penalties
         if self.penalties:

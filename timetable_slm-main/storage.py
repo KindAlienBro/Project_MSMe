@@ -197,6 +197,8 @@ def save_version(label: str = None):
     if not schedule_exists():
         return None
     sched = load_schedule()
+    if not sched:
+        return None
     history = load_history()
     versions = load_versions()
     version_id = str(uuid.uuid4())

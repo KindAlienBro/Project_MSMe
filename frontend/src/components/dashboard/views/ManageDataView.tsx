@@ -450,9 +450,8 @@ export function ManageDataView() {
                                         <input type={f.type} value={formData[f.key] || ''}
                                             list={`${f.key}-datalist`}
                                             onChange={(e) => setFormData({ ...formData, [f.key]: e.target.value })}
-                                            className={`w-full rounded-lg border border-gray-300 p-2 text-sm ${editItem && (f.key === 'id' || f.key === 'code') ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                                            placeholder={f.name}
-                                            disabled={!!editItem && (f.key === 'id' || f.key === 'code')} />
+                                            className="w-full rounded-lg border border-gray-300 p-2 text-sm"
+                                            placeholder={f.name} />
 
                                         {/* Smart Autocomplete Datalists */}
                                         {f.key === 'faculty_id' && (

@@ -376,7 +376,7 @@ export function TimetableView() {
           periodCounter++;
 
           cells.forEach((cell: any) => {
-            if (matchFaculty && cell.faculty !== selectedFaculty) return;
+            if (matchFaculty && !(cell.faculty || '').includes(selectedFaculty)) return;
 
             // Use actual time from the header (e.g., "1:40-2:35")
             const timeSlot = h;

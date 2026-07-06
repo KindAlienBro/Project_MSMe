@@ -684,8 +684,15 @@ def update_faculty(faculty_id: str, faculty: FacultyIn):
     for i, f in enumerate(data["faculties"]):
         if f["id"] == faculty_id:
             updated = faculty.model_dump()
-            updated["id"] = faculty_id
             data["faculties"][i] = updated
+            # Cascade to allocations and scheduling_rules if ID changed
+            if faculty_id != updated["id"]:
+                for a in data.get("allocations", []):
+                    if a.get("faculty_id") == faculty_id:
+                        a["faculty_id"] = updated["id"]
+                for r in data.get("scheduling_rules", []):
+                    if r.get("faculty_id") == faculty_id:
+                        r["faculty_id"] = updated["id"]
             save_data(data)
             return {"message": "Faculty updated.", "faculty": updated}
     raise HTTPException(404, f"Faculty '{faculty_id}' not found.")
@@ -732,8 +739,15 @@ def update_subject(subject_code: str, subject: SubjectIn):
     for i, s in enumerate(data["subjects"]):
         if s["code"] == subject_code:
             updated = subject.model_dump()
-            updated["code"] = subject_code
             data["subjects"][i] = updated
+            # Cascade to allocations and scheduling_rules if code changed
+            if subject_code != updated["code"]:
+                for a in data.get("allocations", []):
+                    if a.get("subject_code") == subject_code:
+                        a["subject_code"] = updated["code"]
+                for r in data.get("scheduling_rules", []):
+                    if subject_code in r.get("subject_codes", []):
+                        r["subject_codes"] = [updated["code"] if c == subject_code else c for c in r["subject_codes"]]
             save_data(data)
             return {"message": "Subject updated.", "subject": updated}
     raise HTTPException(404, f"Subject '{subject_code}' not found.")
@@ -780,8 +794,12 @@ def update_section(section_id: str, section: SectionIn):
     for i, s in enumerate(data["sections"]):
         if s["id"] == section_id:
             updated = section.model_dump()
-            updated["id"] = section_id
             data["sections"][i] = updated
+            # Cascade to allocations if ID changed
+            if section_id != updated["id"]:
+                for a in data.get("allocations", []):
+                    if a.get("section_id") == section_id:
+                        a["section_id"] = updated["id"]
             save_data(data)
             return {"message": "Section updated.", "section": updated}
     raise HTTPException(404, f"Section '{section_id}' not found.")
@@ -836,7 +854,6 @@ def update_room(room_id: str, room: RoomIn):
     for i, r in enumerate(data["rooms"]):
         if r["id"] == room_id:
             updated = room.model_dump()
-            updated["id"] = room_id
             data["rooms"][i] = updated
             save_data(data)
             return {"message": "Room updated.", "room": updated}

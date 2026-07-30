@@ -51,10 +51,12 @@ class ObjectiveEngine:
             "subject_repetition": 10,
             "morning_core": 5,
             "late_heavy": 5,
-            "faculty_gaps": 2,
+            "faculty_gaps": 30,
+            "student_gaps": 100,
+            "isolated_afternoon": 100,
             "campus_movement": 3,
             "faculty_load_balance": 1,
-            "no_first_hour_free": 20
+            "no_first_hour_free": 50
         }
         
         self.penalties: List[cp_model.IntVar] = []
@@ -69,13 +71,11 @@ class ObjectiveEngine:
         self._prioritize_morning_core_subjects()
         self._avoid_late_heavy_subjects()
         
-        # Disable highly expensive constraints for massive math (large datasets)
-        if len(self.tasks) <= 100:
-            self._minimize_faculty_gaps()
-            self._minimize_campus_movement()
-            self._penalize_first_hour_free()
-        else:
-            print(f"Skipping expensive soft constraints due to massive math (Tasks: {len(self.tasks)})")
+        self._minimize_faculty_gaps()
+        self._minimize_student_gaps()
+        self._penalize_isolated_afternoon_classes()
+        self._minimize_campus_movement()
+        self._penalize_first_hour_free()
 
         # Summation of all penalties
         if self.penalties:
@@ -252,6 +252,138 @@ class ObjectiveEngine:
                 self.model.Add(idle_time == 0).OnlyEnforceIf(day_active.Not())
 
                 self.penalties.append(idle_time * weight)
+
+    def _minimize_student_gaps(self):
+        """
+        Penalizes 'idle spans' for students (sections).
+        """
+        weight = self.weights.get("student_gaps", 10)
+        if weight == 0: return
+
+        tasks_by_section = defaultdict(list)
+        for task in self.tasks:
+            tasks_by_section[task.section.section_id].append(task)
+
+        for sec_id, s_tasks in tasks_by_section.items():
+            if not s_tasks:
+                continue
+
+            for day in range(const.NUM_WORKING_DAYS):
+                day_offset_start = day * const.NUM_TEACHING_SLOTS_PER_DAY
+                day_offset_end = (day + 1) * const.NUM_TEACHING_SLOTS_PER_DAY
+
+                day_active = self.model.NewBoolVar(f"sec_active_{sec_id}_{day}")
+                day_start = self.model.NewIntVar(day_offset_start, day_offset_end, f"sec_start_{sec_id}_{day}")
+                day_end = self.model.NewIntVar(day_offset_start, day_offset_end, f"sec_end_{sec_id}_{day}")
+                
+                task_on_day_lits = []
+                total_duration_on_day = self.model.NewIntVar(0, const.NUM_TEACHING_SLOTS_PER_DAY, f"sec_dur_{sec_id}_{day}")
+                
+                durations_sum = []
+
+                for task in s_tasks:
+                    t_start = self.ce.task_vars[task.task_id][0]
+                    t_end = self.ce.task_vars[task.task_id][1]
+                    
+                    is_on_day = self.model.NewBoolVar(f"sec_{task.task_id}_on_day_{day}")
+                    
+                    t_day = self.model.NewIntVar(0, const.NUM_WORKING_DAYS - 1, f"sec_t_day_{task.task_id}_{day}")
+                    self.model.AddDivisionEquality(t_day, t_start, const.NUM_TEACHING_SLOTS_PER_DAY)
+                    
+                    self.model.Add(t_day == day).OnlyEnforceIf(is_on_day)
+                    self.model.Add(t_day != day).OnlyEnforceIf(is_on_day.Not())
+
+                    task_on_day_lits.append(is_on_day)
+
+                    # Update min start and max end for the day ONLY if task is on this day
+                    self.model.Add(day_start <= t_start).OnlyEnforceIf(is_on_day)
+                    self.model.Add(day_end >= t_end).OnlyEnforceIf(is_on_day)
+                    
+                    dur_term = self.model.NewIntVar(0, task.duration, f"sec_dur_term_{task.task_id}_{day}")
+                    self.model.Add(dur_term == task.duration).OnlyEnforceIf(is_on_day)
+                    self.model.Add(dur_term == 0).OnlyEnforceIf(is_on_day.Not())
+                    durations_sum.append(dur_term)
+
+                self.model.Add(sum(task_on_day_lits) > 0).OnlyEnforceIf(day_active)
+                self.model.Add(sum(task_on_day_lits) == 0).OnlyEnforceIf(day_active.Not())
+                
+                self.model.Add(total_duration_on_day == sum(durations_sum))
+
+                span = self.model.NewIntVar(0, const.NUM_TEACHING_SLOTS_PER_DAY, f"sec_span_{sec_id}_{day}")
+                self.model.Add(span == day_end - day_start).OnlyEnforceIf(day_active)
+                self.model.Add(span == 0).OnlyEnforceIf(day_active.Not())
+                
+                idle_time = self.model.NewIntVar(0, const.NUM_TEACHING_SLOTS_PER_DAY, f"sec_idle_{sec_id}_{day}")
+                self.model.Add(idle_time == span - total_duration_on_day).OnlyEnforceIf(day_active)
+                self.model.Add(idle_time == 0).OnlyEnforceIf(day_active.Not())
+
+                self.penalties.append(idle_time * weight)
+
+    def _penalize_isolated_afternoon_classes(self):
+        """
+        Penalizes sections having only 1 or 2 classes (slots) after lunch.
+        Students would rather have either no afternoon classes or a full afternoon.
+        """
+        weight = self.weights.get("isolated_afternoon", 10)
+        if weight == 0: return
+
+        afternoon_start_index = 4 # Index for slots after lunch
+        
+        tasks_by_section = defaultdict(list)
+        for task in self.tasks:
+            tasks_by_section[task.section.section_id].append(task)
+            
+        for sec_id, s_tasks in tasks_by_section.items():
+            for day in range(const.NUM_WORKING_DAYS):
+                afternoon_duration_sum = []
+                
+                for task in s_tasks:
+                    start_var = self.ce.task_vars[task.task_id][0]
+                    
+                    daily_slot = self.model.NewIntVar(0, const.NUM_TEACHING_SLOTS_PER_DAY - 1, f"daily_slot_{task.task_id}_{day}")
+                    self.model.AddModuloEquality(daily_slot, start_var, const.NUM_TEACHING_SLOTS_PER_DAY)
+                    
+                    t_day = self.model.NewIntVar(0, const.NUM_WORKING_DAYS - 1, f"t_day_{task.task_id}_aft_{day}")
+                    self.model.AddDivisionEquality(t_day, start_var, const.NUM_TEACHING_SLOTS_PER_DAY)
+                    
+                    is_on_day = self.model.NewBoolVar(f"is_on_day_{task.task_id}_{day}_aft")
+                    self.model.Add(t_day == day).OnlyEnforceIf(is_on_day)
+                    self.model.Add(t_day != day).OnlyEnforceIf(is_on_day.Not())
+
+                    is_afternoon = self.model.NewBoolVar(f"is_afternoon_{task.task_id}_{day}_aft")
+                    self.model.Add(daily_slot >= afternoon_start_index).OnlyEnforceIf(is_afternoon)
+                    self.model.Add(daily_slot < afternoon_start_index).OnlyEnforceIf(is_afternoon.Not())
+
+                    # Task is on this day AND in the afternoon
+                    is_on_day_and_afternoon = self.model.NewBoolVar(f"is_on_day_and_afternoon_{task.task_id}_{day}")
+                    self.model.AddBoolAnd([is_on_day, is_afternoon]).OnlyEnforceIf(is_on_day_and_afternoon)
+                    
+                    dur_term = self.model.NewIntVar(0, task.duration, f"aft_dur_{task.task_id}_{day}")
+                    self.model.Add(dur_term == task.duration).OnlyEnforceIf(is_on_day_and_afternoon)
+                    self.model.Add(dur_term == 0).OnlyEnforceIf(is_on_day_and_afternoon.Not())
+                    
+                    afternoon_duration_sum.append(dur_term)
+                    
+                total_afternoon_dur = self.model.NewIntVar(0, const.NUM_TEACHING_SLOTS_PER_DAY, f"tot_aft_dur_{sec_id}_{day}")
+                if afternoon_duration_sum:
+                    self.model.Add(total_afternoon_dur == sum(afternoon_duration_sum))
+                else:
+                    self.model.Add(total_afternoon_dur == 0)
+                    
+                # We want to penalize if total_afternoon_dur is 1 or 2.
+                is_dur_1 = self.model.NewBoolVar(f"is_dur_1_{sec_id}_{day}")
+                self.model.Add(total_afternoon_dur == 1).OnlyEnforceIf(is_dur_1)
+                self.model.Add(total_afternoon_dur != 1).OnlyEnforceIf(is_dur_1.Not())
+
+                is_dur_2 = self.model.NewBoolVar(f"is_dur_2_{sec_id}_{day}")
+                self.model.Add(total_afternoon_dur == 2).OnlyEnforceIf(is_dur_2)
+                self.model.Add(total_afternoon_dur != 2).OnlyEnforceIf(is_dur_2.Not())
+
+                is_isolated = self.model.NewBoolVar(f"is_isolated_{sec_id}_{day}")
+                self.model.AddBoolOr([is_dur_1, is_dur_2]).OnlyEnforceIf(is_isolated)
+                self.model.AddBoolAnd([is_dur_1.Not(), is_dur_2.Not()]).OnlyEnforceIf(is_isolated.Not())
+                
+                self.penalties.append(is_isolated * weight)
 
     def _minimize_campus_movement(self):
         """

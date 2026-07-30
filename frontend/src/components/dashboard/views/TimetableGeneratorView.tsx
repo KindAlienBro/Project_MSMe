@@ -163,6 +163,7 @@ export function TimetableGeneratorView() {
     const [availableSemesters, setAvailableSemesters] = useState<number[]>([]);
     const [semesterType, setSemesterType] = useState<'ODD' | 'EVEN' | null>(null);
     const [selectedSemesters, setSelectedSemesters] = useState<number[]>([]);
+    const [lockedSemestersStr, setLockedSemestersStr] = useState<string>('');
 
     // ── Load timetable on mount ──────────────────────────────────────────
     useEffect(() => {
@@ -243,9 +244,15 @@ export function TimetableGeneratorView() {
         setIsGenerating(true);
         setError(null);
         try {
+            const lockedSems = lockedSemestersStr
+                .split(',')
+                .map(s => parseInt(s.trim()))
+                .filter(n => !isNaN(n));
+
             const res = await axios.post(`${HF_API}/generate`, {
                 time_limit_seconds: timeLimit,
                 semesters: selectedSemesters.length > 0 ? selectedSemesters : undefined,
+                locked_semesters: lockedSems.length > 0 ? lockedSems : undefined,
                 version_label: versionLabel.trim() ? versionLabel.trim() : undefined,
             });
             if (res.data.status === 'OPTIMAL' || res.data.status === 'FEASIBLE') {
@@ -514,16 +521,27 @@ export function TimetableGeneratorView() {
                 </div>
 
                 <div className="border-t border-gray-100 pt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
                                 ⏱ Solver Time Limit: <span className="text-blue-600">{timeLimit}s</span>
                             </label>
-                            <input type="range" min={10} max={240} value={timeLimit}
+                            <input type="range" min={10} max={1800} value={timeLimit}
                                 onChange={e => setTimeLimit(parseInt(e.target.value))}
                                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                             />
-                            <div className="flex justify-between text-xs text-gray-400 mt-1"><span>10s</span><span>240s</span></div>
+                            <div className="flex justify-between text-xs text-gray-400 mt-1"><span>10s</span><span>1800s</span></div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                🔒 Locked Semesters :
+                            </label>
+                            <input type="text" value={lockedSemestersStr}
+                                onChange={e => setLockedSemestersStr(e.target.value)}
+                                placeholder="e.g. 7"
+                                className="w-full rounded-lg border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Leave empty for none. These won't be modified.</p>
                         </div>
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -534,7 +552,7 @@ export function TimetableGeneratorView() {
                                 placeholder="e.g. Midterm Schedule v1"
                                 className="w-full rounded-lg border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500"
                             />
-                            <p className="text-xs text-gray-500 mt-1">Provide a label before regenerating or clearing to name the snapshot.</p>
+                            <p className="text-xs text-gray-500 mt-1">Provide a label to name the snapshot.</p>
                         </div>
                     </div>
                 </div>

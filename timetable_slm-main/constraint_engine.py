@@ -18,7 +18,9 @@ class ConstraintEngine:
         rooms: List[Room],
         max_continuous_stretch: int = 3,
         slm_constraints: List[Dict[str, Any]] = None,
-        scheduling_rules: List[Dict[str, Any]] = None
+        scheduling_rules: List[Dict[str, Any]] = None,
+        locked_schedule: Dict[str, Any] = None,
+        locked_semesters: List[int] = None
     ):
         self.model = model
         self.tasks = tasks
@@ -28,6 +30,8 @@ class ConstraintEngine:
         self.max_continuous_stretch = max_continuous_stretch
         self.slm_constraints = slm_constraints or []
         self.scheduling_rules = scheduling_rules or []
+        self.locked_schedule = locked_schedule or {}
+        self.locked_semesters = set(locked_semesters or [])
         self.room_map = {room.room_id: i for i, room in enumerate(self.rooms)}
         self.task_vars: Dict[str, TaskVariables] = {}
 
@@ -40,15 +44,31 @@ class ConstraintEngine:
 
     def _create_task_variables(self):
         for task in self.tasks:
-            allowed_starts = self._get_allowed_start_slots(task)
-            start_domain = cp_model.Domain.FromValues(allowed_starts)
-            start_var = self.model.NewIntVarFromDomain(start_domain, name=f"{task.task_id}_start")
+            is_locked = task.section.semester in self.locked_semesters
+            
+            if is_locked and task.task_id in self.locked_schedule:
+                # Force the task to the exact slot and room from the existing schedule
+                locked_info = self.locked_schedule[task.task_id]
+                start_slot = locked_info["start_slot"]
+                room_id = locked_info["room_id"]
+                room_index = self.room_map.get(room_id, 0) # Fallback to 0 if missing
+
+                start_domain = cp_model.Domain.FromValues([start_slot])
+                start_var = self.model.NewIntVarFromDomain(start_domain, name=f"{task.task_id}_start")
+                
+                room_domain = cp_model.Domain.FromValues([room_index])
+                room_var = self.model.NewIntVarFromDomain(room_domain, name=f"{task.task_id}_room")
+            else:
+                allowed_starts = self._get_allowed_start_slots(task)
+                start_domain = cp_model.Domain.FromValues(allowed_starts)
+                start_var = self.model.NewIntVarFromDomain(start_domain, name=f"{task.task_id}_start")
+
+                allowed_room_indices = self._get_allowed_rooms(task)
+                room_domain = cp_model.Domain.FromValues(allowed_room_indices)
+                room_var = self.model.NewIntVarFromDomain(room_domain, name=f"{task.task_id}_room")
+
             end_var = self.model.NewIntVar(0, const.TOTAL_TEACHING_SLOTS_PER_WEEK, name=f"{task.task_id}_end")
             interval_var = self.model.NewIntervalVar(start_var, task.duration, end_var, name=f"{task.task_id}_interval")
-
-            allowed_room_indices = self._get_allowed_rooms(task)
-            room_domain = cp_model.Domain.FromValues(allowed_room_indices)
-            room_var = self.model.NewIntVarFromDomain(room_domain, name=f"{task.task_id}_room")
 
             self.task_vars[task.task_id] = (start_var, end_var, interval_var, room_var)
 

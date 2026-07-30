@@ -2,6 +2,7 @@
 
 from typing import List, Dict, Optional, Any, Tuple
 from ortools.sat.python import cp_model
+import os
 
 from models import Task, Faculty, Section, Room
 from constraint_engine import ConstraintEngine
@@ -24,17 +25,22 @@ class TimetableSolver:
         enable_soft_constraints: bool = True,
         soft_constraint_weights: Dict[str, int] = None,
         log_search_progress: bool = True,
-        num_workers: int = 8,
+        num_workers: int = None,
         slm_constraints: List[Dict[str, Any]] = None,
         scheduling_rules: List[Dict[str, Any]] = None,
+        locked_schedule: Dict[str, Any] = None,
+        locked_semesters: List[int] = None,
     ) -> Tuple[str, Optional[Dict[str, Any]]]:
+        if num_workers is None:
+            num_workers = os.cpu_count() or 8
 
         # 1. Hard constraints
         print("Initializing Constraint Engine...")
         self.constraint_engine = ConstraintEngine(
             model=self.model, tasks=self.tasks, faculties=self.faculties,
             sections=self.sections, rooms=self.rooms,
-            slm_constraints=slm_constraints, scheduling_rules=scheduling_rules
+            slm_constraints=slm_constraints, scheduling_rules=scheduling_rules,
+            locked_schedule=locked_schedule, locked_semesters=locked_semesters
         )
         self.constraint_engine.apply_all_constraints()
 

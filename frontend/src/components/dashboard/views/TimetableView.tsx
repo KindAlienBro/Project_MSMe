@@ -219,7 +219,9 @@ export function TimetableView() {
       Object.values(secObj.slots).forEach((dayObj: any) => {
         Object.values(dayObj).forEach((slotItems: any) => {
           slotItems.forEach((item: any) => {
-            if (item.faculty) faculties.add(item.faculty);
+            if (item.faculty) {
+              item.faculty.split(' / ').forEach((f: string) => faculties.add(f.trim()));
+            }
           });
         });
       });

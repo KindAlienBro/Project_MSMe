@@ -244,6 +244,7 @@ class GenerateRequest(BaseModel):
     time_limit_seconds: int = 30
     version_label: Optional[str] = None
     semesters: Optional[List[int]] = None  # e.g. [5, 7] for odd sems only
+    locked_semesters: Optional[List[int]] = None
 
 class UpdateRequest(BaseModel):
     prompt: str
@@ -978,37 +979,43 @@ def generate(req: GenerateRequest):
             raise HTTPException(400, f"Missing data for: {', '.join(missing)}.")
 
         # ── Semester filtering ────────────────────────────────────────────
-        if req.semesters:
-            selected_sems = set(req.semesters)
-            # 1. Filter sections to only selected semesters
-            data["sections"] = [
-                s for s in data["sections"] if s["semester"] in selected_sems
-            ]
-            if not data["sections"]:
-                raise HTTPException(400, f"No sections found for semesters: {req.semesters}")
+        has_sems = bool(req.semesters)
+        has_locked = bool(req.locked_semesters)
+        if has_sems or has_locked:
+            selected_sems = set(req.semesters or [])
+            locked_sems = set(req.locked_semesters or [])
+            combined_sems = selected_sems.union(locked_sems)
+            
+            if combined_sems:
+                # 1. Filter sections to only combined semesters
+                data["sections"] = [
+                    s for s in data["sections"] if s["semester"] in combined_sems
+                ]
+                if not data["sections"]:
+                    raise HTTPException(400, f"No sections found for semesters: {combined_sems}")
 
-            # 2. Filter allocations to only reference surviving sections
-            valid_section_ids = {s["id"] for s in data["sections"]}
-            data["allocations"] = [
-                a for a in data["allocations"]
-                if a["section_id"] in valid_section_ids
-            ]
+                # 2. Filter allocations to only reference surviving sections
+                valid_section_ids = {s["id"] for s in data["sections"]}
+                data["allocations"] = [
+                    a for a in data["allocations"]
+                    if a["section_id"] in valid_section_ids
+                ]
 
-            # 3. Filter subjects to only those referenced by surviving allocations
-            used_subject_codes = {a["subject_code"] for a in data["allocations"]}
-            data["subjects"] = [
-                s for s in data["subjects"] if s["code"] in used_subject_codes
-            ]
+                # 3. Filter subjects to only those referenced by surviving allocations
+                used_subject_codes = {a["subject_code"] for a in data["allocations"]}
+                data["subjects"] = [
+                    s for s in data["subjects"] if s["code"] in used_subject_codes
+                ]
 
-            # 4. Filter faculties to only those referenced by surviving allocations
-            used_faculty_ids = {a["faculty_id"] for a in data["allocations"]}
-            data["faculties"] = [
-                f for f in data["faculties"] if f["id"] in used_faculty_ids
-            ]
+                # 4. Filter faculties to only those referenced by surviving allocations
+                used_faculty_ids = {a["faculty_id"] for a in data["allocations"]}
+                data["faculties"] = [
+                    f for f in data["faculties"] if f["id"] in used_faculty_ids
+                ]
 
-            print(f"[generate] Filtered to semesters {req.semesters}: "
-                  f"{len(data['sections'])} sections, {len(data['allocations'])} allocations, "
-                  f"{len(data['subjects'])} subjects, {len(data['faculties'])} faculties")
+                print(f"[generate] Filtered to combined semesters {combined_sems}: "
+                      f"{len(data['sections'])} sections, {len(data['allocations'])} allocations, "
+                      f"{len(data['subjects'])} subjects, {len(data['faculties'])} faculties")
 
         facs, subs, secs, rooms, allocs = _build_objects(data)
         tasks = prepare_scheduling_tasks(allocs, facs, subs, secs)
@@ -1016,12 +1023,21 @@ def generate(req: GenerateRequest):
         if not tasks:
             raise HTTPException(400, "No schedulable tasks found. Check your allocations.")
 
+        locked_schedule = {}
+        if req.locked_semesters:
+            if schedule_exists():
+                locked_schedule = load_schedule()
+            else:
+                raise HTTPException(400, "Cannot lock semesters: no existing schedule found.")
+
         solver = TimetableSolver(tasks, facs, secs, rooms)
         try:
             status, solution = solver.solve(
                 time_limit_seconds=req.time_limit_seconds,
                 enable_soft_constraints=True,
                 scheduling_rules=data.get("scheduling_rules", []),
+                locked_schedule=locked_schedule,
+                locked_semesters=req.locked_semesters
             )
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
